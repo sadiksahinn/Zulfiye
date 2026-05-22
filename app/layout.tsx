@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 export const metadata: Metadata = {
   title: "MAUNA Couture ERP",
   description: "Luxury couture management system",
-  manifest: "/manifest.json",
-  themeColor: "#b69463",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "MAUNA",
-  },
 };
 
 export default function RootLayout({
@@ -20,7 +14,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }
