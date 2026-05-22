@@ -187,3 +187,22 @@ input[type=number] {
     padding-bottom: 90px;
   }
 }
+
+.mobile-menu-button,
+.mobile-app-nav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-button {
+    display: flex !important;
+  }
+
+  .mobile-app-nav {
+    display: grid !important;
+  }
+
+  .desktop-sidebar {
+    display: none !important;
+  }
+}

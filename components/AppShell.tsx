@@ -52,7 +52,7 @@ export default function AppShell({
     <main className="min-h-screen bg-[#f7f0e7] pb-28 text-[#211b16] lg:pb-0">
       <button
         onClick={() => setOpen(true)}
-        className="fixed left-4 top-4 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#211b16] text-white shadow-xl lg:hidden"
+        className="mobile-menu-button fixed left-4 top-4 z-50 h-12 w-12 items-center justify-center rounded-2xl bg-[#211b16] text-white shadow-xl lg:hidden"
       >
         <Menu size={22} />
       </button>
@@ -89,7 +89,7 @@ export default function AppShell({
       )}
 
       <div className="mx-auto flex w-full max-w-[1600px] gap-5 p-2 lg:p-6">
-        <aside className="hidden w-[300px] shrink-0 rounded-[2rem] bg-[#171411] p-5 text-white shadow-2xl lg:block">
+        <aside className="desktop-sidebar hidden w-[300px] shrink-0 rounded-[2rem] bg-[#171411] p-5 text-white shadow-2xl lg:block">
           <div className="mb-8 flex items-center gap-4">
             <div className="h-14 w-14 rounded-2xl bg-white p-2">
               <img
@@ -127,7 +127,7 @@ export default function AppShell({
         </section>
       </div>
 
-      <nav className="fixed bottom-4 left-3 right-3 z-[75] grid grid-cols-5 gap-2 rounded-[1.6rem] bg-[#171411]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,.35)] backdrop-blur-xl lg:hidden">
+      <nav className="mobile-app-nav fixed bottom-4 left-3 right-3 z-[75] grid-cols-5 gap-2 rounded-[1.6rem] bg-[#171411]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,.35)] backdrop-blur-xl lg:hidden">
         <a
           href="/dashboard"
           className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-bold text-white"
