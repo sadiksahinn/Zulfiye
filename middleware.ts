@@ -1,25 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/", "/forgot-password", "/reset-password"];
-
-export function middleware(req: NextRequest) {
-  const token =
-    req.cookies.get("sb-access-token") ||
-    req.cookies.get("supabase-auth-token");
-
-  const { pathname } = req.nextUrl;
-
-  const isPublic = publicRoutes.includes(pathname);
-
-  if (!token && !isPublic) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  if (token && pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
+export function middleware(_req: NextRequest) {
   return NextResponse.next();
 }
 
