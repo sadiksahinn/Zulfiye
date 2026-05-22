@@ -45,6 +45,26 @@ export default function AppShell({
   ];
 
   return (
+    
+      <a
+        href="/products"
+        style={{
+          position: "fixed",
+          top: "18px",
+          right: "18px",
+          zIndex: 999999999,
+          background: "#b69463",
+          color: "white",
+          padding: "14px 20px",
+          borderRadius: "18px",
+          fontWeight: 900,
+          boxShadow: "0 15px 45px rgba(0,0,0,.35)",
+          textDecoration: "none"
+        }}
+      >
+        MENÜ TEST
+      </a>
+
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
       <div className="mx-auto flex w-full max-w-[1700px] gap-6 p-0 lg:p-6">
         
