@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
-  Menu,
-  X,
-  Home,
-  Package,
-  CalendarDays,
+  LayoutDashboard,
+  Users,
   ShoppingBag,
-  Grid3X3,
+  CalendarDays,
+  Settings,
 } from "lucide-react";
 
 export default function AppShell({
@@ -18,124 +16,102 @@ export default function AppShell({
   title: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
-
   const menu = [
-    ["Anasayfa", "/dashboard"],
-    ["Satış", "/sales"],
-    ["Müşteriler", "/customers"],
-    ["Ürünler", "/products"],
-    ["Kiralama", "/rentals"],
-    ["İade", "/returns"],
-    ["Takvim", "/calendar"],
-    ["SMS", "/sms"],
-    ["Muhasebe", "/accounting"],
-    ["Raporlar", "/reports"],
-    ["Ayarlar", "/settings"],
+    {
+      name: "Anasayfa",
+      href: "/dashboard",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Müşteri",
+      href: "/customers",
+      icon: Users,
+    },
+    {
+      name: "Ürün",
+      href: "/products",
+      icon: ShoppingBag,
+    },
+    {
+      name: "Takvim",
+      href: "/calendar",
+      icon: CalendarDays,
+    },
+    {
+      name: "Ayar",
+      href: "/settings",
+      icon: Settings,
+    },
   ];
 
-  const MenuList = () => (
-    <div className="space-y-2">
-      {menu.map(([name, href]) => (
-        <a
-          key={href}
-          href={href}
-          className="block rounded-2xl px-4 py-3 text-sm font-semibold text-zinc-200 hover:bg-white/10"
-        >
-          {name}
-        </a>
-      ))}
-    </div>
-  );
-
   return (
-    <main className="min-h-screen bg-[#f7f0e7] pb-28 text-[#211b16] lg:pb-0">
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          position: "fixed",
-          top: "calc(env(safe-area-inset-top) + 14px)",
-          right: "14px",
-          zIndex: 99999,
-          display: "flex",
-        }}
-        className="h-14 items-center gap-2 rounded-2xl bg-[#211b16] px-5 text-white shadow-2xl lg:hidden"
-      >
-        <Menu size={22} />
-        <span className="text-sm font-bold">Menü</span>
-      </button>
-
-      {open && (
-        <div className="fixed inset-0 z-[90] lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setOpen(false)}
-          />
-
-          <aside className="absolute bottom-3 left-3 top-3 w-[82vw] max-w-[320px] overflow-auto rounded-[1.5rem] bg-[#171411] p-5 text-white shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold tracking-[0.18em]">
-                  MAUNA
-                </div>
-                <div className="text-xs tracking-[0.28em] text-[#d8be8d]">
-                  COUTURE ERP
-                </div>
-              </div>
-
-              <button
-                onClick={() => setOpen(false)}
-                className="rounded-xl bg-white/10 p-3"
-              >
-                <X size={20} />
-              </button>
+    <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
+      <div className="mx-auto flex w-full max-w-[1700px] gap-6 p-0 lg:p-6">
+        
+        {/* DESKTOP SIDEBAR */}
+        <aside className="hidden lg:block w-[300px] shrink-0 rounded-[2rem] bg-[#171411] p-5 text-white shadow-2xl">
+          <div className="mb-8">
+            <div className="text-3xl font-black tracking-[0.25em]">
+              MAUNA
             </div>
-
-            <MenuList />
-          </aside>
-        </div>
-      )}
-
-      <div className="mx-auto flex w-full max-w-[1600px] gap-5 p-2 lg:p-6">
-        <aside className="desktop-sidebar hidden w-[300px] shrink-0 rounded-[2rem] bg-[#171411] p-5 text-white shadow-2xl lg:block">
-          <div className="mb-8 flex items-center gap-4">
-            <div className="h-14 w-14 rounded-2xl bg-white p-2">
-              <img
-                src="/mauna-logo.png"
-                alt="MAUNA"
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            <div>
-              <div className="text-2xl font-bold tracking-[0.18em]">
-                MAUNA
-              </div>
-              <div className="text-xs tracking-[0.28em] text-[#d8be8d]">
-                COUTURE ERP
-              </div>
+            <div className="text-xs tracking-[0.3em] text-[#d8be8d]">
+              COUTURE ERP
             </div>
           </div>
 
-          <MenuList />
+          <div className="space-y-2">
+            {menu.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="block rounded-2xl px-4 py-4 text-sm font-semibold text-zinc-200 transition hover:bg-white/10"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
         </aside>
 
-        <section className="min-w-0 flex-1 rounded-[1.3rem] border border-white/70 bg-white/50 shadow-xl backdrop-blur-xl lg:rounded-[2rem]">
-          <header className="border-b border-white/70 px-4 pb-4 pt-20 lg:px-8 lg:py-7">
+        {/* CONTENT */}
+        <section className="min-w-0 flex-1 rounded-none lg:rounded-[2rem] border border-white/70 bg-white/60 shadow-xl backdrop-blur-xl">
+          
+          <header className="px-5 pb-6 pt-10 lg:px-8 lg:pt-8">
             <p className="text-[10px] tracking-[0.32em] text-[#b69463]">
               MAUNA COUTURE OPERATING SYSTEM
             </p>
 
-            <h1 className="mt-2 text-[30px] font-semibold leading-none tracking-[-0.04em] lg:text-5xl">
+            <h1 className="mt-2 text-[30px] font-black tracking-[-0.05em] lg:text-5xl">
               {title}
             </h1>
           </header>
 
-          <div className="p-3 lg:p-8">{children}</div>
+          <div className="p-3 pb-28 lg:p-8">
+            {children}
+          </div>
         </section>
       </div>
 
-      
+      {/* MOBILE TAB BAR */}
+      <nav className="fixed bottom-0 left-0 right-0 z-[99999] border-t border-[#eadfce] bg-white/95 backdrop-blur-xl lg:hidden">
+        <div className="grid grid-cols-5">
+          {menu.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center justify-center gap-1 py-3 text-[#7d6c58]"
+              >
+                <Icon size={22} strokeWidth={2.2} />
+                <span className="text-[11px] font-semibold">
+                  {item.name}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+      </nav>
     </main>
   );
 }
