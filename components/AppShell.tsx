@@ -52,9 +52,17 @@ export default function AppShell({
     <main className="min-h-screen bg-[#f7f0e7] pb-28 text-[#211b16] lg:pb-0">
       <button
         onClick={() => setOpen(true)}
-        className="mobile-menu-button fixed left-4 top-4 z-50 h-12 w-12 items-center justify-center rounded-2xl bg-[#211b16] text-white shadow-xl lg:hidden"
+        style={{
+          position: "fixed",
+          top: "calc(env(safe-area-inset-top) + 14px)",
+          right: "14px",
+          zIndex: 99999,
+          display: "flex",
+        }}
+        className="h-14 items-center gap-2 rounded-2xl bg-[#211b16] px-5 text-white shadow-2xl lg:hidden"
       >
         <Menu size={22} />
+        <span className="text-sm font-bold">Menü</span>
       </button>
 
       {open && (
@@ -127,47 +135,7 @@ export default function AppShell({
         </section>
       </div>
 
-      <nav className="mobile-app-nav fixed bottom-4 left-3 right-3 z-[75] grid-cols-5 gap-2 rounded-[1.6rem] bg-[#171411]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,.35)] backdrop-blur-xl lg:hidden">
-        <a
-          href="/dashboard"
-          className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-bold text-white"
-        >
-          <Home size={20} />
-          Ana
-        </a>
-
-        <a
-          href="/products"
-          className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-bold text-white"
-        >
-          <Package size={20} />
-          Ürün
-        </a>
-
-        <a
-          href="/rentals"
-          className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-[#b69463] px-2 py-3 text-[11px] font-bold text-white shadow-lg"
-        >
-          <ShoppingBag size={20} />
-          Kirala
-        </a>
-
-        <a
-          href="/calendar"
-          className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-bold text-white"
-        >
-          <CalendarDays size={20} />
-          Takvim
-        </a>
-
-        <button
-          onClick={() => setOpen(true)}
-          className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 text-[11px] font-bold text-white"
-        >
-          <Grid3X3 size={20} />
-          Menü
-        </button>
-      </nav>
+      
     </main>
   );
 }
