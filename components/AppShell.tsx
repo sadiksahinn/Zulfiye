@@ -1,13 +1,6 @@
 "use client";
 
 import React from "react";
-import {
-  LayoutDashboard,
-  Users,
-  ShoppingBag,
-  CalendarDays,
-  Settings,
-} from "lucide-react";
 
 export default function AppShell({
   title,
@@ -17,32 +10,42 @@ export default function AppShell({
   children: React.ReactNode;
 }) {
   const menu = [
-    { name: "Anasayfa", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Müşteri", href: "/customers", icon: Users },
-    { name: "Ürün", href: "/products", icon: ShoppingBag },
-    { name: "Takvim", href: "/calendar", icon: CalendarDays },
-    { name: "Ayar", href: "/settings", icon: Settings },
+    ["Anasayfa", "/dashboard"],
+    ["Satış", "/sales"],
+    ["Müşteriler", "/customers"],
+    ["Ürünler", "/products"],
+    ["Kiralama", "/rentals"],
+    ["İade", "/returns"],
+    ["Takvim", "/calendar"],
+    ["SMS", "/sms"],
+    ["Muhasebe", "/accounting"],
+    ["Raporlar", "/reports"],
+    ["Personel", "/staff"],
+    ["Ayarlar", "/settings"],
   ];
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
       <div className="mx-auto flex w-full max-w-[1700px] gap-6 p-0 lg:p-6">
         <aside className="hidden w-[300px] shrink-0 rounded-[2rem] bg-[#171411] p-5 text-white shadow-2xl lg:block">
-          <div className="mb-8">
-            <div className="text-3xl font-black tracking-[0.25em]">MAUNA</div>
-            <div className="text-xs tracking-[0.3em] text-[#d8be8d]">
-              COUTURE ERP
+          <div className="mb-8 flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white p-2 shadow-lg">
+              <img src="/mauna-logo.png" alt="MAUNA" className="h-full w-full object-contain" />
+            </div>
+            <div>
+              <div className="text-2xl font-black tracking-[0.18em]">MAUNA</div>
+              <div className="text-xs tracking-[0.28em] text-[#d8be8d]">COUTURE v1</div>
             </div>
           </div>
 
           <div className="space-y-2">
-            {menu.map((item) => (
+            {menu.map(([name, href]) => (
               <a
-                key={item.href}
-                href={item.href}
-                className="block rounded-2xl px-4 py-4 text-sm font-semibold text-zinc-200 transition hover:bg-white/10"
+                key={href}
+                href={href}
+                className="block rounded-2xl px-4 py-3.5 text-sm font-semibold text-zinc-200 transition hover:bg-white/10"
               >
-                {item.name}
+                {name}
               </a>
             ))}
           </div>
@@ -62,25 +65,6 @@ export default function AppShell({
           <div className="p-3 pb-28 lg:p-8">{children}</div>
         </section>
       </div>
-
-      <nav className="fixed bottom-0 left-0 right-0 z-[99999] border-t border-[#eadfce] bg-white/95 backdrop-blur-xl lg:hidden">
-        <div className="grid grid-cols-5">
-          {menu.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                className="flex flex-col items-center justify-center gap-1 py-3 text-[#7d6c58]"
-              >
-                <Icon size={22} strokeWidth={2.2} />
-                <span className="text-[11px] font-semibold">{item.name}</span>
-              </a>
-            );
-          })}
-        </div>
-      </nav>
     </main>
   );
 }
