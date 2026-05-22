@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f7f0e7;
   --foreground: #171717;
 }
 
@@ -12,15 +12,103 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Text Selection */
+::selection {
+  background: #b69463;
+  color: #fff;
+}
+
+/* Premium Cards */
+.premium-card {
+  border-radius: 2rem;
+  border: 1px solid rgba(234, 223, 206, 0.9);
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 80px rgba(118, 93, 60, 0.12);
+}
+
+/* Premium Titles */
+.premium-title {
+  color: #211b16;
+  letter-spacing: -0.04em;
+  font-weight: 650;
+}
+
+/* Premium Muted Text */
+.premium-muted {
+  color: #7a6d5e;
+}
+
+/* Premium Button */
+.premium-button {
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #b69463, #d8bd84);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 18px 45px rgba(182,148,99,0.25);
+  transition: all .2s ease;
+}
+
+.premium-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 24px 55px rgba(182,148,99,0.35);
+}
+
+/* Inputs */
+.input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid #e6dbcf;
+  background: rgba(255,255,255,0.82);
+  padding: 1rem 1.25rem;
+  outline: none;
+  color: #1f1b16;
+  transition: all .2s ease;
+}
+
+.input:focus {
+  border-color: #b69463;
+  box-shadow: 0 0 0 4px rgba(182,148,99,0.12);
+}
+
+/* Number input arrows kaldır */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Money Input */
+.money-input-wrapper {
+  position: relative;
+}
+
+.money-input {
+  padding-right: 4rem !important;
+}
+
+.money-badge {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8b7a66;
+  font-weight: 700;
+  pointer-events: none;
+  font-size: 0.95rem;
+}
+
+/* Smooth */
+* {
+  scroll-behavior: smooth;
 }
