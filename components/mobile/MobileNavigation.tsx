@@ -1,23 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 export default function MobileNavigation() {
   const [open, setOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    function check() {
-      setIsMobile(window.innerWidth <= 1024);
-    }
-
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  if (!isMobile) return null;
 
   const links = [
     ["Anasayfa", "/dashboard"],
@@ -39,15 +26,15 @@ export default function MobileNavigation() {
         onClick={() => setOpen(true)}
         style={{
           position: "fixed",
-          right: 16,
-          top: 16,
+          right: "16px",
+          top: "16px",
           zIndex: 2147483647,
           display: "flex",
           alignItems: "center",
-          gap: 8,
+          gap: "8px",
           background: "#171411",
           color: "white",
-          borderRadius: 18,
+          borderRadius: "18px",
           padding: "14px 18px",
           boxShadow: "0 18px 50px rgba(0,0,0,.35)",
           border: "1px solid rgba(255,255,255,.16)",
@@ -82,7 +69,7 @@ export default function MobileNavigation() {
               boxShadow: "0 25px 90px rgba(0,0,0,.45)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
               <div>
                 <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: 4 }}>MAUNA</div>
                 <div style={{ fontSize: 11, letterSpacing: 3, color: "#d8be8d" }}>COUTURE ERP</div>
@@ -90,11 +77,7 @@ export default function MobileNavigation() {
 
               <button
                 onClick={() => setOpen(false)}
-                style={{
-                  background: "rgba(255,255,255,.12)",
-                  borderRadius: 14,
-                  padding: 12,
-                }}
+                style={{ background: "rgba(255,255,255,.12)", borderRadius: 14, padding: 12 }}
               >
                 <X size={22} />
               </button>
