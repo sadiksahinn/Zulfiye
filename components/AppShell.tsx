@@ -117,19 +117,19 @@ export default function AppShell({
         </div>
       )}
 
-      <div className="relative z-10 flex min-h-screen p-4 lg:p-6 gap-6">
+      <div className="relative z-10 flex min-h-screen p-2 lg:p-6 gap-6">
         <div className="hidden lg:block">
           <Sidebar />
         </div>
 
-        <section className="flex-1 overflow-auto rounded-[2.2rem] border border-white/70 bg-white/45 shadow-[0_30px_100px_rgba(118,93,60,0.14)] backdrop-blur-2xl">
-          <header className="sticky top-0 z-20 border-b border-white/70 bg-white/55 backdrop-blur-2xl px-6 lg:px-10 py-6 pt-24 lg:pt-6">
+        <section className="flex-1 overflow-auto rounded-[1.4rem] lg:rounded-[2.2rem] border border-white/70 bg-white/45 shadow-[0_30px_100px_rgba(118,93,60,0.14)] backdrop-blur-2xl">
+          <header className="sticky top-0 z-20 border-b border-white/70 bg-white/55 backdrop-blur-2xl px-4 lg:px-10 py-4 pt-20 lg:pt-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
               <div>
                 <p className="text-xs tracking-[0.45em] uppercase text-[#b69463]">
                   MAUNA Couture Operating System
                 </p>
-                <h1 className="mt-3 text-4xl lg:text-5xl font-semibold tracking-[-0.04em] text-[#211b16]">
+                <h1 className="mt-3 text-3xl lg:text-5xl font-semibold tracking-[-0.04em] text-[#211b16]">
                   {title}
                 </h1>
               </div>
@@ -145,7 +145,7 @@ export default function AppShell({
             </div>
           </header>
 
-          <div className="p-6 lg:p-10">{children}</div>
+          <div className="p-4 lg:p-10">{children}</div>
         </section>
       </div>
     </main>
