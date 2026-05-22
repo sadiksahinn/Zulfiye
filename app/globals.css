@@ -112,3 +112,37 @@ input[type=number] {
 * {
   scroll-behavior: smooth;
 }
+@media (max-width: 768px) {
+  .premium-card {
+    border-radius: 1.4rem;
+    padding: 1.25rem !important;
+  }
+
+  .input {
+    padding: 0.85rem 1rem;
+    border-radius: 0.9rem;
+    font-size: 14px;
+  }
+
+  .premium-title {
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 2.2rem !important;
+    line-height: 1.05 !important;
+  }
+
+  h2 {
+    font-size: 1.35rem !important;
+  }
+
+  h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .mobile-compact-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
