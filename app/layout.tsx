@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import MobileNavigation from "@/components/mobile/MobileNavigation";
 
 export const metadata: Metadata = {
   title: "MAUNA Couture ERP",
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>{children}<MobileNavigation /></AuthProvider>
       </body>
     </html>
   );
