@@ -206,3 +206,23 @@ input[type=number] {
     display: none !important;
   }
 }
+
+@keyframes maunaLoaderRing {
+  0% { transform: translateY(-120px) scale(.75); opacity: 0; }
+  55% { transform: translateY(14px) scale(1.04); opacity: 1; }
+  78% { transform: translateY(-7px) scale(.98); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes maunaLoaderLogo {
+  0% { transform: rotate(-260deg) scale(.88); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.mauna-loader-ring {
+  animation: maunaLoaderRing 1.05s cubic-bezier(.2,.9,.2,1) both;
+}
+
+.mauna-loader-logo {
+  animation: maunaLoaderLogo 1.05s cubic-bezier(.2,.9,.2,1) both;
+}

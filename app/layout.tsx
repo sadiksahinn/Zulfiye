@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import MobileNavigation from "@/components/mobile/MobileNavigation";
+import MaunaLoader from "@/components/MaunaLoader";
 import ResetPWA from "@/components/system/ResetPWA";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body>
         <ResetPWA />
         <AuthProvider>
+            <MaunaLoader />
           {children}
           <MobileNavigation />
         </AuthProvider>
