@@ -1,151 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
-
-const templates = [
-  {
-    title: "Kiralama Bilgilendirme",
-    type: "kiralama",
-    message:
-      "Merhaba {musteri}, MAUNA Couture’dan kiraladığınız {urun} modeli {teslim_tarihi} saat {teslim_saati}’te teslim edilecektir. En geç {iade_tarihi} saat {iade_saati}’e kadar iade edilmesi gerekmektedir. Bilginize.",
-  },
-  {
-    title: "Prova Hatırlatma",
-    type: "prova",
-    message:
-      "Merhaba {musteri}, MAUNA Couture prova randevunuz {prova_tarihi} saat {prova_saati} olarak planlanmıştır. Sizi bekliyoruz.",
-  },
-  {
-    title: "İade Hatırlatma",
-    type: "iade",
-    message:
-      "Merhaba {musteri}, MAUNA Couture’dan kiraladığınız {urun} ürününün iade tarihi {iade_tarihi} saat {iade_saati}’tir. Gecikme yaşanmaması için bilginize sunarız.",
-  },
-  {
-    title: "Kalan Ödeme Hatırlatma",
-    type: "odeme",
-    message:
-      "Merhaba {musteri}, MAUNA Couture işleminiz için kalan ödeme tutarınız {kalan_tutar} TL’dir. Teslim öncesi ödemenizi tamamlamanızı rica ederiz.",
-  },
-  {
-    title: "Ürün Teslim Hazır",
-    type: "teslim",
-    message:
-      "Merhaba {musteri}, {urun} ürününüz MAUNA Couture’da teslim için hazırdır. Teslim tarihiniz {teslim_tarihi} saat {teslim_saati}’tir.",
-  },
-];
+import { Copy, MessageSquareText, Phone, Send, Sparkles } from "lucide-react";
 
 export default function SmsPage() {
-  const [selected, setSelected] = useState(templates[0]);
-  const [customerName, setCustomerName] = useState("Ayşe Hanım");
-  const [productName, setProductName] = useState("AHU Beyaz 38 Gelinlik");
-  const [deliveryDate, setDeliveryDate] = useState("12.06.2026");
-  const [deliveryTime, setDeliveryTime] = useState("14:00");
-  const [returnDate, setReturnDate] = useState("16.06.2026");
-  const [returnTime, setReturnTime] = useState("12:00");
-  const [remainingAmount, setRemainingAmount] = useState("15.000");
+  const [message, setMessage] = useState("Merhaba, MAUNA Couture randevunuz için sizi bekliyoruz.");
+  const [phone, setPhone] = useState("");
 
-  function renderMessage(message: string) {
-    return message
-      .replaceAll("{musteri}", customerName)
-      .replaceAll("{urun}", productName)
-      .replaceAll("{teslim_tarihi}", deliveryDate)
-      .replaceAll("{teslim_saati}", deliveryTime)
-      .replaceAll("{iade_tarihi}", returnDate)
-      .replaceAll("{iade_saati}", returnTime)
-      .replaceAll("{prova_tarihi}", deliveryDate)
-      .replaceAll("{prova_saati}", deliveryTime)
-      .replaceAll("{kalan_tutar}", remainingAmount);
-  }
-
-  const preview = renderMessage(selected.message);
+  const cleanPhone = phone.replace(/\D/g, "").replace(/^0/, "90");
+  const whatsappUrl = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}` : "#";
 
   return (
-    <AppShell title="SMS Şablon Merkezi">
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="premium-card p-8">
-          <h2 className="premium-title text-2xl">Hazır Şablonlar</h2>
-          <p className="premium-muted mt-2">
-            Kiralama, prova, iade ve ödeme bilgilendirmeleri.
+    <AppShell title="SMS">
+      <div className="space-y-5 pb-24 lg:space-y-8 lg:pb-0">
+        <div className="relative overflow-hidden rounded-[1.7rem] border border-white/70 bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)] lg:rounded-[2rem] lg:p-7">
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA SMS / WhatsApp</p>
+          <h1 className="mt-3 text-3xl font-black tracking-[-0.06em] lg:text-5xl">Mesaj merkezi</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
+            Müşteri mesajlarını hızlıca oluşturun ve WhatsApp üzerinden gönderin.
           </p>
-
-          <div className="mt-6 space-y-3">
-            {templates.map((template) => (
-              <button
-                key={template.type}
-                onClick={() => setSelected(template)}
-                className={`w-full rounded-3xl border p-5 text-left transition ${
-                  selected.type === template.type
-                    ? "border-[#b69463] bg-[#b69463]/10"
-                    : "border-[#eadfce] bg-white/60 hover:bg-white"
-                }`}
-              >
-                <h3 className="font-semibold text-[#211b16]">
-                  {template.title}
-                </h3>
-                <p className="mt-1 text-sm premium-muted">{template.type}</p>
-              </button>
-            ))}
-          </div>
         </div>
 
-        <div className="premium-card p-8">
-          <h2 className="premium-title text-2xl">Değişken Test Alanı</h2>
-          <p className="premium-muted mt-2">
-            Sistem bu alanları kiralama/satış/prova kayıtlarından otomatik dolduracak.
-          </p>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div className="premium-card p-5 lg:p-7">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                <MessageSquareText size={21} />
+              </div>
+              <div>
+                <h2 className="premium-title text-xl">Mesaj Alanı</h2>
+                <p className="premium-muted text-sm">Telefon ve mesajı girin</p>
+              </div>
+            </div>
 
-          <div className="mt-6 grid gap-4">
-            <input className="input" value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Müşteri adı" />
-            <input className="input" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Ürün adı" />
-            <input className="input" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} placeholder="Teslim tarihi" />
-            <input className="input" value={deliveryTime} onChange={(e) => setDeliveryTime(e.target.value)} placeholder="Teslim saati" />
-            <input className="input" value={returnDate} onChange={(e) => setReturnDate(e.target.value)} placeholder="İade tarihi" />
-            <input className="input" value={returnTime} onChange={(e) => setReturnTime(e.target.value)} placeholder="İade saati" />
-
-            <div className="money-input-wrapper">
-              <input
-                className="input money-input"
-                type="number"
-                inputMode="decimal"
-                min="0"
-                value={remainingAmount.replaceAll(".", "")}
-                onChange={(e) => setRemainingAmount(e.target.value)}
-                placeholder="Kalan ödeme"
-              />
-              <span className="money-badge">₺</span>
+            <div className="grid gap-4">
+              <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05xx xxx xx xx" />
+              <textarea className="input min-h-52" value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
           </div>
-        </div>
 
-        <div className="premium-card p-8">
-          <h2 className="premium-title text-2xl">SMS Önizleme</h2>
-          <p className="premium-muted mt-2">
-            NetGSM bağlandığında bu mesaj tek tıkla gönderilecek.
-          </p>
+          <div className="premium-card p-5 lg:p-7">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                <Sparkles size={21} />
+              </div>
+              <div>
+                <h2 className="premium-title text-xl">Önizleme</h2>
+                <p className="premium-muted text-sm">Gönderime hazır</p>
+              </div>
+            </div>
 
-          <div className="mt-6 rounded-[2rem] border border-[#eadfce] bg-white/80 p-6">
-            <p className="text-sm leading-7 text-[#211b16]">
-              {preview}
-            </p>
-          </div>
+            <div className="rounded-[1.4rem] border border-[#eadfce] bg-[#f7f0e7]/70 p-5 text-base font-semibold leading-8 text-[#211b16]">
+              {message}
+            </div>
 
-          <div className="mt-6 grid gap-3">
-            <button
-              onClick={() => navigator.clipboard.writeText(preview)}
-              className="premium-button py-4"
-            >
-              Mesajı Kopyala
-            </button>
+            <div className="mt-5 grid gap-3">
+              <button onClick={() => navigator.clipboard.writeText(message)} className="flex items-center justify-center gap-2 rounded-2xl border border-[#eadfce] bg-white px-4 py-4 text-sm font-black text-[#211b16]">
+                <Copy size={18} /> Mesajı Kopyala
+              </button>
 
-            <button className="rounded-2xl border border-[#eadfce] bg-white/70 py-4 font-semibold text-[#6d6256]">
-              NetGSM Entegrasyonu Bekliyor
-            </button>
-          </div>
-
-          <div className="mt-6 rounded-3xl bg-[#f7f0e7] p-5 text-sm text-[#6d6256]">
-            Otomasyon planı: prova 1 gün önce, teslim sabahı, iade sabahı ve kalan ödeme için otomatik SMS.
+              <a href={whatsappUrl} target="_blank" className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] px-4 py-4 text-sm font-black text-white">
+                <Send size={18} /> WhatsApp Aç
+              </a>
+            </div>
           </div>
         </div>
       </div>
