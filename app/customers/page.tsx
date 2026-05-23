@@ -85,9 +85,9 @@ export default function CustomersPage() {
   }, []);
 
   return (
-    <AppShell title="Müşteri Yönetimi">
+    <AppShell title="Müşteriler">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <div className="rounded-[2rem] bg-white p-8 shadow-xl border border-[#eadfce]">
+        <div className="premium-card p-5 lg:p-8">
           <h2 className="text-2xl font-semibold text-[#1f1b16]">
             Yeni Müşteri Ekle
           </h2>
@@ -110,13 +110,13 @@ export default function CustomersPage() {
 
           <button
             onClick={createCustomer}
-            className="mt-6 w-full rounded-2xl bg-[#b69463] py-4 text-white font-semibold"
+            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-white font-black shadow-[0_18px_42px_rgba(182,148,99,.24)]"
           >
             Müşteri Ekle
           </button>
         </div>
 
-        <div className="rounded-[2rem] bg-white p-8 shadow-xl border border-[#eadfce]">
+        <div className="premium-card p-5 lg:p-8">
           <h2 className="text-2xl font-semibold text-[#1f1b16]">
             Müşteri Listesi
           </h2>
