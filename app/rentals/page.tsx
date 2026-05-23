@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
+import { CalendarDays, Search, ShieldCheck, Sparkles, UserPlus } from "lucide-react";
 
 type Product = {
   id: string;
@@ -235,9 +236,26 @@ export default function RentalsPage() {
 
   return (
     <AppShell title="Kiralama">
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 premium-card p-8">
-          <h2 className="premium-title text-2xl">Kiralama Oluştur</h2>
+      <div className="space-y-5 lg:space-y-8">
+        <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)] lg:p-7">
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Kiralama Yönetimi</p>
+          <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] lg:text-4xl">Kiralama operasyonları</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
+            Ürün, müşteri, teslim, iade ve ödeme akışını tek ekrandan yönetin.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2 premium-card p-5 lg:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+              <Sparkles size={21} />
+            </div>
+            <div>
+              <h2 className="premium-title text-2xl">Kiralama Oluştur</h2>
+              <p className="premium-muted mt-1 text-sm">Ürün ve müşteri eşleştir, takvime otomatik işle.</p>
+            </div>
+          </div>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2">
@@ -294,9 +312,9 @@ export default function RentalsPage() {
 
                 <button
                   onClick={() => setShowCustomerModal(true)}
-                  className="premium-button px-5 py-4"
+                  className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] px-5 py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.20)] transition hover:scale-[1.01]"
                 >
-                  + Yeni Müşteri
+                  <UserPlus size={18} /> Yeni Müşteri
                 </button>
               </div>
 
@@ -341,13 +359,22 @@ export default function RentalsPage() {
 
           {message && <div className="mt-6 rounded-2xl bg-white/70 border border-[#eadfce] p-4 text-[#6d6256]">{message}</div>}
 
-          <button onClick={createRental} className="premium-button mt-6 w-full py-4">
+          <button onClick={createRental} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)] transition hover:scale-[1.01]">
+            <CalendarDays size={18} />
             Kiralama Kaydet ve Takvime İşle
           </button>
         </div>
 
-        <div className="premium-card p-8">
-          <h2 className="premium-title text-2xl">Ürün Teyidi</h2>
+        <div className="premium-card p-5 lg:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+              <ShieldCheck size={21} />
+            </div>
+            <div>
+              <h2 className="premium-title text-2xl">Ürün Teyidi</h2>
+              <p className="premium-muted mt-1 text-sm">Seçilen ürün bilgileri</p>
+            </div>
+          </div>
 
           {selectedProduct ? (
             <div className="mt-6">
@@ -365,6 +392,7 @@ export default function RentalsPage() {
               Ürün seçilince fotoğraf ve detaylar burada görünecek.
             </div>
           )}
+        </div>
         </div>
       </div>
 
