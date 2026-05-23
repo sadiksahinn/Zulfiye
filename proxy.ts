@@ -18,6 +18,6 @@ export const config = {
     "/accounting/:path*",
     "/staff/:path*",
     "/settings/:path*",
-    "/sms/:path*",
-  ],
+    "/sms/:path*"
+  ]
 };
