@@ -341,7 +341,7 @@ export default function ProductsPage() {
                   </div>
 
                   <a
-                    href="/products"
+                    href={`/products/${product.id}`}
                     className="mt-5 block rounded-2xl bg-[#211b16] py-3 text-center text-white font-semibold"
                   >
                     Ürün Detayı
