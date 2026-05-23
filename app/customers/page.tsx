@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
+import { Search } from "lucide-react";
 
 type Customer = {
   id: string;
@@ -26,6 +27,20 @@ export default function CustomersPage() {
   });
 
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
+
+  const filteredCustomers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return customers;
+
+    return customers.filter((customer) =>
+      [customer.full_name, customer.phone, customer.instagram, customer.wedding_date, customer.notes]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [customers, search]);
 
   function updateField(key: string, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -117,17 +132,32 @@ export default function CustomersPage() {
         </div>
 
         <div className="premium-card p-5 lg:p-8">
-          <h2 className="text-2xl font-semibold text-[#1f1b16]">
-            Müşteri Listesi
-          </h2>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-2xl font-black text-[#1f1b16]">
+                Müşteri Listesi
+              </h2>
+              <p className="premium-muted mt-2 text-sm">Kayıtlı müşterileri ara ve hızlı görüntüle.</p>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3 lg:min-w-[300px]">
+              <Search size={18} className="text-[#b69463]" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Müşteri ara..."
+                className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-[#a79b8d]"
+              />
+            </div>
+          </div>
 
           <div className="mt-6 space-y-4">
-            {customers.length === 0 ? (
+            {filteredCustomers.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-[#d9c9b5] p-10 text-center text-[#8b8177]">
                 Henüz müşteri bulunmuyor.
               </div>
             ) : (
-              customers.map((customer) => (
+              filteredCustomers.map((customer) => (
                 <div key={customer.id} className="rounded-2xl border border-[#eadfce] p-5">
                   <div className="flex items-center justify-between gap-4">
                     <div>
