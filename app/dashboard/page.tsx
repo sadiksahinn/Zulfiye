@@ -84,7 +84,7 @@ function StatCard({ mobileTitle, desktopTitle, value, icon }: {
   icon: React.ReactNode;
 }) {
   return (
-    <div className="premium-card p-4 transition hover:-translate-y-1 lg:p-7">
+    <div className="premium-card min-h-[118px] p-4 transition hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(118,93,60,.14)] lg:min-h-[170px] lg:p-7">
       <div className="flex items-center justify-between gap-2">
         <p className="premium-muted text-xs font-semibold lg:text-base">
           <span className="lg:hidden">{mobileTitle}</span>
@@ -94,7 +94,7 @@ function StatCard({ mobileTitle, desktopTitle, value, icon }: {
           {icon}
         </div>
       </div>
-      <h2 className="mt-3 text-3xl font-semibold text-[#211b16] lg:mt-6 lg:text-5xl">{value}</h2>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-[#211b16] lg:mt-6 lg:text-5xl">{value}</h2>
     </div>
   );
 }

@@ -240,3 +240,13 @@ input[type=number] {
   background: linear-gradient(135deg, rgba(255,255,255,.42), transparent 38%, rgba(182,148,99,.08));
   opacity: .55;
 }
+
+.dashboard-fade-in > * {
+  animation: dashboardFadeIn 0.42s ease-out both;
+}
+
+.dashboard-fade-in > *:nth-child(2) { animation-delay: 0.04s; }
+.dashboard-fade-in > *:nth-child(3) { animation-delay: 0.08s; }
+.dashboard-fade-in > *:nth-child(4) { animation-delay: 0.12s; }
+.dashboard-fade-in > *:nth-child(5) { animation-delay: 0.16s; }
+.dashboard-fade-in > *:nth-child(6) { animation-delay: 0.20s; }
