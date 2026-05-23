@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function ProductDetailPage() {
   const params = useParams();
