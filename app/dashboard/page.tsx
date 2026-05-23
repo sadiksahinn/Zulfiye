@@ -1,100 +1,254 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import {
-  Bell,
-  CalendarDays,
-  CreditCard,
+  AlertTriangle,
+  CalendarClock,
   Package,
-  Plus,
-  RotateCcw,
-  ShoppingBag,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from "recharts";
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState({
-    products: 0,
-    customers: 0,
-    rentals: 0,
-    fittings: 0,
-  });
+  const [products, setProducts] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [rentals, setRentals] = useState<any[]>([]);
 
-  const chartData = [
-    { name: "Pzt", gelir: 0 },
-    { name: "Sal", gelir: 0 },
-    { name: "Çar", gelir: 0 },
-    { name: "Per", gelir: 0 },
-    { name: "Cum", gelir: 0 },
-    { name: "Cmt", gelir: 0 },
-    { name: "Paz", gelir: 0 },
-  ];
-
-  async function loadStats() {
-    const [products, customers, rentals, fittings] = await Promise.all([
-      supabase.from("products").select("*", { count: "exact", head: true }),
-      supabase.from("customers").select("*", { count: "exact", head: true }),
-      supabase.from("rentals").select("*", { count: "exact", head: true }),
-      supabase.from("fittings").select("*", { count: "exact", head: true }),
+  async function load() {
+    const [p, c, r] = await Promise.all([
+      supabase.from("products").select("*"),
+      supabase.from("customers").select("*"),
+      supabase.from("rentals").select("*").order("created_at", { ascending: false }),
     ]);
 
-    setStats({
-      products: products.count || 0,
-      customers: customers.count || 0,
-      rentals: rentals.count || 0,
-      fittings: fittings.count || 0,
-    });
+    setProducts(p.data || []);
+    setCustomers(c.data || []);
+    setRentals(r.data || []);
   }
 
   useEffect(() => {
-    loadStats();
+    load();
   }, []);
 
-  const quickActions = [
-    { title: "Ürün Ekle", href: "/products", icon: <Plus size={18} />, note: "Stok" },
-    { title: "Kiralama", href: "/rentals", icon: <ShoppingBag size={18} />, note: "Teslim" },
-    { title: "İade Al", href: "/returns", icon: <RotateCcw size={18} />, note: "Kontrol" },
-    { title: "Müşteri", href: "/customers", icon: <Users size={18} />, note: "Kart" },
-    { title: "Takvim", href: "/calendar", icon: <CalendarDays size={18} />, note: "Plan" },
-    { title: "Ödeme", href: "/accounting", icon: <CreditCard size={18} />, note: "Tahsilat" },
-  ];
+  const stats = useMemo(() => {
+    const revenue = rentals.reduce(
+      (acc, item) => acc + Number(item.total_amount || 0),
+      0
+    );
+
+    const remaining = rentals.reduce(
+      (acc, item) => acc + Number(item.remaining_amount || 0),
+      0
+    );
+
+    return {
+      revenue,
+      remaining,
+      rented: products.filter((x) => x.status === "kirada").length,
+      stock: products.filter((x) => x.status === "stokta").length,
+      delayed: rentals.filter((x) => x.status === "gecikti").length,
+    };
+  }, [products, rentals]);
 
   return (
-    <AppShell title="Anasayfa">
-      <div className="space-y-4 lg:space-y-10">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
-          <StatCard mobileTitle="Ürün" desktopTitle="Toplam Ürün" value={stats.products} icon={<Package size={20} />} />
-          <StatCard mobileTitle="Müşteri" desktopTitle="Toplam Müşteri" value={stats.customers} icon={<Users size={20} />} />
-          <StatCard mobileTitle="Kiralama" desktopTitle="Aktif Kiralama" value={stats.rentals} icon={<TrendingUp size={20} />} />
-          <StatCard mobileTitle="Prova" desktopTitle="Prova Kaydı" value={stats.fittings} icon={<CalendarDays size={20} />} />
+    <AppShell title="Dashboard">
+      <div className="space-y-5 pb-24 lg:space-y-8 lg:pb-0">
+
+        <div className="relative overflow-hidden rounded-[1.8rem] border border-white/70 bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)] lg:p-8">
+          <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">
+                MAUNA OPERASYON
+              </p>
+
+              <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] lg:text-6xl">
+                Yönetim Paneli
+              </h1>
+
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
+                Kiralama, müşteri, tahsilat ve operasyon süreçlerini canlı takip edin.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 lg:min-w-[320px]">
+              <MiniCard
+                label="Toplam Ciro"
+                value={`${stats.revenue.toLocaleString("tr-TR")} TL`}
+              />
+
+              <MiniCard
+                label="Bekleyen"
+                value={`${stats.remaining.toLocaleString("tr-TR")} TL`}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+          <Card
+            title="Toplam Ürün"
+            value={products.length}
+            sub={`${stats.stock} stokta`}
+            icon={<Package size={22} />}
+          />
+
+          <Card
+            title="Müşteri"
+            value={customers.length}
+            sub="Kayıtlı müşteri"
+            icon={<Users size={22} />}
+          />
+
+          <Card
+            title="Kiradaki"
+            value={stats.rented}
+            sub="Aktif operasyon"
+            icon={<TrendingUp size={22} />}
+          />
+
+          <Card
+            title="Geciken"
+            value={stats.delayed}
+            sub="İade bekleniyor"
+            icon={<AlertTriangle size={22} />}
+            danger
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_.85fr]">
+
+          <div className="premium-card p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                <CalendarClock size={20} />
+              </div>
+
+              <div>
+                <h2 className="premium-title text-2xl">
+                  Son Kiralamalar
+                </h2>
+
+                <p className="premium-muted text-sm">
+                  Güncel operasyon hareketleri
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {rentals.slice(0, 6).map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-3xl border border-[#eadfce] bg-white/60 p-4"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-black text-[#211b16]">
+                        {item.customer_name || "Müşteri"}
+                      </h3>
+
+                      <p className="mt-1 text-xs font-bold text-[#8a7f72]">
+                        {item.delivery_date} • {item.return_date}
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-[#f7f0e7] px-4 py-3 text-sm font-black text-[#211b16]">
+                      {Number(item.total_amount || 0).toLocaleString("tr-TR")} TL
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="premium-card p-6">
+            <h2 className="premium-title text-2xl">
+              Operasyon Durumu
+            </h2>
+
+            <div className="mt-6 space-y-4">
+
+              <StatusRow
+                label="Stokta Ürün"
+                value={stats.stock}
+              />
+
+              <StatusRow
+                label="Kiradaki Ürün"
+                value={stats.rented}
+              />
+
+              <StatusRow
+                label="Bekleyen Tahsilat"
+                value={`${stats.remaining.toLocaleString("tr-TR")} TL`}
+              />
+
+              <StatusRow
+                label="Geciken İade"
+                value={stats.delayed}
+                danger
+              />
+            </div>
+          </div>
         </div>
       </div>
     </AppShell>
   );
 }
 
-function StatCard({ mobileTitle, desktopTitle, value, icon }: {
-  mobileTitle: string;
-  desktopTitle: string;
-  value: number;
-  icon: React.ReactNode;
-}) {
+function Card({ title, value, sub, icon, danger = false }: any) {
   return (
-    <div className="premium-card min-h-[118px] p-4 transition hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(118,93,60,.14)] lg:min-h-[170px] lg:p-7">
-      <div className="flex items-center justify-between gap-2">
-        <p className="premium-muted text-xs font-semibold lg:text-base">
-          <span className="lg:hidden">{mobileTitle}</span>
-          <span className="hidden lg:inline">{desktopTitle}</span>
-        </p>
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#b69463]/15 text-[#b69463] lg:h-12 lg:w-12 lg:rounded-2xl">
+    <div className={`premium-card p-6 ${danger ? "border-red-200" : ""}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="premium-muted text-sm">{title}</p>
+
+          <h3 className="mt-3 text-4xl font-black tracking-[-0.05em] text-[#211b16]">
+            {value}
+          </h3>
+
+          <p className={`mt-2 text-xs font-bold ${danger ? "text-red-600" : "text-[#8a7f72]"}`}>
+            {sub}
+          </p>
+        </div>
+
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${danger ? "bg-red-100 text-red-600" : "bg-[#b69463]/15 text-[#b69463]"}`}>
           {icon}
         </div>
       </div>
-      <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] text-[#211b16] lg:mt-6 lg:text-5xl">{value}</h2>
+    </div>
+  );
+}
+
+function MiniCard({ label, value }: any) {
+  return (
+    <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-xl">
+      <div className="text-[10px] font-black uppercase tracking-[0.22em] text-white/50">
+        {label}
+      </div>
+
+      <div className="mt-2 text-sm font-black text-white">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function StatusRow({ label, value, danger = false }: any) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl border border-[#eadfce] bg-white/60 px-4 py-4">
+      <span className="text-sm font-bold text-[#6d6256]">
+        {label}
+      </span>
+
+      <span className={`rounded-full px-3 py-1 text-sm font-black ${danger ? "bg-red-100 text-red-700" : "bg-[#f7f0e7] text-[#211b16]"}`}>
+        {value}
+      </span>
     </div>
   );
 }
