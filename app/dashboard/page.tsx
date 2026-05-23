@@ -55,12 +55,12 @@ export default function DashboardPage() {
   }, []);
 
   const quickActions = [
-    { title: "Ürün Ekle", href: "/products", icon: <Plus size={18} /> },
-    { title: "Kiralama", href: "/rentals", icon: <ShoppingBag size={18} /> },
-    { title: "İade Al", href: "/returns", icon: <RotateCcw size={18} /> },
-    { title: "Müşteri", href: "/customers", icon: <Users size={18} /> },
-    { title: "Takvim", href: "/calendar", icon: <CalendarDays size={18} /> },
-    { title: "Ödeme", href: "/accounting", icon: <CreditCard size={18} /> },
+    { title: "Ürün Ekle", href: "/products", icon: <Plus size={18} />, note: "Stok" },
+    { title: "Kiralama", href: "/rentals", icon: <ShoppingBag size={18} />, note: "Teslim" },
+    { title: "İade Al", href: "/returns", icon: <RotateCcw size={18} />, note: "Kontrol" },
+    { title: "Müşteri", href: "/customers", icon: <Users size={18} />, note: "Kart" },
+    { title: "Takvim", href: "/calendar", icon: <CalendarDays size={18} />, note: "Plan" },
+    { title: "Ödeme", href: "/accounting", icon: <CreditCard size={18} />, note: "Tahsilat" },
   ];
 
   return (

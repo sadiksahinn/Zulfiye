@@ -226,3 +226,17 @@ input[type=number] {
 .mauna-loader-logo {
   animation: maunaLoaderLogo 1.05s cubic-bezier(.2,.9,.2,1) both;
 }
+
+.premium-card {
+  position: relative;
+}
+
+.premium-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,.42), transparent 38%, rgba(182,148,99,.08));
+  opacity: .55;
+}
