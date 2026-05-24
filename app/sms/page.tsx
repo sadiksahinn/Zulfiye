@@ -1,17 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { Copy, Send } from "lucide-react";
+import { Copy, MessageSquareText, Send } from "lucide-react";
+
+const templates = [
+  "Merhaba, MAUNA Couture randevunuz için sizi bekliyoruz.",
+  "Merhaba, ürününüz teslim için hazırdır. Detaylı bilgi için bizimle iletişime geçebilirsiniz.",
+  "Merhaba, kiraladığınız ürünün iade tarihi yaklaşmıştır. Gecikme yaşanmaması için bilginize sunarız.",
+  "Merhaba, kalan ödemeniz bulunmaktadır. Teslim öncesi ödemenizi tamamlamanızı rica ederiz.",
+];
 
 export default function SmsPage() {
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("Merhaba, MAUNA Couture randevunuz için sizi bekliyoruz.");
+  const [message, setMessage] = useState(templates[0]);
+  const [copied, setCopied] = useState(false);
 
-  const cleanPhone = phone.replace(/\D/g, "").replace(/^0/, "90");
+  const cleanPhone = useMemo(() => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.startsWith("90")) return digits;
+    if (digits.startsWith("0")) return `90${digits.slice(1)}`;
+    if (digits.length === 10) return `90${digits}`;
+    return digits;
+  }, [phone]);
+
   const whatsappUrl = cleanPhone
     ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`
     : "#";
+
+  async function copyMessage() {
+    await navigator.clipboard.writeText(message);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <AppShell title="SMS / WhatsApp">
@@ -19,33 +40,80 @@ export default function SmsPage() {
         <div className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white">
           <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Mesaj Merkezi</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">SMS / WhatsApp</h1>
-          <p className="mt-2 text-sm text-white/70">Müşteri mesajlarını hızlıca oluştur ve gönder.</p>
+          <p className="mt-2 text-sm text-white/70">Hazır şablonlarla müşteri mesajlarını hızlıca oluşturun.</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[.8fr_1.2fr]">
           <div className="premium-card p-6">
-            <h2 className="premium-title text-2xl">Mesaj Oluştur</h2>
-            <div className="mt-6 grid gap-4">
-              <input className="input" placeholder="Telefon: 05xx xxx xx xx" value={phone} onChange={(e) => setPhone(e.target.value)} />
-              <textarea className="input min-h-52" value={message} onChange={(e) => setMessage(e.target.value)} />
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                <MessageSquareText size={20} />
+              </div>
+              <div>
+                <h2 className="premium-title text-2xl">Hazır Şablonlar</h2>
+                <p className="premium-muted text-sm">Tek tıkla mesaj seç</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              {templates.map((item) => (
+                <button
+                  key={item}
+                  onClick={() => setMessage(item)}
+                  className={`rounded-2xl border p-4 text-left text-sm font-bold leading-6 transition ${
+                    message === item
+                      ? "border-[#b69463] bg-[#b69463]/10 text-[#211b16]"
+                      : "border-[#eadfce] bg-white/70 text-[#6d6256]"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
             </div>
           </div>
 
           <div className="premium-card p-6">
-            <h2 className="premium-title text-2xl">Önizleme</h2>
+            <h2 className="premium-title text-2xl">Mesaj Oluştur</h2>
+
+            <div className="mt-6 grid gap-4">
+              <input
+                className="input"
+                placeholder="Telefon: 05xx xxx xx xx"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+
+              <textarea
+                className="input min-h-52"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
+
             <div className="mt-6 rounded-3xl bg-[#f7f0e7] p-5 text-sm font-semibold leading-7 text-[#211b16]">
               {message}
             </div>
 
-            <div className="mt-6 grid gap-3">
-              <button onClick={() => navigator.clipboard.writeText(message)} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-4 font-black text-[#211b16]">
-                <Copy className="mr-2 inline" size={18} /> Kopyala
+            <div className="mt-6 grid gap-3 lg:grid-cols-2">
+              <button
+                onClick={copyMessage}
+                className="rounded-2xl border border-[#eadfce] bg-white px-4 py-4 font-black text-[#211b16]"
+              >
+                <Copy className="mr-2 inline" size={18} /> {copied ? "Kopyalandı" : "Kopyala"}
               </button>
 
-              <a href={whatsappUrl} target="_blank" className="rounded-2xl bg-[#211b16] px-4 py-4 text-center font-black text-white">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                className="rounded-2xl bg-[#211b16] px-4 py-4 text-center font-black text-white"
+              >
                 <Send className="mr-2 inline" size={18} /> WhatsApp Aç
               </a>
             </div>
+
+            <p className="mt-4 text-xs font-bold text-[#8a7f72]">
+              Formatlanan numara: {cleanPhone || "Telefon girilmedi"}
+            </p>
           </div>
         </div>
       </div>
