@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, CalendarDays, Phone, UserRound, Wallet } from "lucide-react";
+import { ArrowLeft, CalendarDays, Phone, Save, UserRound, Wallet } from "lucide-react";
 
 export default function CustomerDetailPage() {
   const params = useParams<{ id: string }>();
@@ -12,6 +12,14 @@ export default function CustomerDetailPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [message, setMessage] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    instagram: "",
+    wedding_date: "",
+    notes: "",
+  });
 
   async function load() {
     const [customerRes, rentalsRes, salesRes] = await Promise.all([
@@ -23,6 +31,17 @@ export default function CustomerDetailPage() {
     if (customerRes.error) setMessage(customerRes.error.message);
 
     setCustomer(customerRes.data);
+
+    if (customerRes.data) {
+      setForm({
+        full_name: customerRes.data.full_name || "",
+        phone: customerRes.data.phone || "",
+        instagram: customerRes.data.instagram || "",
+        wedding_date: customerRes.data.wedding_date || "",
+        notes: customerRes.data.notes || "",
+      });
+    }
+
     setRentals(rentalsRes.data || []);
     setSales(salesRes.data || []);
   }
@@ -30,6 +49,34 @@ export default function CustomerDetailPage() {
   useEffect(() => {
     if (params.id) load();
   }, [params.id]);
+
+  function updateField(key: string, value: string) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function updateCustomer() {
+    setMessage("");
+
+    const { error } = await supabase
+      .from("customers")
+      .update({
+        full_name: form.full_name,
+        phone: form.phone,
+        instagram: form.instagram,
+        wedding_date: form.wedding_date || null,
+        notes: form.notes,
+      })
+      .eq("id", params.id);
+
+    if (error) {
+      setMessage(error.message || "Müşteri güncellenemedi.");
+      return;
+    }
+
+    setMessage("Müşteri bilgileri güncellendi.");
+    setEditing(false);
+    await load();
+  }
 
   const totals = useMemo(() => {
     const rentalRemaining = rentals.reduce((s, x) => s + Number(x.remaining_amount || 0), 0);
@@ -64,6 +111,10 @@ export default function CustomerDetailPage() {
               <a href="/customers" className="rounded-2xl bg-white/15 px-5 py-4 text-center text-sm font-black text-white">
                 <ArrowLeft className="mr-2 inline" size={18} /> Listeye Dön
               </a>
+              <button onClick={() => setEditing((value) => !value)} className="rounded-2xl bg-white px-5 py-4 text-center text-sm font-black text-[#211b16]">
+                <Save className="mr-2 inline" size={18} /> {editing ? "Kapat" : "Düzenle"}
+              </button>
+
               {whatsappPhone ? (
                 <a href={`https://wa.me/${whatsappPhone}`} target="_blank" className="rounded-2xl bg-white px-5 py-4 text-center text-sm font-black text-[#211b16]">
                   WhatsApp Aç
@@ -72,6 +123,25 @@ export default function CustomerDetailPage() {
             </div>
           </div>
         </section>
+
+        {message ? <div className="premium-card p-4 text-sm font-black text-[#6d6256]">{message}</div> : null}
+
+        {editing ? (
+          <section className="premium-card p-5 lg:p-6">
+            <SectionTitle icon={<Save size={20} />} title="Müşteri Bilgilerini Düzenle" sub="Telefon, not ve tarih bilgilerini güncelle" />
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <input className="input" placeholder="Ad Soyad" value={form.full_name} onChange={(e) => updateField("full_name", e.target.value)} />
+              <input className="input" placeholder="Telefon" value={form.phone} onChange={(e) => updateField("phone", e.target.value)} />
+              <input className="input" placeholder="Instagram" value={form.instagram} onChange={(e) => updateField("instagram", e.target.value)} />
+              <input className="input" type="date" value={form.wedding_date} onChange={(e) => updateField("wedding_date", e.target.value)} />
+              <textarea className="input min-h-28 md:col-span-2" placeholder="Notlar" value={form.notes} onChange={(e) => updateField("notes", e.target.value)} />
+            </div>
+
+            <button onClick={updateCustomer} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-5 py-4 text-sm font-black text-white">
+              <Save size={18} /> Müşteriyi Kaydet
+            </button>
+          </section>
+        ) : null}
 
         <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           <Metric title="Kiralama" value={rentals.length} icon={<CalendarDays size={20} />} />
