@@ -28,18 +28,21 @@ export default function AppShell({
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const menu = [
+  const operationMenu = [
     { name: "Bugün", href: "/today", icon: Home },
-    { name: "Yönetim", href: "/dashboard", icon: BarChart3 },
+    { name: "Takvim", href: "/calendar", icon: CalendarDays },
+    { name: "Kiralama", href: "/rentals", icon: CalendarDays },
     { name: "Satış", href: "/sales", icon: ShoppingBag },
     { name: "Müşteriler", href: "/customers", icon: Users },
     { name: "Ürünler", href: "/products", icon: Package },
-    { name: "Kiralama", href: "/rentals", icon: CalendarDays },
-    { name: "İade", href: "/returns", icon: RotateCcw },
-    { name: "Takvim", href: "/calendar", icon: CalendarDays },
-    { name: "SMS", href: "/sms", icon: MessageSquareText },
+    { name: "İade / Teslim", href: "/returns", icon: RotateCcw },
+  ];
+
+  const managementMenu = [
+    { name: "Yönetim", href: "/dashboard", icon: BarChart3 },
     { name: "Muhasebe", href: "/accounting", icon: CreditCard },
     { name: "Raporlar", href: "/reports", icon: BarChart3 },
+    { name: "SMS", href: "/sms", icon: MessageSquareText },
     { name: "Personel", href: "/staff", icon: UserRound },
     { name: "Ayarlar", href: "/settings", icon: Settings },
   ];
@@ -63,32 +66,74 @@ export default function AppShell({
             </div>
           </div>
 
-          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
-            {menu.map((item) => {
-              const Icon = item.icon;
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          <nav className="flex-1 overflow-y-auto pr-1">
+            <div className="mb-4">
+              <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                Günlük Operasyon
+              </div>
 
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
-                    active
-                      ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
-                      : "text-zinc-200 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  <span
-                    className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
-                      active ? "bg-white/20 text-white" : "bg-white/8 text-[#d8be8d] group-hover:bg-white/12"
-                    }`}
-                  >
-                    <Icon size={20} strokeWidth={2.35} />
-                  </span>
-                  <span className="leading-none">{item.name}</span>
-                </a>
-              );
-            })}
+              <div className="space-y-2">
+                {operationMenu.map((item) => {
+                  const Icon = item.icon;
+                  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
+                        active
+                          ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
+                          : "text-zinc-200 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
+                          active ? "bg-white/20 text-white" : "bg-white/8 text-[#d8be8d] group-hover:bg-white/12"
+                        }`}
+                      >
+                        <Icon size={20} strokeWidth={2.35} />
+                      </span>
+                      <span className="leading-none">{item.name}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                Yönetim Paneli
+              </div>
+
+              <div className="space-y-2">
+                {managementMenu.map((item) => {
+                  const Icon = item.icon;
+                  const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
+                        active
+                          ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
+                          : "text-zinc-400 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
+                          active ? "bg-white/20 text-white" : "bg-white/8 text-[#8f7a58] group-hover:bg-white/12"
+                        }`}
+                      >
+                        <Icon size={20} strokeWidth={2.2} />
+                      </span>
+                      <span className="leading-none">{item.name}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
           </nav>
 
           <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4 shadow-inner">
