@@ -21,8 +21,12 @@ export default function ReturnsPage() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
   async function load() {
+    setLoading(true);
+
     const { data } = await supabase
       .from("rentals")
       .select("*")
@@ -30,6 +34,7 @@ export default function ReturnsPage() {
       .order("return_date", { ascending: true });
 
     setRentals((data || []) as Rental[]);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -54,6 +59,7 @@ export default function ReturnsPage() {
 
   async function completeReturn(rental: Rental) {
     setMessage("");
+    setProcessingId(rental.id);
 
     const { error } = await supabase
       .from("rentals")
@@ -64,19 +70,28 @@ export default function ReturnsPage() {
 
     if (error) {
       setMessage("İade tamamlanamadı.");
+      setProcessingId(null);
       return;
     }
 
     if (rental.product_id) {
-      await supabase
+      const { error: productError } = await supabase
         .from("products")
         .update({
           status: "stokta",
         })
         .eq("id", rental.product_id);
+
+      if (productError) {
+        setMessage("İade alındı fakat ürün stoğa döndürülemedi.");
+        setProcessingId(null);
+        load();
+        return;
+      }
     }
 
-    setMessage("İade başarıyla tamamlandı.");
+    setMessage("İade başarıyla tamamlandı, ürün stoğa döndü.");
+    setProcessingId(null);
     load();
   }
 
@@ -152,7 +167,11 @@ export default function ReturnsPage() {
 
           <div className="mt-6 space-y-4">
 
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="rounded-3xl border border-dashed border-[#d9c9b5] p-12 text-center text-sm font-bold text-[#8a7f72]">
+                İade kayıtları yükleniyor...
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-[#d9c9b5] p-12 text-center text-sm font-bold text-[#8a7f72]">
                 Aktif iade bulunamadı.
               </div>
@@ -209,10 +228,11 @@ export default function ReturnsPage() {
 
                     <button
                       onClick={() => completeReturn(rental)}
-                      className="flex items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-6 py-4 text-sm font-black text-white transition active:scale-[0.98]"
+                      disabled={processingId === rental.id}
+                      className="flex items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-6 py-4 text-sm font-black text-white transition active:scale-[0.98] disabled:opacity-60"
                     >
                       <CheckCircle2 size={18} />
-                      İadeyi Tamamla
+                      {processingId === rental.id ? "İşleniyor..." : "İadeyi Tamamla"}
                     </button>
                   </div>
                 </div>
