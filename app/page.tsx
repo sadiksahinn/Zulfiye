@@ -1,141 +1,187 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Eye, EyeOff, KeyRound, LockKeyhole, Mail, ShieldCheck, UserPlus } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
-  const [lang, setLang] = useState<"tr" | "en">("tr");
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [lang, setLang] = useState<"tr" | "en">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("mauna_lang");
+      if (saved === "en") return "en";
+    }
+    return "tr";
+  });
 
-  const t = {
+  const copy = {
     tr: {
-      welcome: "Hoş Geldiniz",
-      desc: "MAUNA Couture yönetim sistemine giriş yapın.",
+      title: "Hoş Geldiniz",
+      subtitle: "MAUNA Couture yönetim sistemine güvenli giriş yapın.",
       email: "E-posta",
+      emailPlaceholder: "ornek@mauna.com",
       password: "Şifre",
       login: "Giriş Yap",
+      loading: "Giriş yapılıyor...",
       forgot: "Şifremi Unuttum",
       register: "Kayıt Ol",
+      error: "Giriş başarısız. E-posta veya şifreyi kontrol edin.",
       secure: "Güvenli Giriş",
-      version: "MAUNA Couture ERP v1",
-      placeholder: "ornek@mauna.com",
-      error: "Giriş başarısız. Bilgileri kontrol edin.",
+      footer: "MAUNA Couture - Yazılım VALKEA",
     },
     en: {
-      welcome: "Welcome",
-      desc: "Sign in to MAUNA Couture management system.",
+      title: "Welcome",
+      subtitle: "Sign in securely to the MAUNA Couture management system.",
       email: "Email",
+      emailPlaceholder: "example@mauna.com",
       password: "Password",
       login: "Sign In",
+      loading: "Signing in...",
       forgot: "Forgot Password",
-      register: "Create Account",
+      register: "Register",
+      error: "Login failed. Please check your email or password.",
       secure: "Secure Login",
-      version: "MAUNA Couture ERP v1",
-      placeholder: "example@mauna.com",
-      error: "Login failed. Check your information.",
+      footer: "MAUNA Couture - Software by VALKEA",
     },
   }[lang];
 
   async function login() {
     setMessage("");
+    setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setMessage(t.error);
+    if (!email.trim() || !password) {
+      setMessage("E-posta ve şifre zorunludur.");
+      setLoading(false);
       return;
     }
 
-    window.location.href = "/dashboard";
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: normalizedEmail,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      console.error("SUPABASE LOGIN ERROR:", error);
+      setMessage(error.message || copy.error);
+      return;
+    }
+
+    if (!data.session) {
+      setMessage("Oturum oluşturulamadı. Supabase email provider ve kullanıcı şifresini kontrol edin.");
+      return;
+    }
+
+    setMessage("Giriş başarılı. Yönlendiriliyorsunuz...");
+
+    await supabase.auth.getSession();
+    router.replace("/dashboard");
+
+    setTimeout(() => {
+      window.location.assign("/dashboard");
+    }, 350);
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f0e7] bg-[radial-gradient(circle_at_top,rgba(255,255,255,.95),transparent_35%),radial-gradient(circle_at_bottom,rgba(182,148,99,.18),transparent_35%)] px-5 py-8 text-[#211b16]">
-      <div className="mx-auto flex w-full max-w-md justify-end">
-        <div className="rounded-full border border-[#eadfce] bg-white/70 p-1 shadow-xl backdrop-blur-xl">
-          <button
-            onClick={() => setLang("tr")}
-            className={`rounded-full px-5 py-2 font-bold ${lang === "tr" ? "bg-[#b69463] text-white" : "text-[#7a6d5e]"}`}
-          >
-            TR
-          </button>
-          <button
-            onClick={() => setLang("en")}
-            className={`rounded-full px-5 py-2 font-bold ${lang === "en" ? "bg-[#b69463] text-white" : "text-[#7a6d5e]"}`}
-          >
-            EN
-          </button>
-        </div>
-      </div>
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f0e7] px-5 py-7 text-[#211b16]">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,.98),transparent_34%),radial-gradient(circle_at_80%_100%,rgba(182,148,99,.18),transparent_36%)]" />
 
-      <section className="mx-auto mt-8 w-full max-w-md rounded-[2.4rem] border border-[#eadfce] bg-white/78 p-8 shadow-[0_30px_100px_rgba(118,93,60,.16)] backdrop-blur-2xl">
-        <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-white shadow-2xl">
-          <Image src="/mauna-logo.png" alt="MAUNA" width={105} height={105} className="object-contain" />
-        </div>
+      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-[360px] flex-col justify-center">
+        <div className="rounded-[2rem] border border-[#eadfce] bg-white/82 px-5 pb-6 pt-6 shadow-[0_28px_90px_rgba(118,93,60,.16)] backdrop-blur-2xl">
+          <div className="flex items-start justify-between gap-4">
+            <div className="relative -mt-12 flex h-32 w-32 items-center justify-center rounded-full bg-white shadow-[0_24px_70px_rgba(118,93,60,.18)]">
+              <div className="absolute inset-2 rounded-full border border-[#eadfce]" />
+              <Image src="/mauna-logo.png" alt="MAUNA Couture" width={96} height={96} priority className="object-contain" />
+            </div>
 
-        <div className="mt-8 text-center">
-          <h1 className="text-4xl font-black tracking-[-0.05em]">{t.welcome}</h1>
-          <p className="mt-4 text-lg leading-8 text-[#7a6d5e]">{t.desc}</p>
-        </div>
-
-        <div className="mt-8 grid gap-5">
-          <label>
-            <span className="mb-2 block font-semibold text-[#6d6256]">{t.email}</span>
-            <input
-              className="input"
-              type="email"
-              placeholder={t.placeholder}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-
-          <label>
-            <span className="mb-2 block font-semibold text-[#6d6256]">{t.password}</span>
-            <input
-              className="input"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        </div>
-
-        {message && (
-          <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {message}
+            <div className="mt-1 rounded-full border border-[#eadfce] bg-white/75 p-1 shadow-sm backdrop-blur-xl">
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem("mauna_lang", "tr");
+                  setLang("tr");
+                }}
+                className={`rounded-full px-3 py-1.5 text-[11px] font-black ${lang === "tr" ? "bg-[#b69463] text-white" : "text-[#7d6c58]"}`}
+              >
+                TR
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  localStorage.setItem("mauna_lang", "en");
+                  setLang("en");
+                }}
+                className={`rounded-full px-3 py-1.5 text-[11px] font-black ${lang === "en" ? "bg-[#b69463] text-white" : "text-[#7d6c58]"}`}
+              >
+                EN
+              </button>
+            </div>
           </div>
-        )}
 
-        <button onClick={login} className="premium-button mt-7 w-full py-4 text-lg">
-          {t.login}
-        </button>
+          <div className="mt-5 text-center">
+            <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#b69463]">MAUNA Couture v1</p>
+            <h1 className="mt-3 text-[2.25rem] font-black leading-none tracking-[-0.055em] text-[#211b16]">{copy.title}</h1>
+            <p className="mx-auto mt-3 max-w-[265px] text-[14px] leading-6 text-[#7d6c58]">{copy.subtitle}</p>
+          </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <a href="/forgot-password" className="rounded-2xl border border-[#eadfce] bg-white/70 py-4 text-center font-bold text-[#6d6256]">
-            {t.forgot}
-          </a>
-          <a href="/register" className="rounded-2xl border border-[#eadfce] bg-white/70 py-4 text-center font-bold text-[#6d6256]">
-            {t.register}
-          </a>
+          <div className="mt-6 grid gap-3.5">
+            <label className="block">
+              <span className="mb-2 block text-sm font-bold text-[#6d6256]">{copy.email}</span>
+              <div className="flex items-center gap-3 rounded-[1.2rem] border border-[#eadfce] bg-[#fcfaf7] px-4 py-3">
+                <Mail size={20} className="text-[#8a7f72]" />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder={copy.emailPlaceholder} className="w-full bg-transparent text-[16px] font-semibold outline-none" />
+              </div>
+            </label>
+
+            <label className="block">
+              <span className="mb-2 block text-sm font-bold text-[#6d6256]">{copy.password}</span>
+              <div className="flex items-center gap-3 rounded-[1.2rem] border border-[#eadfce] bg-[#fcfaf7] px-4 py-3">
+                <LockKeyhole size={20} className="text-[#8a7f72]" />
+                <input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} placeholder="••••••••" className="w-full bg-transparent text-[16px] font-semibold outline-none" />
+                <button type="button" onClick={() => setShowPassword((v) => !v)}>
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </label>
+          </div>
+
+          {message && <div className="mt-4 rounded-2xl border border-[#eadfce] bg-[#fcfaf7] px-4 py-3 text-sm font-bold text-[#7d6c58]">{message}</div>}
+
+          <button onClick={login} disabled={loading} className="mt-5 flex w-full items-center justify-between rounded-[1.35rem] bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-3 pl-5 pr-3 text-base font-black text-white shadow-[0_22px_55px_rgba(182,148,99,.30)] disabled:opacity-60">
+            <span>{loading ? copy.loading : copy.login}</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#b69463] shadow-lg">
+              <ShieldCheck size={22} />
+            </span>
+          </button>
+
+          <div className="mt-3.5 grid grid-cols-2 gap-2.5">
+            <a href="/forgot-password" className="flex items-center justify-center gap-2 rounded-[1.1rem] border border-[#eadfce] bg-white/70 px-2.5 py-2.5 text-center text-[13px] font-black text-[#6d6256] shadow-sm">
+              <KeyRound size={18} /> {copy.forgot}
+            </a>
+
+            <a href="/register" className="flex items-center justify-center gap-2 rounded-[1.1rem] border border-[#eadfce] bg-white/70 px-2.5 py-2.5 text-center text-[13px] font-black text-[#6d6256] shadow-sm">
+              <UserPlus size={18} /> {copy.register}
+            </a>
+          </div>
+
+          <div className="mt-5 flex items-center justify-between text-xs font-semibold text-[#8a7f72]">
+            <span>MAUNA Couture v1</span>
+            <span>{copy.secure}</span>
+          </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-between text-sm text-[#8b8177]">
-          <span>{t.version}</span>
-          <span>{t.secure}</span>
-        </div>
+        <p className="mt-5 text-center text-sm font-semibold text-[#8a7f72]">{copy.footer}</p>
       </section>
-
-      <p className="mt-8 text-center text-sm text-[#8b8177]">
-        © 2026 MAUNA Couture. All rights reserved.
-      </p>
     </main>
   );
 }
