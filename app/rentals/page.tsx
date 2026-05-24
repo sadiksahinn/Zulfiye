@@ -58,7 +58,7 @@ export default function RentalsPage() {
 
   async function loadData() {
     const [productsRes, customersRes] = await Promise.all([
-      supabase.from("products").select("*").neq("status", "satildi").order("created_at", { ascending: false }),
+      supabase.from("products").select("*").eq("status", "stokta").order("created_at", { ascending: false }),
       supabase.from("customers").select("*").order("created_at", { ascending: false }),
     ]);
 
@@ -230,7 +230,23 @@ export default function RentalsPage() {
       },
     ].filter((event): event is NonNullable<typeof event> => event !== null));
 
-    setMessage("Kiralama oluşturuldu ve takvime işlendi.");
+    setMessage("Kiralama oluşturuldu, ürün kirada durumuna alındı ve takvime işlendi.");
+    setSelectedProduct(null);
+    setSelectedCustomer(null);
+    setProductSearch("");
+    setCustomerSearch("");
+    setForm({
+      deliveryDate: "",
+      deliveryTime: "",
+      eventDate: "",
+      eventTime: "",
+      eventType: "Düğün",
+      returnDate: "",
+      returnTime: "",
+      totalAmount: "",
+      depositAmount: "",
+      notes: "",
+    });
     loadData();
   }
 
