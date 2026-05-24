@@ -104,7 +104,7 @@ export default function TodayPage() {
                         {[customer.phone, customer.instagram].filter(Boolean).join(" • ") || "Detay yok"}
                       </p>
                     </div>
-                    <Link href="/customers" className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
+                    <Link href={`/customers/${customer.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
                       Müşteri Kartına Git
                     </Link>
                   </div>
