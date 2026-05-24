@@ -25,12 +25,15 @@ export default function DashboardPage() {
   useEffect(() => { load(); }, []);
 
   const stats = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
     const revenue = rentals.reduce((s, x) => s + Number(x.total_amount || 0), 0);
     const remaining = rentals.reduce((s, x) => s + Number(x.remaining_amount || 0), 0);
     const stock = products.filter((x) => x.status === "stokta").length;
     const rented = products.filter((x) => x.status === "kirada").length;
     const delayed = rentals.filter((x) => x.status === "gecikti").length;
-    return { revenue, remaining, stock, rented, delayed };
+    const todayDeliveries = rentals.filter((x) => x.delivery_date === today).length;
+    const todayReturns = rentals.filter((x) => x.return_date === today).length;
+    return { revenue, remaining, stock, rented, delayed, todayDeliveries, todayReturns };
   }, [products, rentals]);
 
   const progress = products.length ? Math.round((stats.rented / products.length) * 100) : 0;
@@ -47,7 +50,9 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <section className="grid grid-cols-2 gap-3 xl:grid-cols-6">
+          <Metric title="Bugün Teslim" value={stats.todayDeliveries} sub="Teslim edilecek" icon={<CalendarDays size={20} />} />
+          <Metric title="Bugün İade" value={stats.todayReturns} sub="Geri alınacak" icon={<CalendarDays size={20} />} />
           <Metric title="Ürün" value={products.length} sub={`${stats.stock} stokta`} icon={<Package size={20} />} />
           <Metric title="Müşteri" value={customers.length} sub="Kayıtlı" icon={<Users size={20} />} />
           <Metric title="Kirada" value={stats.rented} sub="Aktif" icon={<ShoppingBag size={20} />} />
@@ -66,7 +71,9 @@ export default function DashboardPage() {
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <Quick href="/rentals" title="Kiralama" icon={<CalendarDays size={18} />} />
+              <Quick href="/returns" title="İade Al" icon={<AlertTriangle size={18} />} />
               <Quick href="/sales" title="Satış" icon={<ShoppingBag size={18} />} />
+              <Quick href="/calendar" title="Takvim" icon={<CalendarDays size={18} />} />
               <Quick href="/products" title="Ürünler" icon={<Package size={18} />} />
               <Quick href="/customers" title="Müşteri" icon={<Users size={18} />} />
             </div>
