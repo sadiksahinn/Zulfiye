@@ -85,7 +85,7 @@ export default function LoginPage() {
     setMessage("Giriş başarılı. Yönlendiriliyorsunuz...");
 
     await supabase.auth.getSession();
-    router.replace("/dashboard");
+    router.replace("/today");
 
     setTimeout(() => {
       window.location.assign("/dashboard");
