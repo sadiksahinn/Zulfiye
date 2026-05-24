@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Clock, Package, RotateCcw, Search } from "lucide-react";
+import { CalendarDays, Clock, Package, RotateCcw, Search, Filter } from "lucide-react";
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "today" | "upcoming">("all");
 
   async function load() {
     const { data } = await supabase
@@ -24,14 +25,30 @@ export default function CalendarPage() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return events.filter((e) =>
-      [e.title, e.event_type, e.event_date, e.description]
+    const today = new Date().toISOString().slice(0, 10);
+
+    return events.filter((e) => {
+      const matchesSearch = [e.title, e.event_type, e.event_date, e.description]
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
-        .includes(q)
-    );
-  }, [events, search]);
+        .includes(q);
+
+      if (!matchesSearch) return false;
+      if (filter === "today") return e.event_date === today;
+      if (filter === "upcoming") return e.event_date >= today;
+      return true;
+    });
+  }, [events, search, filter]);
+
+  const todayCount = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    return events.filter((e) => e.event_date === today).length;
+  }, [events]);
+
+  const returnCount = useMemo(() => {
+    return events.filter((e) => e.event_type === "return").length;
+  }, [events]);
 
   return (
     <AppShell title="Takvim">
@@ -46,9 +63,21 @@ export default function CalendarPage() {
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
             Teslim, etkinlik ve iade günlerini tek ekrandan takip edin.
           </p>
+
+          <div className="mt-5 grid grid-cols-3 gap-3 lg:max-w-xl">
+            <Hero label="Bugün" value={todayCount} />
+            <Hero label="İade" value={returnCount} />
+            <Hero label="Toplam" value={events.length} />
+          </div>
         </div>
 
         <div className="premium-card p-6">
+          <div className="mb-4 grid grid-cols-3 gap-2">
+            <FilterButton active={filter === "all"} onClick={() => setFilter("all")} label="Tümü" />
+            <FilterButton active={filter === "today"} onClick={() => setFilter("today")} label="Bugün" />
+            <FilterButton active={filter === "upcoming"} onClick={() => setFilter("upcoming")} label="Yaklaşan" />
+          </div>
+
           <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-4">
             <Search size={18} className="text-[#b69463]" />
             <input
@@ -103,5 +132,29 @@ function Info({ icon, value }: any) {
       <span className="text-[#b69463]">{icon}</span>
       {value}
     </div>
+  );
+}
+
+
+function Hero({ label, value }: any) {
+  return (
+    <div className="rounded-2xl bg-white/10 p-4 text-center backdrop-blur-xl">
+      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{label}</div>
+      <div className="mt-2 text-xl font-black text-white">{value}</div>
+    </div>
+  );
+}
+
+function FilterButton({ active, onClick, label }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-black ${
+        active ? "bg-[#211b16] text-white" : "border border-[#eadfce] bg-white/70 text-[#6d6256]"
+      }`}
+    >
+      <Filter size={15} />
+      {label}
+    </button>
   );
 }
