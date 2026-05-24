@@ -16,11 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-const publicRoutes = [
-  "/",
-  "/forgot-password",
-  "/reset-password",
-];
+const publicRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
 
 export function AuthProvider({
   children,
@@ -34,22 +30,30 @@ export function AuthProvider({
   const pathname = usePathname();
 
   useEffect(() => {
+    let mounted = true;
+
     async function loadUser() {
+      setLoading(true);
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      setUser(session?.user ?? null);
+      if (!mounted) return;
 
-      if (!session && !publicRoutes.includes(pathname)) {
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      const isPublicRoute = publicRoutes.includes(pathname);
+
+      if (!session && !isPublicRoute) {
         router.replace("/");
+        return;
       }
 
       if (session && pathname === "/") {
         router.replace("/dashboard");
       }
-
-      setLoading(false);
     }
 
     loadUser();
@@ -57,10 +61,16 @@ export function AuthProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (!mounted) return;
 
-      if (!session && !publicRoutes.includes(pathname)) {
+      setUser(session?.user ?? null);
+      setLoading(false);
+
+      const isPublicRoute = publicRoutes.includes(pathname);
+
+      if (!session && !isPublicRoute) {
         router.replace("/");
+        return;
       }
 
       if (session && pathname === "/") {
@@ -68,11 +78,15 @@ export function AuthProvider({
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [pathname, router]);
 
   async function logout() {
     await supabase.auth.signOut();
+    setUser(null);
     router.replace("/");
   }
 
