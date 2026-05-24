@@ -51,7 +51,7 @@ export default function AppShell({
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
       <div className="mx-auto flex w-full max-w-[1700px] gap-6 p-0 lg:p-6">
-        <aside className="hidden min-h-[calc(100vh-3rem)] w-[310px] shrink-0 flex-col rounded-[2rem] border border-white/10 bg-[#171411] p-5 text-white shadow-[0_28px_90px_rgba(33,27,22,.28)] lg:flex">
+        <aside className="hidden min-h-[calc(100vh-3rem)] w-[330px] shrink-0 flex-col rounded-[2rem] border border-white/10 bg-[#171411] p-5 font-sans text-white shadow-[0_28px_90px_rgba(33,27,22,.28)] lg:flex">
           <div className="mb-7 flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-[1.35rem] bg-white p-2 shadow-[0_18px_45px_rgba(0,0,0,.22)]">
               <img src="/mauna-logo.png" alt="MAUNA" className="h-full w-full object-contain" />
@@ -62,7 +62,7 @@ export default function AppShell({
             </div>
           </div>
 
-          <nav className="flex-1 space-y-1.5 overflow-y-auto pr-1">
+          <nav className="flex-1 space-y-2 overflow-y-auto pr-1">
             {menu.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -71,20 +71,20 @@ export default function AppShell({
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                  className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
                     active
                       ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
                       : "text-zinc-200 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                    className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
                       active ? "bg-white/20 text-white" : "bg-white/8 text-[#d8be8d] group-hover:bg-white/12"
                     }`}
                   >
-                    <Icon size={18} />
+                    <Icon size={20} strokeWidth={2.35} />
                   </span>
-                  <span>{item.name}</span>
+                  <span className="leading-none">{item.name}</span>
                 </a>
               );
             })}
