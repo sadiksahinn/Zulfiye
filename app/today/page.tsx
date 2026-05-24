@@ -18,16 +18,19 @@ import {
 export default function TodayPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
   async function load() {
-    const [rentalsRes, customersRes] = await Promise.all([
+    const [rentalsRes, customersRes, salesRes] = await Promise.all([
       supabase.from("rentals").select("*").order("delivery_date", { ascending: true }),
       supabase.from("customers").select("*").order("created_at", { ascending: false }),
+      supabase.from("sales").select("*").order("created_at", { ascending: false }),
     ]);
 
     setRentals(rentalsRes.data || []);
     setCustomers(customersRes.data || []);
+    setSales(salesRes.data || []);
   }
 
   useEffect(() => {
@@ -49,14 +52,33 @@ export default function TodayPage() {
     const q = search.trim().toLowerCase();
     if (!q) return [];
 
-    return customers.filter((c) =>
-      [c.full_name, c.phone, c.instagram]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(q)
-    ).slice(0, 6);
-  }, [customers, search]);
+    return customers
+      .filter((c) =>
+        [c.full_name, c.phone, c.instagram]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q)
+      )
+      .map((customer) => {
+        const customerRentals = rentals.filter((r) => r.customer_id === customer.id);
+        const customerSales = sales.filter((sale) => sale.customer_id === customer.id);
+        const lastRental = customerRentals[0];
+        const lastSale = customerSales[0];
+        const remaining =
+          customerRentals.reduce((sum, item) => sum + Number(item.remaining_amount || 0), 0) +
+          customerSales.reduce((sum, item) => sum + Number(item.remaining_amount || 0), 0);
+
+        return {
+          ...customer,
+          lastRental,
+          lastSale,
+          remaining,
+          operationCount: customerRentals.length + customerSales.length,
+        };
+      })
+      .slice(0, 6);
+  }, [customers, rentals, sales, search]);
 
   const todayFlow = useMemo(() => {
     const deliveryItems = stats.deliveries.map((x) => ({ ...x, flowType: "Teslim", flowTime: x.delivery_time || "Saat yok" }));
@@ -103,7 +125,15 @@ export default function TodayPage() {
                       <p className="mt-1 text-xs font-bold text-[#8a7f72]">
                         {[customer.phone, customer.instagram].filter(Boolean).join(" • ") || "Detay yok"}
                       </p>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <MiniBadge label="İşlem" value={`${customer.operationCount || 0}`} />
+                        <MiniBadge label="Kalan" value={`${Number(customer.remaining || 0).toLocaleString("tr-TR")} TL`} danger={Number(customer.remaining || 0) > 0} />
+                        {customer.lastRental ? <MiniBadge label="Son Kiralama" value={customer.lastRental.return_date || customer.lastRental.delivery_date || "-"} /> : null}
+                        {customer.lastSale ? <MiniBadge label="Son Satış" value={customer.lastSale.sale_date || "-"} /> : null}
+                      </div>
                     </div>
+
                     <Link href={`/customers/${customer.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
                       Müşteri Kartına Git
                     </Link>
@@ -236,5 +266,16 @@ function Empty({ text, compact = false }: any) {
     <div className={`rounded-3xl border border-dashed border-[#d9c9b5] text-center text-sm font-bold text-[#8a7f72] ${compact ? "p-6" : "p-10"}`}>
       {text}
     </div>
+  );
+}
+
+
+function MiniBadge({ label, value, danger = false }: any) {
+  return (
+    <span className={`rounded-full px-3 py-1 text-[11px] font-black ${
+      danger ? "bg-red-100 text-red-700" : "bg-[#f7f0e7] text-[#6d6256]"
+    }`}>
+      {label}: {value}
+    </span>
   );
 }
