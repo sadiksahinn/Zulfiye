@@ -29,7 +29,8 @@ export default function AppShell({
   const { user, logout } = useAuth();
 
   const menu = [
-    { name: "Anasayfa", href: "/dashboard", icon: Home },
+    { name: "Bugün", href: "/today", icon: Home },
+    { name: "Yönetim", href: "/dashboard", icon: BarChart3 },
     { name: "Satış", href: "/sales", icon: ShoppingBag },
     { name: "Müşteriler", href: "/customers", icon: Users },
     { name: "Ürünler", href: "/products", icon: Package },
