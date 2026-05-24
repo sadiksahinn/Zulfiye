@@ -2,31 +2,62 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import {
+  CalendarDays,
+  Home,
+  Menu,
+  Package,
+  RotateCcw,
+  ShoppingBag,
+  UserRound,
+  X,
+} from "lucide-react";
 
 export default function MobileNavigation() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  const publicPages = ["/", "/forgot-password", "/reset-password"];
+  const publicPages = ["/", "/forgot-password", "/reset-password", "/register"];
   if (publicPages.includes(pathname)) return null;
 
-  const links = [
-    ["Anasayfa", "/dashboard"],
-    ["Satış", "/sales"],
-    ["Müşteriler", "/customers"],
-    ["Ürünler", "/products"],
-    ["Kiralama", "/rentals"],
-    ["İade / Teslim", "/returns"],
-    ["Takvim", "/calendar"],
-    ["SMS", "/sms"],
+  const mainLinks = [
+    ["Bugün", "/today", Home],
+    ["Takvim", "/calendar", CalendarDays],
+    ["Kiralama", "/rentals", CalendarDays],
+    ["Müşteri", "/customers", UserRound],
+    ["Ürünler", "/products", Package],
+    ["İade", "/returns", RotateCcw],
+    ["Satış", "/sales", ShoppingBag],
+  ] as const;
+
+  const adminLinks = [
+    ["Yönetim", "/dashboard"],
     ["Muhasebe", "/accounting"],
     ["Raporlar", "/reports"],
+    ["SMS", "/sms"],
     ["Ayarlar", "/settings"],
-  ];
+  ] as const;
 
   return (
     <>
+      <div className="fixed bottom-3 left-3 right-3 z-[99998] grid grid-cols-5 gap-2 rounded-[1.7rem] border border-white/20 bg-[#171411]/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
+        {mainLinks.slice(0, 5).map(([name, href, Icon]) => {
+          const active = pathname === href || pathname.startsWith(`${href}/`);
+          return (
+            <a
+              key={href}
+              href={href}
+              className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-black ${
+                active ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white" : "text-white/70"
+              }`}
+            >
+              <Icon size={18} />
+              {name}
+            </a>
+          );
+        })}
+      </div>
+
       <button
         onClick={() => setOpen(true)}
         className="fixed right-4 top-4 z-[99999] flex items-center gap-2 rounded-2xl bg-[#171411] px-5 py-4 text-white shadow-2xl lg:hidden"
@@ -41,7 +72,7 @@ export default function MobileNavigation() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <div className="text-2xl font-black tracking-[0.25em]">MAUNA</div>
-                <div className="text-xs tracking-[0.3em] text-[#d8be8d]">COUTURE ERP</div>
+                <div className="text-xs tracking-[0.3em] text-[#d8be8d]">COUTURE OPERATION</div>
               </div>
               <button onClick={() => setOpen(false)} className="rounded-xl bg-white/10 p-3">
                 <X size={22} />
@@ -49,8 +80,21 @@ export default function MobileNavigation() {
             </div>
 
             <div className="grid gap-3">
-              {links.map(([name, href]) => (
-                <a key={href} href={href} className="rounded-2xl bg-white/10 px-4 py-4 font-bold text-white">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                Personel İşlemleri
+              </p>
+              {mainLinks.map(([name, href, Icon]) => (
+                <a key={href} href={href} className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-4 font-bold text-white">
+                  <Icon size={18} className="text-[#d8be8d]" />
+                  {name}
+                </a>
+              ))}
+
+              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                Yönetim
+              </p>
+              {adminLinks.map(([name, href]) => (
+                <a key={href} href={href} className="rounded-2xl bg-white/[0.06] px-4 py-4 font-bold text-white/85">
                   {name}
                 </a>
               ))}
