@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import { QRCodeSVG } from "qrcode.react";
-import { ArrowLeft, CalendarDays, Copy, Hash, PackageCheck, Palette, Ruler, ShieldCheck, Sparkles, Tag } from "lucide-react";
+import { ArrowLeft, CalendarDays, Copy, Hash, PackageCheck, Palette, Ruler, Save, ShieldCheck, Sparkles, Tag } from "lucide-react";
 
 type Product = {
   id: string;
@@ -31,6 +31,18 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    model_name: "",
+    category: "",
+    size: "",
+    color: "",
+    sale_price: "",
+    rental_price: "",
+    status: "",
+    notes: "",
+  });
 
   async function loadProduct() {
     setLoading(true);
@@ -49,7 +61,23 @@ export default function ProductDetailPage() {
       return;
     }
 
-    setProduct((data || null) as Product | null);
+    const productData = (data || null) as Product | null;
+    setProduct(productData);
+
+    if (productData) {
+      setEditForm({
+        name: productData.name || "",
+        model_name: productData.model_name || "",
+        category: productData.category || "",
+        size: productData.size || "",
+        color: productData.color || "",
+        sale_price: String(productData.sale_price || ""),
+        rental_price: String(productData.rental_price || ""),
+        status: productData.status || "stokta",
+        notes: productData.notes || "",
+      });
+    }
+
     setLoading(false);
   }
 
@@ -62,6 +90,40 @@ export default function ProductDetailPage() {
     await navigator.clipboard.writeText(product.barcode);
     setMessage("Barkod kopyalandı.");
     setTimeout(() => setMessage(""), 1500);
+  }
+
+  function updateEditField(key: string, value: string) {
+    setEditForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function updateProduct() {
+    if (!product) return;
+
+    setMessage("");
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        name: editForm.name,
+        model_name: editForm.model_name,
+        category: editForm.category,
+        size: editForm.size,
+        color: editForm.color,
+        sale_price: Number(editForm.sale_price || 0),
+        rental_price: Number(editForm.rental_price || 0),
+        status: editForm.status,
+        notes: editForm.notes,
+      })
+      .eq("id", product.id);
+
+    if (error) {
+      setMessage(error.message || "Ürün güncellenemedi.");
+      return;
+    }
+
+    setMessage("Ürün bilgileri güncellendi.");
+    setEditing(false);
+    await loadProduct();
   }
 
   if (loading) {
@@ -102,13 +164,47 @@ export default function ProductDetailPage() {
               </p>
             </div>
 
-            <a href="/products" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/15 px-5 py-4 text-sm font-black text-white">
-              <ArrowLeft size={18} /> Listeye Dön
-            </a>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button onClick={() => setEditing((value) => !value)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-4 text-sm font-black text-[#211b16]">
+                <Save size={18} /> {editing ? "Düzenlemeyi Kapat" : "Ürünü Düzenle"}
+              </button>
+
+              <a href="/products" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/15 px-5 py-4 text-sm font-black text-white">
+                <ArrowLeft size={18} /> Listeye Dön
+              </a>
+            </div>
           </div>
         </div>
 
         {message ? <div className="premium-card p-4 text-sm font-black text-[#6d6256]">{message}</div> : null}
+
+        {editing ? (
+          <div className="premium-card p-5 lg:p-7">
+            <h2 className="premium-title text-2xl">Ürün Bilgilerini Düzenle</h2>
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+              <input className="input md:col-span-2" placeholder="Ürün adı" value={editForm.name} onChange={(e) => updateEditField("name", e.target.value)} />
+              <input className="input" placeholder="Model adı" value={editForm.model_name} onChange={(e) => updateEditField("model_name", e.target.value)} />
+              <input className="input" placeholder="Kategori" value={editForm.category} onChange={(e) => updateEditField("category", e.target.value)} />
+              <input className="input" placeholder="Beden" value={editForm.size} onChange={(e) => updateEditField("size", e.target.value)} />
+              <input className="input" placeholder="Renk" value={editForm.color} onChange={(e) => updateEditField("color", e.target.value)} />
+              <input className="input" type="number" inputMode="decimal" min="0" placeholder="Satış fiyatı" value={editForm.sale_price} onChange={(e) => updateEditField("sale_price", e.target.value)} />
+              <input className="input" type="number" inputMode="decimal" min="0" placeholder="Kiralama fiyatı" value={editForm.rental_price} onChange={(e) => updateEditField("rental_price", e.target.value)} />
+              <select className="input md:col-span-2" value={editForm.status} onChange={(e) => updateEditField("status", e.target.value)}>
+                <option value="stokta">Stokta</option>
+                <option value="kirada">Kirada</option>
+                <option value="provada">Provada</option>
+                <option value="tadilatta">Tadilatta</option>
+                <option value="temizlemede">Temizlemede</option>
+                <option value="satildi">Satıldı</option>
+              </select>
+              <textarea className="input md:col-span-2 min-h-28" placeholder="Notlar" value={editForm.notes} onChange={(e) => updateEditField("notes", e.target.value)} />
+            </div>
+
+            <button onClick={updateProduct} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-5 py-4 text-sm font-black text-white">
+              <Save size={18} /> Değişiklikleri Kaydet
+            </button>
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.35fr_.75fr]">
           <section className="premium-card p-5 lg:p-7">
