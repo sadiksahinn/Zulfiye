@@ -128,7 +128,7 @@ export default function SalesPage() {
 
     const total = Number(form.totalAmount || selectedProduct.sale_price || 0);
     const paid = Number(form.paidAmount || 0);
-    const remaining = total - paid;
+    const remaining = Math.max(total - paid, 0);
 
     const { data: sale, error } = await supabase
       .from("sales")
@@ -148,7 +148,7 @@ export default function SalesPage() {
       .single();
 
     if (error) {
-      setMessage("Satış kaydedilemedi.");
+      setMessage(error.message || "Satış kaydedilemedi. Supabase sales tablosunu kontrol edin.");
       return;
     }
 
@@ -169,6 +169,16 @@ export default function SalesPage() {
     });
 
     setMessage("Satış tamamlandı. Ürün satıldı durumuna alındı.");
+    setSelectedProduct(null);
+    setSelectedCustomer(null);
+    setProductSearch("");
+    setCustomerSearch("");
+    setForm({
+      totalAmount: "",
+      paidAmount: "",
+      paymentType: "Nakit",
+      notes: "",
+    });
     loadData();
   }
 
