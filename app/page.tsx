@@ -1,21 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginPage() {
-  const router = useRouter();
-
+  const [lang, setLang] = useState<"tr" | "en">("tr");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+
+  const t = {
+    tr: {
+      welcome: "Hoş Geldiniz",
+      desc: "MAUNA Couture yönetim sistemine giriş yapın.",
+      email: "E-posta",
+      password: "Şifre",
+      login: "Giriş Yap",
+      forgot: "Şifremi Unuttum",
+      register: "Kayıt Ol",
+      secure: "Güvenli Giriş",
+      version: "MAUNA Couture ERP v1",
+      placeholder: "ornek@mauna.com",
+      error: "Giriş başarısız. Bilgileri kontrol edin.",
+    },
+    en: {
+      welcome: "Welcome",
+      desc: "Sign in to MAUNA Couture management system.",
+      email: "Email",
+      password: "Password",
+      login: "Sign In",
+      forgot: "Forgot Password",
+      register: "Create Account",
+      secure: "Secure Login",
+      version: "MAUNA Couture ERP v1",
+      placeholder: "example@mauna.com",
+      error: "Login failed. Check your information.",
+    },
+  }[lang];
 
   async function login() {
-    setLoading(true);
     setMessage("");
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -23,175 +47,95 @@ export default function LoginPage() {
       password,
     });
 
-    setLoading(false);
-
     if (error) {
-      setMessage(error.message);
+      setMessage(t.error);
       return;
     }
 
-    router.replace("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f6efe5] text-[#211b16]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(182,148,99,.16),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(33,27,22,.08),transparent_30%)]" />
+    <main className="min-h-screen bg-[#f7f0e7] bg-[radial-gradient(circle_at_top,rgba(255,255,255,.95),transparent_35%),radial-gradient(circle_at_bottom,rgba(182,148,99,.18),transparent_35%)] px-5 py-8 text-[#211b16]">
+      <div className="mx-auto flex w-full max-w-md justify-end">
+        <div className="rounded-full border border-[#eadfce] bg-white/70 p-1 shadow-xl backdrop-blur-xl">
+          <button
+            onClick={() => setLang("tr")}
+            className={`rounded-full px-5 py-2 font-bold ${lang === "tr" ? "bg-[#b69463] text-white" : "text-[#7a6d5e]"}`}
+          >
+            TR
+          </button>
+          <button
+            onClick={() => setLang("en")}
+            className={`rounded-full px-5 py-2 font-bold ${lang === "en" ? "bg-[#b69463] text-white" : "text-[#7a6d5e]"}`}
+          >
+            EN
+          </button>
+        </div>
+      </div>
 
-      <section className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-2">
-        <div className="hidden flex-col justify-between p-14 lg:flex">
-          <div>
-            <div className="inline-flex items-center gap-3 rounded-full border border-[#d9c9b5] bg-white/70 px-5 py-3 backdrop-blur-xl">
-              <img src="/mauna-logo.png" className="h-10 w-10 object-contain" />
-              <span className="text-xs font-black tracking-[0.35em] text-[#8c7b67]">
-                MAUNA COUTURE ERP
-              </span>
-            </div>
-
-            <div className="mt-16 max-w-xl">
-              <h1 className="text-7xl font-black leading-[0.9] tracking-[-0.08em]">
-                Luxury fashion
-                <br />
-                operating system
-              </h1>
-
-              <p className="mt-8 max-w-lg text-lg leading-8 text-[#6d6256]">
-                Kiralama, satış, prova, müşteri ve couture operasyonlarını tek premium panelden yönetin.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-8">
-            <div>
-              <div className="text-5xl font-black">500+</div>
-              <div className="mt-2 text-sm font-bold text-[#8a7f72]">
-                Aktif ürün yönetimi
-              </div>
-            </div>
-
-            <div className="h-14 w-px bg-[#d9c9b5]" />
-
-            <div>
-              <div className="text-5xl font-black">24/7</div>
-              <div className="mt-2 text-sm font-bold text-[#8a7f72]">
-                Operasyon takibi
-              </div>
-            </div>
-          </div>
+      <section className="mx-auto mt-8 w-full max-w-md rounded-[2.4rem] border border-[#eadfce] bg-white/78 p-8 shadow-[0_30px_100px_rgba(118,93,60,.16)] backdrop-blur-2xl">
+        <div className="mx-auto flex h-36 w-36 items-center justify-center rounded-full bg-white shadow-2xl">
+          <Image src="/mauna-logo.png" alt="MAUNA" width={105} height={105} className="object-contain" />
         </div>
 
-        <div className="relative flex items-center justify-center p-6 lg:p-10">
-          <div className="absolute h-[520px] w-[520px] rounded-full bg-[#b69463]/10 blur-3xl" />
+        <div className="mt-8 text-center">
+          <h1 className="text-4xl font-black tracking-[-0.05em]">{t.welcome}</h1>
+          <p className="mt-4 text-lg leading-8 text-[#7a6d5e]">{t.desc}</p>
+        </div>
 
-          <div className="relative w-full max-w-md overflow-hidden rounded-[2.2rem] border border-white/70 bg-white/75 p-8 shadow-[0_35px_120px_rgba(33,27,22,.14)] backdrop-blur-2xl">
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom_right,rgba(255,255,255,.55),transparent)]" />
+        <div className="mt-8 grid gap-5">
+          <label>
+            <span className="mb-2 block font-semibold text-[#6d6256]">{t.email}</span>
+            <input
+              className="input"
+              type="email"
+              placeholder={t.placeholder}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
 
-            <div className="relative">
-              <div className="flex items-center justify-between">
-                <div className="rounded-full border border-[#eadfce] bg-[#f8f2ea] px-4 py-2 text-[10px] font-black uppercase tracking-[0.32em] text-[#8a7f72]">
-                  Secure Access
-                </div>
+          <label>
+            <span className="mb-2 block font-semibold text-[#6d6256]">{t.password}</span>
+            <input
+              className="input"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+        </div>
 
-                <img
-                  src="/mauna-logo.png"
-                  className="h-14 w-14 rounded-2xl border border-[#eadfce] bg-white p-2 shadow-sm"
-                />
-              </div>
-
-              <div className="mt-10">
-                <h2 className="text-5xl font-black tracking-[-0.07em]">
-                  Welcome
-                </h2>
-
-                <p className="mt-4 text-base leading-7 text-[#6d6256]">
-                  MAUNA Couture yönetim sistemine güvenli giriş yapın.
-                </p>
-              </div>
-
-              <div className="mt-10 grid gap-5">
-                <label className="block">
-                  <span className="mb-3 block text-sm font-black text-[#6d6256]">
-                    E-posta
-                  </span>
-
-                  <div className="flex h-16 items-center gap-3 rounded-2xl border border-[#eadfce] bg-[#fcfaf8] px-5">
-                    <Mail size={19} className="text-[#8a7f72]" />
-                    <input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ornek@mauna.com"
-                      className="w-full bg-transparent text-[15px] font-bold outline-none placeholder:text-[#b1a08d]"
-                    />
-                  </div>
-                </label>
-
-                <label className="block">
-                  <span className="mb-3 block text-sm font-black text-[#6d6256]">
-                    Şifre
-                  </span>
-
-                  <div className="flex h-16 items-center gap-3 rounded-2xl border border-[#eadfce] bg-[#fcfaf8] px-5">
-                    <LockKeyhole size={19} className="text-[#8a7f72]" />
-
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full bg-transparent text-[15px] font-bold outline-none placeholder:text-[#b1a08d]"
-                    />
-                  </div>
-                </label>
-              </div>
-
-              {message && (
-                <div className="mt-5 rounded-2xl bg-[#f7f0e7] p-4 text-sm font-bold text-[#6d6256]">
-                  {message}
-                </div>
-              )}
-
-              <button
-                onClick={login}
-                disabled={loading}
-                className="mt-8 flex h-16 w-full items-center justify-between rounded-2xl bg-gradient-to-r from-[#211b16] to-[#b69463] px-6 text-white shadow-[0_18px_40px_rgba(182,148,99,.22)] transition hover:scale-[1.01]"
-              >
-                <span className="text-[15px] font-black">
-                  {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-                </span>
-
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
-                  <ArrowRight size={18} />
-                </div>
-              </button>
-
-              <div className="mt-6 flex items-center justify-between text-sm font-bold">
-                <Link href="/forgot-password" className="text-[#8a7f72]">
-                  Şifremi Unuttum
-                </Link>
-
-                <Link href="/register" className="text-[#b69463]">
-                  Kayıt Ol
-                </Link>
-              </div>
-
-              <div className="mt-10 flex items-center justify-between border-t border-[#eadfce] pt-6">
-                <div>
-                  <div className="text-xs font-black text-[#211b16]">
-                    MAUNA Couture
-                  </div>
-
-                  <div className="mt-1 text-[11px] font-bold text-[#8a7f72]">
-                    Luxury ERP Platform
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-black uppercase tracking-[0.2em] text-[#8a7f72]">
-                  Secure Login
-                </div>
-              </div>
-            </div>
+        {message && (
+          <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {message}
           </div>
+        )}
+
+        <button onClick={login} className="premium-button mt-7 w-full py-4 text-lg">
+          {t.login}
+        </button>
+
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <a href="/forgot-password" className="rounded-2xl border border-[#eadfce] bg-white/70 py-4 text-center font-bold text-[#6d6256]">
+            {t.forgot}
+          </a>
+          <a href="/register" className="rounded-2xl border border-[#eadfce] bg-white/70 py-4 text-center font-bold text-[#6d6256]">
+            {t.register}
+          </a>
+        </div>
+
+        <div className="mt-8 flex items-center justify-between text-sm text-[#8b8177]">
+          <span>{t.version}</span>
+          <span>{t.secure}</span>
         </div>
       </section>
+
+      <p className="mt-8 text-center text-sm text-[#8b8177]">
+        © 2026 MAUNA Couture. All rights reserved.
+      </p>
     </main>
   );
 }
