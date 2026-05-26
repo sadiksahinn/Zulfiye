@@ -96,6 +96,23 @@ export default function FittingsPage() {
     load();
   }
 
+  async function updateFittingStatus(id: string, status: string) {
+    setMessage("");
+
+    const { error } = await supabase
+      .from("fittings")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) {
+      setMessage(error.message || "Prova durumu güncellenemedi.");
+      return;
+    }
+
+    setMessage("Prova durumu güncellendi.");
+    load();
+  }
+
   const today = new Date().toISOString().slice(0, 10);
   const todayFittings = fittings.filter((x) => x.fitting_date === today);
 
@@ -167,13 +184,31 @@ export default function FittingsPage() {
               ) : (
                 todayFittings.map((item) => (
                   <div key={item.id} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
-                        <UserRound size={19} />
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                          <UserRound size={19} />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-[#211b16]">{item.customer_name || "Müşteri"}</h3>
+                          <p className="text-xs font-bold text-[#8a7f72]">{item.fitting_time || "Saat yok"} • {item.product_name || "Ürün belirtilmedi"}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-black text-[#211b16]">{item.customer_name || "Müşteri"}</h3>
-                        <p className="text-xs font-bold text-[#8a7f72]">{item.fitting_time || "Saat yok"} • {item.product_name || "Ürün belirtilmedi"}</p>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        {["bekliyor", "geldi", "tamamlandi", "teslime_hazir"].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => updateFittingStatus(item.id, status)}
+                            className={`rounded-2xl px-3 py-3 text-xs font-black ${
+                              item.status === status
+                                ? "bg-[#211b16] text-white"
+                                : "border border-[#eadfce] bg-white text-[#6d6256]"
+                            }`}
+                          >
+                            {statusText(status)}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -201,4 +236,13 @@ function SearchField({ label, value, onChange, placeholder }: any) {
 
 function ResultList({ children }: any) {
   return <div className="rounded-3xl border border-[#eadfce] bg-white/80 p-3 shadow-sm">{children}</div>;
+}
+
+
+function statusText(status: string) {
+  if (status === "bekliyor") return "Bekliyor";
+  if (status === "geldi") return "Geldi";
+  if (status === "tamamlandi") return "Tamamlandı";
+  if (status === "teslime_hazir") return "Teslime Hazır";
+  return status;
 }
