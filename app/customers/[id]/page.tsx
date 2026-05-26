@@ -12,6 +12,7 @@ export default function CustomerDetailPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
+  const [fittings, setFittings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -46,6 +47,7 @@ export default function CustomerDetailPage() {
 
     setRentals(rentalsRes.data || []);
     setSales(salesRes.data || []);
+    setFittings(fittingsRes.data || []);
     setFittings(fittingsRes.data || []);
   }
 
@@ -148,6 +150,7 @@ export default function CustomerDetailPage() {
 
         <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           <Metric title="Prova" value={fittings.length} icon={<CalendarDays size={20} />} />
+          <Metric title="Prova" value={fittings.length} icon={<CalendarDays size={20} />} />
           <Metric title="Kiralama" value={rentals.length} icon={<CalendarDays size={20} />} />
           <Metric title="Satış" value={sales.length} icon={<Wallet size={20} />} />
           <Metric title="Kalan" value={`${totals.remaining.toLocaleString("tr-TR")} TL`} icon={<Wallet size={20} />} danger={totals.remaining > 0} />
@@ -168,6 +171,7 @@ export default function CustomerDetailPage() {
           </div>
 
           <div className="space-y-5">
+            <History title="Prova Geçmişi" items={fittings} type="fitting" />
             <History title="Prova Geçmişi" items={fittings} type="fitting" />
             <History title="Kiralama Geçmişi" items={rentals} type="rental" />
             <History title="Satış Geçmişi" items={sales} type="sale" />
