@@ -171,7 +171,6 @@ export default function CustomerDetailPage() {
 
           <div className="space-y-5">
             <History title="Prova Geçmişi" items={fittings} type="fitting" />
-            <History title="Prova Geçmişi" items={fittings} type="fitting" />
             <History title="Kiralama Geçmişi" items={rentals} type="rental" />
             <History title="Satış Geçmişi" items={sales} type="sale" />
           </div>
