@@ -18,20 +18,23 @@ import {
 export default function TodayPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
   async function load() {
-    const [rentalsRes, customersRes, salesRes, fittingsRes] = await Promise.all([
+    const [rentalsRes, customersRes, productsRes, salesRes, fittingsRes] = await Promise.all([
       supabase.from("rentals").select("*").order("delivery_date", { ascending: true }),
       supabase.from("customers").select("*").order("created_at", { ascending: false }),
+      supabase.from("products").select("*").order("created_at", { ascending: false }),
       supabase.from("sales").select("*").order("created_at", { ascending: false }),
       supabase.from("fittings").select("*").order("fitting_date", { ascending: true }),
     ]);
 
     setRentals(rentalsRes.data || []);
     setCustomers(customersRes.data || []);
+    setProducts(productsRes.data || []);
     setSales(salesRes.data || []);
     setFittings(fittingsRes.data || []);
   }
@@ -52,6 +55,22 @@ export default function TodayPage() {
 
     return { fittingsToday, readyFittings, deliveries, returns, delayed, remaining };
   }, [rentals, fittings, today]);
+
+
+  const productResults = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [];
+
+    return products
+      .filter((product) =>
+        [product.name, product.barcode, product.product_code, product.model_name, product.color, product.size]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q)
+      )
+      .slice(0, 6);
+  }, [products, search]);
 
   const customerResults = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -121,10 +140,10 @@ export default function TodayPage() {
             />
           </div>
 
-          {customerResults.length > 0 && (
+          {(customerResults.length > 0 || productResults.length > 0) && (
             <div className="mt-4 grid gap-3">
               {customerResults.map((customer) => (
-                <div key={customer.id} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
+                <div key={`customer-${customer.id}`} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h3 className="font-black text-[#211b16]">{customer.full_name}</h3>
@@ -142,6 +161,31 @@ export default function TodayPage() {
 
                     <Link href={`/customers/${customer.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
                       Müşteri Kartına Git
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {productResults.map((product) => (
+                <div key={`product-${product.id}`} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      {product.image_url ? (
+                        <img src={product.image_url} className="h-14 w-14 rounded-xl object-cover" alt="" />
+                      ) : (
+                        <div className="h-14 w-14 rounded-xl bg-[#f7f0e7]" />
+                      )}
+
+                      <div>
+                        <h3 className="font-black text-[#211b16]">{product.name || "Ürün"}</h3>
+                        <p className="mt-1 text-xs font-bold text-[#8a7f72]">
+                          {[product.barcode, product.model_name, product.color, product.size, product.status].filter(Boolean).join(" • ") || "Detay yok"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Link href={`/products/${product.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
+                      Ürün Kartına Git
                     </Link>
                   </div>
                 </div>
