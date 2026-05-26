@@ -47,7 +47,6 @@ export default function CustomerDetailPage() {
     setRentals(rentalsRes.data || []);
     setSales(salesRes.data || []);
     setFittings(fittingsRes.data || []);
-    setFittings(fittingsRes.data || []);
   }
 
   useEffect(() => {
