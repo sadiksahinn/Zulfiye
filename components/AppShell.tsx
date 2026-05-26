@@ -32,6 +32,7 @@ export default function AppShell({
     { name: "Bugün", href: "/today", icon: Home },
     { name: "Takvim", href: "/calendar", icon: CalendarDays },
     { name: "Kiralama", href: "/rentals", icon: CalendarDays },
+    { name: "Provalar", href: "/fittings", icon: UserRound },
     { name: "Satış", href: "/sales", icon: ShoppingBag },
     { name: "Müşteriler", href: "/customers", icon: Users },
     { name: "Ürünler", href: "/products", icon: Package },

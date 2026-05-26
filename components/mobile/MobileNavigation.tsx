@@ -24,6 +24,7 @@ export default function MobileNavigation() {
     ["Bugün", "/today", Home],
     ["Takvim", "/calendar", CalendarDays],
     ["Kiralama", "/rentals", CalendarDays],
+    ["Prova", "/fittings", UserRound],
     ["Müşteri", "/customers", UserRound],
     ["Ürünler", "/products", Package],
     ["İade", "/returns", RotateCcw],
