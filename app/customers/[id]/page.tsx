@@ -232,14 +232,14 @@ function History({ title, items, type }: any) {
                   <h3 className="font-black text-[#211b16]">{item.product_name || item.title || "İşlem"}</h3>
                   <p className="mt-1 text-xs font-bold text-[#8a7f72]">
                     {type === "rental"
-                      ? [item.delivery_date, item.return_date, item.status].filter(Boolean).join(" • ")
+                      ? [item.delivery_date, item.return_date].filter(Boolean).join(" • ")
                       : type === "fitting"
-                        ? [item.fitting_date, item.fitting_time, item.status].filter(Boolean).join(" • ")
-                        : [item.sale_date, item.status].filter(Boolean).join(" • ")}
+                        ? [item.fitting_date, item.fitting_time].filter(Boolean).join(" • ")
+                        : [item.sale_date].filter(Boolean).join(" • ")}
                   </p>
                 </div>
                 <span className="rounded-2xl bg-[#f7f0e7] px-4 py-2 text-xs font-black text-[#211b16]">
-                  {Number(item.total_amount || 0).toLocaleString("tr-TR")} TL
+                  {type === "fitting" ? statusText(item.status || "bekliyor") : `${Number(item.total_amount || 0).toLocaleString("tr-TR")} TL`}
                 </span>
               </div>
             </div>
@@ -248,4 +248,13 @@ function History({ title, items, type }: any) {
       </div>
     </div>
   );
+}
+
+
+function statusText(status: string) {
+  if (status === "bekliyor") return "Bekliyor";
+  if (status === "geldi") return "Geldi";
+  if (status === "tamamlandi") return "Tamamlandı";
+  if (status === "teslime_hazir") return "Teslime Hazır";
+  return status || "-";
 }

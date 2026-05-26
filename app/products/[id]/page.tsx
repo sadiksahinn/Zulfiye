@@ -298,7 +298,7 @@ export default function ProductDetailPage() {
                       </p>
                     </div>
                     <span className="rounded-2xl bg-[#f7f0e7] px-4 py-2 text-xs font-black text-[#211b16]">
-                      Prova
+                      {fittingStatusText(item.status || "bekliyor")}
                     </span>
                   </div>
                 </div>
@@ -341,4 +341,13 @@ function DetailRow({ icon, title, value }: { icon: React.ReactNode; title: strin
       <div className="text-right text-sm font-black text-[#211b16]">{value || "-"}</div>
     </div>
   );
+}
+
+
+function fittingStatusText(status: string) {
+  if (status === "bekliyor") return "Bekliyor";
+  if (status === "geldi") return "Geldi";
+  if (status === "tamamlandi") return "Tamamlandı";
+  if (status === "teslime_hazir") return "Teslime Hazır";
+  return status || "-";
 }
