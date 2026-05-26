@@ -11,6 +11,7 @@ export default function CustomerDetailPage() {
   const [customer, setCustomer] = useState<any>(null);
   const [rentals, setRentals] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
+  const [fittings, setFittings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
@@ -22,10 +23,11 @@ export default function CustomerDetailPage() {
   });
 
   async function load() {
-    const [customerRes, rentalsRes, salesRes] = await Promise.all([
+    const [customerRes, rentalsRes, salesRes, fittingsRes] = await Promise.all([
       supabase.from("customers").select("*").eq("id", params.id).maybeSingle(),
       supabase.from("rentals").select("*").eq("customer_id", params.id).order("created_at", { ascending: false }),
       supabase.from("sales").select("*").eq("customer_id", params.id).order("created_at", { ascending: false }),
+      supabase.from("fittings").select("*").eq("customer_id", params.id).order("fitting_date", { ascending: false }),
     ]);
 
     if (customerRes.error) setMessage(customerRes.error.message);
@@ -44,6 +46,7 @@ export default function CustomerDetailPage() {
 
     setRentals(rentalsRes.data || []);
     setSales(salesRes.data || []);
+    setFittings(fittingsRes.data || []);
   }
 
   useEffect(() => {
@@ -144,6 +147,7 @@ export default function CustomerDetailPage() {
         ) : null}
 
         <section className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <Metric title="Prova" value={fittings.length} icon={<CalendarDays size={20} />} />
           <Metric title="Kiralama" value={rentals.length} icon={<CalendarDays size={20} />} />
           <Metric title="Satış" value={sales.length} icon={<Wallet size={20} />} />
           <Metric title="Kalan" value={`${totals.remaining.toLocaleString("tr-TR")} TL`} icon={<Wallet size={20} />} danger={totals.remaining > 0} />
@@ -164,6 +168,7 @@ export default function CustomerDetailPage() {
           </div>
 
           <div className="space-y-5">
+            <History title="Prova Geçmişi" items={fittings} type="fitting" />
             <History title="Kiralama Geçmişi" items={rentals} type="rental" />
             <History title="Satış Geçmişi" items={sales} type="sale" />
           </div>
@@ -226,7 +231,9 @@ function History({ title, items, type }: any) {
                   <p className="mt-1 text-xs font-bold text-[#8a7f72]">
                     {type === "rental"
                       ? [item.delivery_date, item.return_date, item.status].filter(Boolean).join(" • ")
-                      : [item.sale_date, item.status].filter(Boolean).join(" • ")}
+                      : type === "fitting"
+                        ? [item.fitting_date, item.fitting_time, item.status].filter(Boolean).join(" • ")
+                        : [item.sale_date, item.status].filter(Boolean).join(" • ")}
                   </p>
                 </div>
                 <span className="rounded-2xl bg-[#f7f0e7] px-4 py-2 text-xs font-black text-[#211b16]">
