@@ -30,6 +30,7 @@ export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [fittings, setFittings] = useState<any[]>([]);
+  const [fittings, setFittings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
