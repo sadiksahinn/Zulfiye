@@ -12,7 +12,6 @@ export default function CustomerDetailPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
-  const [fittings, setFittings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
