@@ -19,18 +19,21 @@ export default function TodayPage() {
   const [rentals, setRentals] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
+  const [fittings, setFittings] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
   async function load() {
-    const [rentalsRes, customersRes, salesRes] = await Promise.all([
+    const [rentalsRes, customersRes, salesRes, fittingsRes] = await Promise.all([
       supabase.from("rentals").select("*").order("delivery_date", { ascending: true }),
       supabase.from("customers").select("*").order("created_at", { ascending: false }),
       supabase.from("sales").select("*").order("created_at", { ascending: false }),
+      supabase.from("fittings").select("*").order("fitting_date", { ascending: true }),
     ]);
 
     setRentals(rentalsRes.data || []);
     setCustomers(customersRes.data || []);
     setSales(salesRes.data || []);
+    setFittings(fittingsRes.data || []);
   }
 
   useEffect(() => {
@@ -40,13 +43,14 @@ export default function TodayPage() {
   const today = new Date().toISOString().slice(0, 10);
 
   const stats = useMemo(() => {
+    const fittingsToday = fittings.filter((x) => x.fitting_date === today);
     const deliveries = rentals.filter((x) => x.delivery_date === today);
     const returns = rentals.filter((x) => x.return_date === today);
     const delayed = rentals.filter((x) => x.status === "gecikti");
     const remaining = rentals.filter((x) => Number(x.remaining_amount || 0) > 0);
 
-    return { deliveries, returns, delayed, remaining };
-  }, [rentals, today]);
+    return { fittingsToday, deliveries, returns, delayed, remaining };
+  }, [rentals, fittings, today]);
 
   const customerResults = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -81,9 +85,10 @@ export default function TodayPage() {
   }, [customers, rentals, sales, search]);
 
   const todayFlow = useMemo(() => {
+    const fittingItems = stats.fittingsToday.map((x) => ({ ...x, flowType: "Prova", flowTime: x.fitting_time || "Saat yok" }));
     const deliveryItems = stats.deliveries.map((x) => ({ ...x, flowType: "Teslim", flowTime: x.delivery_time || "Saat yok" }));
     const returnItems = stats.returns.map((x) => ({ ...x, flowType: "İade", flowTime: x.return_time || "Saat yok" }));
-    return [...deliveryItems, ...returnItems].sort((a, b) => String(a.flowTime).localeCompare(String(b.flowTime)));
+    return [...fittingItems, ...deliveryItems, ...returnItems].sort((a, b) => String(a.flowTime).localeCompare(String(b.flowTime)));
   }, [stats]);
 
   return (
@@ -97,10 +102,10 @@ export default function TodayPage() {
           </p>
 
           <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Hero label="Prova" value={stats.fittingsToday.length} />
             <Hero label="Teslim" value={stats.deliveries.length} />
             <Hero label="İade" value={stats.returns.length} />
             <Hero label="Geciken" value={stats.delayed.length} danger />
-            <Hero label="Ödeme" value={stats.remaining.length} />
           </div>
         </section>
 
@@ -146,11 +151,11 @@ export default function TodayPage() {
 
         <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.1fr_.9fr]">
           <div className="premium-card p-5 lg:p-6">
-            <SectionTitle icon={<Clock size={20} />} title="Günlük Akış" sub="Bugünkü teslim ve iadeler" />
+            <SectionTitle icon={<Clock size={20} />} title="Günlük Akış" sub="Bugünkü prova, teslim ve iadeler" />
 
             <div className="mt-5 space-y-3">
               {todayFlow.length === 0 ? (
-                <Empty text="Bugün için teslim veya iade görünmüyor." />
+                <Empty text="Bugün için prova, teslim veya iade görünmüyor." />
               ) : (
                 todayFlow.map((item) => (
                   <FlowCard key={`${item.id}-${item.flowType}`} item={item} />
@@ -220,12 +225,13 @@ function SectionTitle({ icon, title, sub }: any) {
 
 function FlowCard({ item }: any) {
   const isReturn = item.flowType === "İade";
+  const isFitting = item.flowType === "Prova";
   return (
     <div className="rounded-[1.35rem] border border-[#eadfce] bg-white/70 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isReturn ? "bg-red-100 text-red-700" : "bg-[#b69463]/15 text-[#b69463]"}`}>
-            {isReturn ? <RotateCcw size={20} /> : <Package size={20} />}
+          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isReturn ? "bg-red-100 text-red-700" : isFitting ? "bg-[#b69463]/15 text-[#b69463]" : "bg-[#211b16]/10 text-[#211b16]"}`}>
+            {isReturn ? <RotateCcw size={20} /> : isFitting ? <UserRound size={20} /> : <Package size={20} />}
           </div>
           <div>
             <h3 className="font-black text-[#211b16]">{item.flowTime} — {item.flowType}</h3>
