@@ -29,6 +29,7 @@ type Product = {
 export default function ProductDetailPage() {
   const params = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
+  const [fittings, setFittings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -276,6 +277,35 @@ export default function ProductDetailPage() {
             </div>
           </aside>
         </div>
+
+        <section className="premium-card p-5 lg:p-6">
+          <h2 className="premium-title text-xl">Prova Geçmişi</h2>
+          <p className="premium-muted mt-2 text-sm">Bu ürüne ait son prova kayıtları.</p>
+
+          <div className="mt-5 space-y-3">
+            {fittings.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-[#d9c9b5] p-8 text-center text-sm font-bold text-[#8a7f72]">
+                Bu ürün için prova kaydı yok.
+              </div>
+            ) : (
+              fittings.map((item) => (
+                <div key={item.id} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-black text-[#211b16]">{item.customer_name || "Müşteri"}</h3>
+                      <p className="mt-1 text-xs font-bold text-[#8a7f72]">
+                        {[item.fitting_date, item.fitting_time, item.status].filter(Boolean).join(" • ") || "Prova detayı yok"}
+                      </p>
+                    </div>
+                    <span className="rounded-2xl bg-[#f7f0e7] px-4 py-2 text-xs font-black text-[#211b16]">
+                      Prova
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
       </div>
     </AppShell>
   );
