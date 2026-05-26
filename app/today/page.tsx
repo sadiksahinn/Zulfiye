@@ -44,12 +44,13 @@ export default function TodayPage() {
 
   const stats = useMemo(() => {
     const fittingsToday = fittings.filter((x) => x.fitting_date === today);
+    const readyFittings = fittings.filter((x) => x.status === "teslime_hazir");
     const deliveries = rentals.filter((x) => x.delivery_date === today);
     const returns = rentals.filter((x) => x.return_date === today);
     const delayed = rentals.filter((x) => x.status === "gecikti");
     const remaining = rentals.filter((x) => Number(x.remaining_amount || 0) > 0);
 
-    return { fittingsToday, deliveries, returns, delayed, remaining };
+    return { fittingsToday, readyFittings, deliveries, returns, delayed, remaining };
   }, [rentals, fittings, today]);
 
   const customerResults = useMemo(() => {
@@ -173,11 +174,15 @@ export default function TodayPage() {
                   <Warning key={item.id} title="Geciken İade" text={`${item.customer_name || "Müşteri"} • ${item.product_name || "Ürün"}`} />
                 ))}
 
+                {stats.readyFittings.slice(0, 3).map((item) => (
+                  <Warning key={`ready-${item.id}`} title="Teslime Hazır Prova" text={`${item.customer_name || "Müşteri"} • ${item.product_name || "Ürün"}`} />
+                ))}
+
                 {stats.remaining.slice(0, 3).map((item) => (
                   <Warning key={`pay-${item.id}`} title="Kalan Ödeme" text={`${item.customer_name || "Müşteri"} • ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL`} />
                 ))}
 
-                {stats.delayed.length === 0 && stats.remaining.length === 0 && (
+                {stats.delayed.length === 0 && stats.remaining.length === 0 && stats.readyFittings.length === 0 && (
                   <Empty text="Kritik uyarı yok." compact />
                 )}
               </div>
