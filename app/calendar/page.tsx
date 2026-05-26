@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Clock, Package, RotateCcw, Search, Filter } from "lucide-react";
+import { CalendarDays, Clock, Package, RotateCcw, Search, Filter, UserRound } from "lucide-react";
 
 export default function CalendarPage() {
   const [events, setEvents] = useState<any[]>([]);
@@ -99,14 +99,14 @@ export default function CalendarPage() {
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
-                        {event.event_type === "return" ? <RotateCcw size={20} /> : <Package size={20} />}
+                        {event.event_type === "return" ? <RotateCcw size={20} /> : event.event_type === "fitting" ? <UserRound size={20} /> : <Package size={20} />}
                       </div>
                       <div>
                         <h3 className="text-lg font-black text-[#211b16]">
                           {event.title || "Takvim Kaydı"}
                         </h3>
                         <p className="mt-1 text-sm font-bold text-[#8a7f72]">
-                          {event.description || "Açıklama yok"}
+                          {event.event_type === "fitting" ? "Prova randevusu" : event.description || "Açıklama yok"}
                         </p>
                       </div>
                     </div>
