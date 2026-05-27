@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { usePathname } from "next/navigation";
+import React, { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
   BarChart3,
@@ -26,6 +26,7 @@ export default function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, role, logout } = useAuth();
 
   const operationMenu = [
@@ -52,6 +53,14 @@ export default function AppShell({
     typeof user === "object" && user && "email" in user
       ? String(user.email)
       : "Kullanıcı";
+
+  const adminOnlyRoutes = ["/dashboard", "/accounting", "/reports", "/staff", "/settings"];
+
+  useEffect(() => {
+    if (role === "staff" && adminOnlyRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
+      router.replace("/today");
+    }
+  }, [pathname, role, router]);
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
