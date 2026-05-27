@@ -275,7 +275,15 @@ export default function TodayPage() {
                 ))}
 
                 {stats.remaining.slice(0, 3).map((item) => (
-                  <Warning key={`pay-${item.id}`} title="Kalan Ödeme" text={`${item.customer_name || "Müşteri"} • ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL`} />
+                  <Warning
+                    key={`pay-${item.id}`}
+                    title="Kalan Ödeme"
+                    text={`${item.customer_name || "Müşteri"} • ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL`}
+                    whatsappUrl={whatsappLink(
+                      customerPhone(customers, item.customer_id, item.customer_name),
+                      `Merhaba ${item.customer_name || "Değerli müşterimiz"}, MAUNA Couture işleminiz için kalan ödemeniz ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL’dir. Bilginize sunarız.`
+                    )}
+                  />
                 ))}
 
                 {stats.delayed.length === 0 && stats.remaining.length === 0 && stats.readyFittings.length === 0 && (
@@ -433,11 +441,21 @@ function FlowCard({ item }: any) {
   );
 }
 
-function Warning({ title, text }: any) {
+function Warning({ title, text, whatsappUrl }: any) {
   return (
     <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-      <div className="text-xs font-black uppercase tracking-[0.18em] text-red-700">{title}</div>
-      <div className="mt-1 text-sm font-bold text-[#211b16]">{text}</div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="text-xs font-black uppercase tracking-[0.18em] text-red-700">{title}</div>
+          <div className="mt-1 text-sm font-bold text-[#211b16]">{text}</div>
+        </div>
+
+        {whatsappUrl ? (
+          <a href={whatsappUrl} target="_blank" className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white">
+            WhatsApp
+          </a>
+        ) : null}
+      </div>
     </div>
   );
 }
