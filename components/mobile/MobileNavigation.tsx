@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/providers/AuthProvider";
 import {
   CalendarDays,
   Home,
@@ -16,6 +17,7 @@ import {
 export default function MobileNavigation() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { role } = useAuth();
 
   const publicPages = ["/", "/forgot-password", "/reset-password", "/register"];
   if (publicPages.includes(pathname)) return null;
@@ -91,14 +93,18 @@ export default function MobileNavigation() {
                 </a>
               ))}
 
-              <p className="mt-4 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
-                Yönetim
-              </p>
-              {adminLinks.map(([name, href]) => (
-                <a key={href} href={href} className="rounded-2xl bg-white/[0.06] px-4 py-4 font-bold text-white/85">
-                  {name}
-                </a>
-              ))}
+              {role !== "staff" ? (
+                <>
+                  <p className="mt-4 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                    Yönetim
+                  </p>
+                  {adminLinks.map(([name, href]) => (
+                    <a key={href} href={href} className="rounded-2xl bg-white/[0.06] px-4 py-4 font-bold text-white/85">
+                      {name}
+                    </a>
+                  ))}
+                </>
+              ) : null}
             </div>
           </div>
         </div>
