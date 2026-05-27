@@ -39,6 +39,18 @@ export default function TodayPage() {
     setFittings(fittingsRes.data || []);
   }
 
+
+
+  async function updateFittingStatus(id: string, status: string) {
+    await supabase
+      .from("fittings")
+      .update({ status })
+      .eq("id", id);
+
+    load();
+  }
+
+
   useEffect(() => {
     load();
   }, []);
