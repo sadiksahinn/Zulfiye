@@ -6,28 +6,41 @@ import { useRouter, usePathname } from "next/navigation";
 
 type AuthContextType = {
   user: any;
+  profile: any;
+  role: "staff" | "admin" | "super_admin";
   loading: boolean;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  profile: null,
+  role: "staff",
   loading: true,
   logout: async () => {},
 });
 
 const publicRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
 
-export function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [role, setRole] = useState<"staff" | "admin" | "super_admin">("staff");
   const [loading, setLoading] = useState(true);
 
   const router = useRouter();
   const pathname = usePathname();
+
+  async function loadProfile(userId: string) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+
+    setProfile(data || null);
+    setRole((data?.role as any) || "staff");
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -42,6 +55,14 @@ export function AuthProvider({
       if (!mounted) return;
 
       setUser(session?.user ?? null);
+
+      if (session?.user?.id) {
+        await loadProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setRole("staff");
+      }
+
       setLoading(false);
 
       const isPublicRoute = publicRoutes.includes(pathname);
@@ -52,7 +73,7 @@ export function AuthProvider({
       }
 
       if (session && pathname === "/") {
-        router.replace("/dashboard");
+        router.replace("/today");
       }
     }
 
@@ -60,10 +81,18 @@ export function AuthProvider({
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
 
       setUser(session?.user ?? null);
+
+      if (session?.user?.id) {
+        await loadProfile(session.user.id);
+      } else {
+        setProfile(null);
+        setRole("staff");
+      }
+
       setLoading(false);
 
       const isPublicRoute = publicRoutes.includes(pathname);
@@ -74,7 +103,7 @@ export function AuthProvider({
       }
 
       if (session && pathname === "/") {
-        router.replace("/dashboard");
+        router.replace("/today");
       }
     });
 
@@ -87,17 +116,13 @@ export function AuthProvider({
   async function logout() {
     await supabase.auth.signOut();
     setUser(null);
+    setProfile(null);
+    setRole("staff");
     router.replace("/");
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, profile, role, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );
