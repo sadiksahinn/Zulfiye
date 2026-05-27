@@ -69,6 +69,25 @@ export default function TodayPage() {
   }
 
 
+  async function completeDeliveryFromToday(item: any) {
+    if (!item?.id) return;
+
+    await supabase
+      .from("rentals")
+      .update({ status: "aktif" })
+      .eq("id", item.id);
+
+    if (item.product_id) {
+      await supabase
+        .from("products")
+        .update({ status: "kirada" })
+        .eq("id", item.product_id);
+    }
+
+    load();
+  }
+
+
 
   useEffect(() => {
     load();
@@ -334,6 +353,15 @@ function FlowCard({ item }: any) {
             <Link href={`/products/${item.product_id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-2 text-xs font-black text-[#211b16]">
               Ürün Kartı
             </Link>
+          ) : null}
+
+          {item.flowType === "Teslim" ? (
+            <button
+              onClick={() => completeDeliveryFromToday(item)}
+              className="rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white"
+            >
+              Teslim Edildi
+            </button>
           ) : null}
 
           {item.flowType === "İade" ? (
