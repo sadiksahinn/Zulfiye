@@ -50,6 +50,25 @@ export default function TodayPage() {
     load();
   }
 
+  async function completeReturnFromToday(item: any) {
+    if (!item?.id) return;
+
+    await supabase
+      .from("rentals")
+      .update({ status: "tamamlandi" })
+      .eq("id", item.id);
+
+    if (item.product_id) {
+      await supabase
+        .from("products")
+        .update({ status: "stokta" })
+        .eq("id", item.product_id);
+    }
+
+    load();
+  }
+
+
 
   useEffect(() => {
     load();
@@ -315,6 +334,15 @@ function FlowCard({ item }: any) {
             <Link href={`/products/${item.product_id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-2 text-xs font-black text-[#211b16]">
               Ürün Kartı
             </Link>
+          ) : null}
+
+          {item.flowType === "İade" ? (
+            <button
+              onClick={() => completeReturnFromToday(item)}
+              className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white"
+            >
+              İadeyi Al
+            </button>
           ) : null}
 
           <span className={`rounded-2xl px-4 py-2 text-xs font-black ${
