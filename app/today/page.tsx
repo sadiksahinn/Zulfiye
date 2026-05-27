@@ -121,11 +121,13 @@ export default function TodayPage() {
             Prova, teslim, iade ve müşteri aramalarını tek ekrandan takip edin.
           </p>
 
-          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
             <Hero label="Prova" value={stats.fittingsToday.length} />
             <Hero label="Teslim" value={stats.deliveries.length} />
             <Hero label="İade" value={stats.returns.length} />
             <Hero label="Geciken" value={stats.delayed.length} danger />
+            <Hero label="Hazır" value={stats.readyFittings.length} />
+            <Hero label="Ödeme" value={stats.remaining.length} />
           </div>
         </section>
 
