@@ -304,17 +304,31 @@ function FlowCard({ item }: any) {
           </div>
         </div>
 
-        <span className={`rounded-2xl px-4 py-2 text-xs font-black ${
-          item.flowType === "Prova"
-            ? item.status === "teslime_hazir"
-              ? "bg-green-100 text-green-700"
-              : item.status === "geldi"
-                ? "bg-[#b69463]/15 text-[#b69463]"
-                : "bg-[#f7f0e7] text-[#211b16]"
-            : "bg-[#f7f0e7] text-[#211b16]"
-        }`}>
-          {item.flowType === "Prova" ? statusText(item.status || "bekliyor") : item.status || "aktif"}
-        </span>
+        <div className="flex flex-wrap gap-2">
+          {item.customer_id ? (
+            <Link href={`/customers/${item.customer_id}`} className="rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white">
+              Müşteri Kartı
+            </Link>
+          ) : null}
+
+          {item.product_id ? (
+            <Link href={`/products/${item.product_id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-2 text-xs font-black text-[#211b16]">
+              Ürün Kartı
+            </Link>
+          ) : null}
+
+          <span className={`rounded-2xl px-4 py-2 text-xs font-black ${
+            item.flowType === "Prova"
+              ? item.status === "teslime_hazir"
+                ? "bg-green-100 text-green-700"
+                : item.status === "geldi"
+                  ? "bg-[#b69463]/15 text-[#b69463]"
+                  : "bg-[#f7f0e7] text-[#211b16]"
+              : "bg-[#f7f0e7] text-[#211b16]"
+          }`}>
+            {item.flowType === "Prova" ? statusText(item.status || "bekliyor") : item.status || "aktif"}
+          </span>
+        </div>
       </div>
     </div>
   );
