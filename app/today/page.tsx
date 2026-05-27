@@ -255,7 +255,7 @@ export default function TodayPage() {
                 <Empty text="Bugün için prova, teslim veya iade görünmüyor." />
               ) : (
                 todayFlow.map((item) => (
-                  <FlowCard key={`${item.id}-${item.flowType}`} item={item} />
+                  <FlowCard key={`${item.id}-${item.flowType}`} item={{ ...item, customers }} />
                 ))
               )}
             </div>
@@ -302,6 +302,39 @@ export default function TodayPage() {
     </AppShell>
   );
 }
+
+
+function customerPhone(customers: any[], customerId?: string | null, customerName?: string | null) {
+  const customer = customers.find((c) => c.id === customerId || c.full_name === customerName);
+  return customer?.phone || "";
+}
+
+function whatsappLink(phone: string, message: string) {
+  const digits = String(phone || "").replace(/\D/g, "");
+  const clean = digits.startsWith("90") ? digits : digits.startsWith("0") ? `90${digits.slice(1)}` : digits.length === 10 ? `90${digits}` : digits;
+  if (!clean) return "";
+  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+}
+
+function operationMessage(item: any) {
+  const name = item.customer_name || "Değerli müşterimiz";
+  const product = item.product_name || "ürününüz";
+
+  if (item.flowType === "Prova") {
+    return `Merhaba ${name}, MAUNA Couture prova randevunuz ${item.fitting_date || "bugün"} ${item.fitting_time || ""} olarak planlanmıştır. Sizi bekliyoruz.`;
+  }
+
+  if (item.flowType === "Teslim") {
+    return `Merhaba ${name}, ${product} tesliminiz bugün planlanmıştır. MAUNA Couture olarak sizi bekliyoruz.`;
+  }
+
+  if (item.flowType === "İade") {
+    return `Merhaba ${name}, MAUNA Couture’dan kiraladığınız ${product} için iade tarihiniz bugündür. Gecikme yaşanmaması için bilginize sunarız.`;
+  }
+
+  return `Merhaba ${name}, MAUNA Couture işleminiz hakkında bilgilendirme için yazıyoruz.`;
+}
+
 
 function Hero({ label, value, danger = false }: any) {
   return (
@@ -353,6 +386,16 @@ function FlowCard({ item }: any) {
             <Link href={`/products/${item.product_id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-2 text-xs font-black text-[#211b16]">
               Ürün Kartı
             </Link>
+          ) : null}
+
+          {whatsappLink(customerPhone(item.customers || [], item.customer_id, item.customer_name), operationMessage(item)) ? (
+            <a
+              href={whatsappLink(customerPhone(item.customers || [], item.customer_id, item.customer_name), operationMessage(item))}
+              target="_blank"
+              className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white"
+            >
+              WhatsApp
+            </a>
           ) : null}
 
           {item.flowType === "Teslim" ? (
