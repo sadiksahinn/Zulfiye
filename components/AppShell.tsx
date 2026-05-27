@@ -26,7 +26,7 @@ export default function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
 
   const operationMenu = [
     { name: "Bugün", href: "/today", icon: Home },
@@ -102,13 +102,14 @@ export default function AppShell({
               </div>
             </div>
 
-            <div className="mt-8">
-              <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
-                Yönetim Paneli
-              </div>
+            {role !== "staff" ? (
+              <div className="mt-8">
+                <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                  Yönetim Paneli
+                </div>
 
-              <div className="space-y-2">
-                {managementMenu.map((item) => {
+                <div className="space-y-2">
+                  {managementMenu.map((item) => {
                   const Icon = item.icon;
                   const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
@@ -132,9 +133,10 @@ export default function AppShell({
                       <span className="leading-none">{item.name}</span>
                     </a>
                   );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
+            ) : null}
           </nav>
 
           <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4 shadow-inner">
@@ -146,7 +148,7 @@ export default function AppShell({
                 {userEmail.slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate text-sm font-black text-white">Aktif Kullanıcı</div>
+                <div className="truncate text-sm font-black text-white">{role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : "Personel"}</div>
                 <div className="truncate text-xs text-zinc-400">{userEmail}</div>
               </div>
             </div>
