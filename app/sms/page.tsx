@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
+import { supabase } from "@/lib/supabase";
 import { Copy, MessageSquareText, Send } from "lucide-react";
 
 const templates = [
@@ -15,6 +16,21 @@ export default function SmsPage() {
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState(templates[0]);
   const [copied, setCopied] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState("");
+
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  async function loadCustomers() {
+    const { data } = await supabase
+      .from("customers")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    setCustomers(data || []);
+  }
 
   const cleanPhone = useMemo(() => {
     const digits = phone.replace(/\D/g, "");
@@ -76,6 +92,30 @@ export default function SmsPage() {
             <h2 className="premium-title text-2xl">Mesaj Oluştur</h2>
 
             <div className="mt-6 grid gap-4">
+
+              <select
+                className="input"
+                value={selectedCustomer}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setSelectedCustomer(id);
+
+                  const customer = customers.find((c) => c.id === id);
+
+                  if (customer?.phone) {
+                    setPhone(customer.phone);
+                  }
+                }}
+              >
+                <option value="">Müşteri Seç</option>
+
+                {customers.map((customer) => (
+                  <option key={customer.id} value={customer.id}>
+                    {customer.full_name}
+                  </option>
+                ))}
+              </select>
+
               <input
                 className="input"
                 placeholder="Telefon: 05xx xxx xx xx"
