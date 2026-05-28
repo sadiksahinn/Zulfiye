@@ -255,7 +255,7 @@ export default function TodayPage() {
                 <Empty text="Bugün için prova, teslim veya iade görünmüyor." />
               ) : (
                 todayFlow.map((item) => (
-                  <FlowCard key={`${item.id}-${item.flowType}`} item={{ ...item, customers }} />
+                  <FlowCard key={`${item.id}-${item.flowType}`} item={{ ...item, customers }} onCompleteDelivery={completeDeliveryFromToday} onCompleteReturn={completeReturnFromToday} />
                 ))
               )}
             </div>
@@ -365,7 +365,7 @@ function SectionTitle({ icon, title, sub }: any) {
   );
 }
 
-function FlowCard({ item }: any) {
+function FlowCard({ item, onCompleteDelivery, onCompleteReturn }: any) {
   const isReturn = item.flowType === "İade";
   const isFitting = item.flowType === "Prova";
   return (
@@ -408,7 +408,7 @@ function FlowCard({ item }: any) {
 
           {item.flowType === "Teslim" ? (
             <button
-              onClick={() => completeDeliveryFromToday(item)}
+              onClick={() => onCompleteDelivery(item)}
               className="rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white"
             >
               Teslim Edildi
@@ -417,7 +417,7 @@ function FlowCard({ item }: any) {
 
           {item.flowType === "İade" ? (
             <button
-              onClick={() => completeReturnFromToday(item)}
+              onClick={() => onCompleteReturn(item)}
               className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white"
             >
               İadeyi Al
