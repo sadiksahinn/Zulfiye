@@ -14,7 +14,7 @@ const templates = [
 
 export default function SmsPage() {
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState(templates[0]);
+  const [message, setMessage] = useState(templates[0].message);
   const [copied, setCopied] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState("");
@@ -74,15 +74,16 @@ export default function SmsPage() {
             <div className="mt-6 grid gap-3">
               {templates.map((item) => (
                 <button
-                  key={item}
-                  onClick={() => setMessage(item)}
-                  className={`rounded-2xl border p-4 text-left text-sm font-bold leading-6 transition ${
-                    message === item
+                  key={item.title}
+                  onClick={() => setMessage(item.message)}
+                  className={`rounded-2xl border p-4 text-left transition ${
+                    message === item.message
                       ? "border-[#b69463] bg-[#b69463]/10 text-[#211b16]"
                       : "border-[#eadfce] bg-white/70 text-[#6d6256]"
                   }`}
                 >
-                  {item}
+                  <div className="text-sm font-black text-[#211b16]">{item.title}</div>
+                  <div className="mt-1 text-xs font-bold leading-5 text-[#8a7f72]">{item.message}</div>
                 </button>
               ))}
             </div>
