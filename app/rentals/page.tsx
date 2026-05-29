@@ -145,7 +145,7 @@ export default function RentalsPage() {
       .from("rentals")
       .select("*")
       .eq("product_id", selectedProduct.id)
-      .in("status", ["aktif", "rezerve"])
+      .in("status", ["aktif", "rezerve", "planlandi"])
       .lte("delivery_date", form.returnDate)
       .gte("return_date", form.deliveryDate);
 
@@ -176,7 +176,7 @@ export default function RentalsPage() {
         total_amount: total,
         deposit_amount: deposit,
         remaining_amount: remaining,
-        status: "aktif",
+        status: "planlandi",
         notes: form.notes,
         created_by: userData.user?.id,
       })
@@ -188,7 +188,7 @@ export default function RentalsPage() {
       return;
     }
 
-    await supabase.from("products").update({ status: "kirada" }).eq("id", selectedProduct.id);
+    await supabase.from("products").update({ status: "rezerve" }).eq("id", selectedProduct.id);
 
     const baseTitle = `${selectedProduct.name} ${selectedProduct.color || ""} ${selectedProduct.size || ""} - ${selectedCustomer.full_name}`;
 
@@ -230,7 +230,7 @@ export default function RentalsPage() {
       },
     ].filter((event): event is NonNullable<typeof event> => event !== null));
 
-    setMessage("Kiralama oluşturuldu, ürün kirada durumuna alındı ve takvime işlendi.");
+    setMessage("Kiralama oluşturuldu, ürün rezerve edildi ve takvime işlendi.");
     setSelectedProduct(null);
     setSelectedCustomer(null);
     setProductSearch("");
