@@ -281,6 +281,8 @@ export default function ProductsPage() {
             <select className="input" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
               <option value="all">Tüm durumlar</option>
               <option value="stokta">Stokta</option>
+              <option value="rezerve">Rezerve</option>
+              <option value="planlandi">Planlandı</option>
               <option value="kirada">Kirada</option>
               <option value="provada">Provada</option>
               <option value="tadilatta">Tadilatta</option>
@@ -314,7 +316,7 @@ export default function ProductsPage() {
                     </div>
 
                     <span className="rounded-full bg-[#b69463]/15 px-3 py-1 text-xs text-[#b69463]">
-                      {product.status}
+                      {statusText(product.status)}
                     </span>
                   </div>
 
@@ -359,4 +361,17 @@ export default function ProductsPage() {
       </div>
     </AppShell>
   );
+}
+
+
+function statusText(status?: string | null) {
+  if (status === "stokta") return "Stokta";
+  if (status === "rezerve") return "Rezerve";
+  if (status === "planlandi") return "Planlandı";
+  if (status === "kirada") return "Kirada";
+  if (status === "provada") return "Provada";
+  if (status === "tadilatta") return "Tadilatta";
+  if (status === "temizlemede") return "Temizlemede";
+  if (status === "satildi") return "Satıldı";
+  return status || "-";
 }
