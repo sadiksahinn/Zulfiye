@@ -27,7 +27,7 @@ export default function AppShell({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, role, logout } = useAuth();
+  const { user, role, loading, logout } = useAuth();
 
   const operationMenu = [
     { name: "Bugün", href: "/today", icon: Home },
@@ -57,10 +57,23 @@ export default function AppShell({
   const adminOnlyRoutes = ["/dashboard", "/accounting", "/reports", "/staff", "/settings"];
 
   useEffect(() => {
+    if (loading) return;
+
     if (role === "staff" && adminOnlyRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
       router.replace("/today");
     }
-  }, [pathname, role, router]);
+  }, [pathname, role, router, loading]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#f7f0e7] text-[#211b16]">
+        <div className="rounded-[2rem] border border-[#eadfce] bg-white/70 p-8 text-center shadow-xl">
+          <div className="text-sm font-black uppercase tracking-[0.24em] text-[#b69463]">MAUNA</div>
+          <div className="mt-2 text-2xl font-black">Yetki kontrol ediliyor...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
