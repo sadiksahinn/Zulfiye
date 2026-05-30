@@ -5,15 +5,25 @@ on:
     - cron: '0 1 * * 0'   # Her Pazar 04:00 Türkiye saati (01:00 UTC)
   workflow_dispatch:        # Manuel tetikleme butonu
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   backup:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Node.js kur
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Secrets kontrolü
+        run: |
+          if [ -z "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "HATA: SUPABASE_URL secret eksik!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "HATA: SUPABASE_SERVICE_ROLE_KEY secret eksik!"
+            exit 1
+          fi
+          echo "Secrets tamam."
 
       - name: Supabase JS yükle
         run: npm install @supabase/supabase-js
@@ -48,39 +58,38 @@ jobs:
             const dir = `backup_${timestamp}`;
             fs.mkdirSync(dir, { recursive: true });
 
-            let summary = { date: timestamp, tables: {} };
+            const summary = { date: timestamp, tables: {} };
+            let hasError = false;
 
             for (const table of TABLES) {
-              const { data, error } = await supabase
-                .from(table)
-                .select('*')
-                .order('created_at', { ascending: true })
-                .limit(100000);
+              try {
+                const { data, error } = await supabase
+                  .from(table)
+                  .select('*')
+                  .limit(100000);
 
-              if (error) {
-                console.error(`${table}: HATA - ${error.message}`);
-                summary.tables[table] = { error: error.message };
-              } else {
-                const count = (data || []).length;
-                fs.writeFileSync(
-                  path.join(dir, `${table}.json`),
-                  JSON.stringify(data, null, 2)
-                );
-                console.log(`${table}: ${count} kayıt yedeklendi`);
-                summary.tables[table] = { count };
+                if (error) {
+                  console.error(`${table}: HATA - ${error.message}`);
+                  summary.tables[table] = { error: error.message };
+                  hasError = true;
+                } else {
+                  const count = (data || []).length;
+                  fs.writeFileSync(path.join(dir, `${table}.json`), JSON.stringify(data, null, 2));
+                  console.log(`✓ ${table}: ${count} kayıt`);
+                  summary.tables[table] = { count };
+                }
+              } catch (e) {
+                console.error(`${table}: ${e.message}`);
+                summary.tables[table] = { error: e.message };
               }
             }
 
-            fs.writeFileSync(
-              path.join(dir, '_ozet.json'),
-              JSON.stringify(summary, null, 2)
-            );
-
-            console.log('\nYedekleme tamamlandı:', timestamp);
-            console.log('Toplam tablo:', TABLES.length);
+            fs.writeFileSync(path.join(dir, '_ozet.json'), JSON.stringify(summary, null, 2));
+            console.log(`\nYedekleme tamamlandı: ${timestamp}`);
+            if (hasError) process.exit(1);
           }
 
-          backup().catch(console.error);
+          backup().catch(e => { console.error(e); process.exit(1); });
           EOF
 
       - name: Yedekleri sıkıştır
