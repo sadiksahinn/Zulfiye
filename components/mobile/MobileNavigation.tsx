@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
+  Activity,
   CalendarDays,
   Home,
   LogOut,
@@ -41,7 +42,8 @@ export default function MobileNavigation() {
     ["Raporlar", "/reports"],
     ["SMS", "/sms"],
     ["Ayarlar", "/settings"],
-  ] as const;
+    ...(role === "super_admin" ? [["Aktivite Günlüğü", "/logs"]] : []),
+  ];
 
   return (
     <>

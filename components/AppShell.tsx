@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import {
+  Activity,
   BarChart3,
   CalendarDays,
   CreditCard,
@@ -47,6 +48,7 @@ export default function AppShell({
     { name: "SMS", href: "/sms", icon: MessageSquareText },
     { name: "Personel", href: "/staff", icon: UserRound },
     { name: "Ayarlar", href: "/settings", icon: Settings },
+    ...(role === "super_admin" ? [{ name: "Aktivite", href: "/logs", icon: Activity }] : []),
   ];
 
   const userEmail =
