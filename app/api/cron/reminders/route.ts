@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -12,54 +8,40 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json({ error: "Supabase credentials eksik" }, { status: 500 });
+  }
+
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
   const today = new Date().toISOString().slice(0, 10);
   const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
   const results: string[] = [];
 
-  // 1. Gecikmiş kiralamaları otomatik "gecikti" yap
   const { data: overdueRentals } = await supabase
-    .from("rentals")
-    .select("id")
-    .in("status", ["aktif", "planlandi"])
-    .lt("return_date", today);
+    .from("rentals").select("id")
+    .in("status", ["aktif", "planlandi"]).lt("return_date", today);
 
-  if (overdueRentals && overdueRentals.length > 0) {
+  if (overdueRentals?.length) {
     await supabase.from("rentals").update({ status: "gecikti" }).in("id", overdueRentals.map((r) => r.id));
     results.push(`${overdueRentals.length} kiralama gecikti yapıldı`);
   }
 
-  // 2. Yarınki provalar
   const { data: tomorrowFittings } = await supabase
-    .from("fittings")
-    .select("id, customer_name, fitting_time")
-    .eq("fitting_date", tomorrow)
-    .eq("status", "bekliyor");
+    .from("fittings").select("id, customer_name")
+    .eq("fitting_date", tomorrow).eq("status", "bekliyor");
 
-  if (tomorrowFittings && tomorrowFittings.length > 0) {
-    results.push(`${tomorrowFittings.length} prova yarın`);
-  }
+  if (tomorrowFittings?.length) results.push(`${tomorrowFittings.length} prova yarın`);
 
-  // 3. Yarınki teslimler
   const { data: tomorrowDeliveries } = await supabase
-    .from("rentals")
-    .select("id, customer_name, product_name")
-    .eq("delivery_date", tomorrow)
-    .in("status", ["planlandi", "rezerve"]);
+    .from("rentals").select("id, customer_name")
+    .eq("delivery_date", tomorrow).in("status", ["planlandi", "rezerve"]);
 
-  if (tomorrowDeliveries && tomorrowDeliveries.length > 0) {
-    results.push(`${tomorrowDeliveries.length} teslim yarın`);
-  }
-
-  // 4. Bugün iadesi beklenenler
-  const { data: todayReturns } = await supabase
-    .from("rentals")
-    .select("id, customer_name")
-    .eq("return_date", today)
-    .eq("status", "aktif");
-
-  if (todayReturns && todayReturns.length > 0) {
-    results.push(`${todayReturns.length} iade bugün bekleniyor`);
-  }
+  if (tomorrowDeliveries?.length) results.push(`${tomorrowDeliveries.length} teslim yarın`);
 
   return NextResponse.json({ success: true, date: today, results });
 }
