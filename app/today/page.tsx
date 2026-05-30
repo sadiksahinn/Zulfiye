@@ -5,316 +5,12 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import {
-  AlertTriangle,
-  CalendarDays,
-  Clock,
-  Package,
-  RotateCcw,
-  Search,
-  ShoppingBag,
-  UserRound,
+  AlertTriangle, CalendarDays, Clock, Package,
+  RotateCcw, Search, ShoppingBag, UserRound,
 } from "lucide-react";
 
-export default function TodayPage() {
-  const [rentals, setRentals] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [sales, setSales] = useState<any[]>([]);
-  const [fittings, setFittings] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-
-  async function load() {
-    const [rentalsRes, customersRes, productsRes, salesRes, fittingsRes] = await Promise.all([
-      supabase.from("rentals").select("*").order("delivery_date", { ascending: true }),
-      supabase.from("customers").select("*").order("created_at", { ascending: false }),
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
-      supabase.from("sales").select("*").order("created_at", { ascending: false }),
-      supabase.from("fittings").select("*").order("fitting_date", { ascending: true }),
-    ]);
-
-    setRentals(rentalsRes.data || []);
-    setCustomers(customersRes.data || []);
-    setProducts(productsRes.data || []);
-    setSales(salesRes.data || []);
-    setFittings(fittingsRes.data || []);
-  }
-
-
-
-  async function updateFittingStatus(id: string, status: string) {
-    await supabase
-      .from("fittings")
-      .update({ status })
-      .eq("id", id);
-
-    load();
-  }
-
-  async function completeReturnFromToday(item: any) {
-    if (!item?.id) return;
-
-    await supabase
-      .from("rentals")
-      .update({ status: "tamamlandi" })
-      .eq("id", item.id);
-
-    if (item.product_id) {
-      await supabase
-        .from("products")
-        .update({ status: "stokta" })
-        .eq("id", item.product_id);
-    }
-
-    load();
-  }
-
-
-  async function completeDeliveryFromToday(item: any) {
-    if (!item?.id) return;
-
-    await supabase
-      .from("rentals")
-      .update({ status: "aktif" })
-      .eq("id", item.id);
-
-    if (item.product_id) {
-      await supabase
-        .from("products")
-        .update({ status: "kirada" })
-        .eq("id", item.product_id);
-    }
-
-    load();
-  }
-
-
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const today = new Date().toISOString().slice(0, 10);
-
-  const stats = useMemo(() => {
-    const fittingsToday = fittings.filter((x) => x.fitting_date === today);
-    const readyFittings = fittings.filter((x) => x.status === "teslime_hazir");
-    const deliveries = rentals.filter((x) => x.delivery_date === today);
-    const returns = rentals.filter((x) => x.return_date === today);
-    const delayed = rentals.filter((x) => x.status === "gecikti");
-    const remaining = rentals.filter((x) => Number(x.remaining_amount || 0) > 0);
-
-    return { fittingsToday, readyFittings, deliveries, returns, delayed, remaining };
-  }, [rentals, fittings, today]);
-
-
-  const productResults = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
-
-    return products
-      .filter((product) =>
-        [product.name, product.barcode, product.product_code, product.model_name, product.color, product.size]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(q)
-      )
-      .slice(0, 6);
-  }, [products, search]);
-
-  const customerResults = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return [];
-
-    return customers
-      .filter((c) =>
-        [c.full_name, c.phone, c.instagram]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(q)
-      )
-      .map((customer) => {
-        const customerRentals = rentals.filter((r) => r.customer_id === customer.id);
-        const customerSales = sales.filter((sale) => sale.customer_id === customer.id);
-        const lastRental = customerRentals[0];
-        const lastSale = customerSales[0];
-        const remaining =
-          customerRentals.reduce((sum, item) => sum + Number(item.remaining_amount || 0), 0) +
-          customerSales.reduce((sum, item) => sum + Number(item.remaining_amount || 0), 0);
-
-        return {
-          ...customer,
-          lastRental,
-          lastSale,
-          remaining,
-          operationCount: customerRentals.length + customerSales.length,
-        };
-      })
-      .slice(0, 6);
-  }, [customers, rentals, sales, search]);
-
-  const todayFlow = useMemo(() => {
-    const fittingItems = stats.fittingsToday.map((x) => ({ ...x, flowType: "Prova", flowTime: x.fitting_time || "Saat yok" }));
-    const deliveryItems = stats.deliveries.map((x) => ({ ...x, flowType: "Teslim", flowTime: x.delivery_time || "Saat yok" }));
-    const returnItems = stats.returns.map((x) => ({ ...x, flowType: "İade", flowTime: x.return_time || "Saat yok" }));
-    return [...fittingItems, ...deliveryItems, ...returnItems].sort((a, b) => String(a.flowTime).localeCompare(String(b.flowTime)));
-  }, [stats]);
-
-  return (
-    <AppShell title="Bugün">
-      <div className="space-y-5 pb-24 lg:space-y-7 lg:pb-0">
-        <section className="relative overflow-hidden rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)]">
-          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">MAUNA Personel Ekranı</p>
-          <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Bugün ne var?</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
-            Prova, teslim, iade ve müşteri aramalarını tek ekrandan takip edin.
-          </p>
-
-          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-6">
-            <Hero label="Prova" value={stats.fittingsToday.length} />
-            <Hero label="Teslim" value={stats.deliveries.length} />
-            <Hero label="İade" value={stats.returns.length} />
-            <Hero label="Geciken" value={stats.delayed.length} danger />
-            <Hero label="Hazır" value={stats.readyFittings.length} />
-            <Hero label="Ödeme" value={stats.remaining.length} />
-          </div>
-        </section>
-
-        <section className="premium-card p-5 lg:p-6">
-          <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/75 px-4 py-4 shadow-inner">
-            <Search size={20} className="text-[#b69463]" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Müşteri adı, telefon veya Instagram ara..."
-              className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-[#a79b8d]"
-            />
-          </div>
-
-          {(customerResults.length > 0 || productResults.length > 0) && (
-            <div className="mt-4 grid gap-3">
-              {customerResults.map((customer) => (
-                <div key={`customer-${customer.id}`} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="font-black text-[#211b16]">{customer.full_name}</h3>
-                      <p className="mt-1 text-xs font-bold text-[#8a7f72]">
-                        {[customer.phone, customer.instagram].filter(Boolean).join(" • ") || "Detay yok"}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <MiniBadge label="İşlem" value={`${customer.operationCount || 0}`} />
-                        <MiniBadge label="Kalan" value={`${Number(customer.remaining || 0).toLocaleString("tr-TR")} TL`} danger={Number(customer.remaining || 0) > 0} />
-                        {customer.lastRental ? <MiniBadge label="Son Kiralama" value={customer.lastRental.return_date || customer.lastRental.delivery_date || "-"} /> : null}
-                        {customer.lastSale ? <MiniBadge label="Son Satış" value={customer.lastSale.sale_date || "-"} /> : null}
-                      </div>
-                    </div>
-
-                    <Link href={`/customers/${customer.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
-                      Müşteri Kartına Git
-                    </Link>
-                  </div>
-                </div>
-              ))}
-
-              {productResults.map((product) => (
-                <div key={`product-${product.id}`} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      {product.image_url ? (
-                        <img src={product.image_url} className="h-14 w-14 rounded-xl object-cover" alt="" />
-                      ) : (
-                        <div className="h-14 w-14 rounded-xl bg-[#f7f0e7]" />
-                      )}
-
-                      <div>
-                        <h3 className="font-black text-[#211b16]">{product.name || "Ürün"}</h3>
-                        <p className="mt-1 text-xs font-bold text-[#8a7f72]">
-                          {[product.barcode, product.model_name, product.color, product.size, product.status].filter(Boolean).join(" • ") || "Detay yok"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <Link href={`/products/${product.id}`} className="rounded-2xl bg-[#211b16] px-4 py-3 text-center text-xs font-black text-white">
-                      Ürün Kartına Git
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.1fr_.9fr]">
-          <div className="premium-card p-5 lg:p-6">
-            <SectionTitle icon={<Clock size={20} />} title="Günlük Akış" sub="Bugünkü prova, teslim ve iadeler" />
-
-            <div className="mt-5 space-y-3">
-              {todayFlow.length === 0 ? (
-                <Empty text="Bugün için prova, teslim veya iade görünmüyor." />
-              ) : (
-                todayFlow.map((item) => (
-                  <FlowCard key={`${item.id}-${item.flowType}`} item={{ ...item, customers }} onCompleteDelivery={completeDeliveryFromToday} onCompleteReturn={completeReturnFromToday} />
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-5">
-            <div className="premium-card p-5 lg:p-6">
-              <SectionTitle icon={<AlertTriangle size={20} />} title="Kritik Uyarılar" sub="Geciken ve ödeme bekleyen işlemler" />
-
-              <div className="mt-5 space-y-3">
-                {stats.delayed.slice(0, 3).map((item) => (
-                  <Warning key={item.id} title="Geciken İade" text={`${item.customer_name || "Müşteri"} • ${item.product_name || "Ürün"}`} />
-                ))}
-
-                {stats.readyFittings.slice(0, 3).map((item) => (
-                  <Warning key={`ready-${item.id}`} title="Teslime Hazır Prova" text={`${item.customer_name || "Müşteri"} • ${item.product_name || "Ürün"}`} />
-                ))}
-
-                {stats.remaining.slice(0, 3).map((item) => (
-                  <Warning
-                    key={`pay-${item.id}`}
-                    title="Kalan Ödeme"
-                    text={`${item.customer_name || "Müşteri"} • ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL`}
-                    whatsappUrl={whatsappLink(
-                      customerPhone(customers, item.customer_id, item.customer_name),
-                      `Merhaba ${item.customer_name || "Değerli müşterimiz"}, MAUNA Couture işleminiz için kalan ödemeniz ${Number(item.remaining_amount || 0).toLocaleString("tr-TR")} TL’dir. Bilginize sunarız.`
-                    )}
-                  />
-                ))}
-
-                {stats.delayed.length === 0 && stats.remaining.length === 0 && stats.readyFittings.length === 0 && (
-                  <Empty text="Kritik uyarı yok." compact />
-                )}
-              </div>
-            </div>
-
-            <div className="premium-card p-5 lg:p-6">
-              <SectionTitle icon={<Package size={20} />} title="Hızlı İşlemler" sub="Personelin en çok kullanacağı alanlar" />
-
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <Quick href="/rentals" title="Kiralama" icon={<CalendarDays size={18} />} />
-                <Quick href="/sales" title="Satış" icon={<ShoppingBag size={18} />} />
-                <Quick href="/returns" title="İade Al" icon={<RotateCcw size={18} />} />
-                <Quick href="/customers" title="Müşteri" icon={<UserRound size={18} />} />
-                <Quick href="/products" title="Ürün Ara" icon={<Package size={18} />} />
-                <Quick href="/calendar" title="Takvim" icon={<CalendarDays size={18} />} />
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </AppShell>
-  );
-}
-
-
-function customerPhone(customers: any[], customerId?: string | null, customerName?: string | null) {
-  const customer = customers.find((c) => c.id === customerId || c.full_name === customerName);
-  return customer?.phone || "";
+function formatDate(d: string) {
+  return new Date(d + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
 }
 
 function whatsappLink(phone: string, message: string) {
@@ -324,175 +20,322 @@ function whatsappLink(phone: string, message: string) {
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
 }
 
-function operationMessage(item: any) {
-  const name = item.customer_name || "Değerli müşterimiz";
-  const product = item.product_name || "ürününüz";
+export default function TodayPage() {
+  const [rentals,  setRentals]  = useState<any[]>([]);
+  const [fittings, setFittings] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [products,  setProducts]  = useState<any[]>([]);
+  const [sales,     setSales]     = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  if (item.flowType === "Prova") {
-    return `Merhaba ${name}, MAUNA Couture prova randevunuz ${item.fitting_date || "bugün"} ${item.fitting_time || ""} olarak planlanmıştır. Sizi bekliyoruz.`;
+  const today = new Date().toISOString().slice(0, 10);
+
+  async function load() {
+    setLoading(true);
+    const [rr, fr, cr, pr, sr] = await Promise.all([
+      supabase.from("rentals")
+        .select("*, customers(id,full_name,phone), products(id,name,category,image_url)")
+        .order("delivery_date", { ascending: true }),
+      supabase.from("fittings")
+        .select("*, customers(id,full_name,phone), products(id,name,category,image_url)")
+        .order("fitting_date", { ascending: true }),
+      supabase.from("customers").select("id,full_name,phone,instagram").order("full_name"),
+      supabase.from("products").select("id,name,barcode,category,color,size,image_url,status").order("name"),
+      supabase.from("sales").select("*, customers(full_name)").order("created_at", { ascending: false }),
+    ]);
+    setRentals(rr.data || []);
+    setFittings(fr.data || []);
+    setCustomers(cr.data || []);
+    setProducts(pr.data || []);
+    setSales(sr.data || []);
+    setLoading(false);
   }
 
-  if (item.flowType === "Teslim") {
-    return `Merhaba ${name}, ${product} tesliminiz bugün planlanmıştır. MAUNA Couture olarak sizi bekliyoruz.`;
+  useEffect(() => { load(); }, []);
+
+  const stats = useMemo(() => {
+    const fittingsToday  = fittings.filter(x => x.fitting_date === today);
+    const readyFittings  = fittings.filter(x => x.status === "teslime_hazir");
+    const deliveries     = rentals.filter(x => x.delivery_date === today);
+    const returns        = rentals.filter(x => x.return_date === today);
+    const overdue        = rentals.filter(x => x.return_date < today && !["tamamlandi","iptal"].includes(x.status));
+    const unpaid         = rentals.filter(x => Number(x.remaining_amount || 0) > 0);
+    return { fittingsToday, readyFittings, deliveries, returns, overdue, unpaid };
+  }, [rentals, fittings, today]);
+
+  const todayFlow = useMemo(() => {
+    const items = [
+      ...stats.fittingsToday.map(x => ({ ...x, flowType: "Prova",  flowTime: x.fitting_time  || "00:00" })),
+      ...stats.deliveries.map(x  => ({ ...x, flowType: "Teslim", flowTime: x.delivery_time || "00:00" })),
+      ...stats.returns.map(x     => ({ ...x, flowType: "İade",   flowTime: x.return_time   || "00:00" })),
+    ];
+    return items.sort((a, b) => a.flowTime.localeCompare(b.flowTime));
+  }, [stats]);
+
+  async function completeDelivery(item: any) {
+    await supabase.from("rentals").update({ status: "aktif" }).eq("id", item.id);
+    if (item.product_id) await supabase.from("products").update({ status: "kirada" }).eq("id", item.product_id);
+    load();
   }
 
-  if (item.flowType === "İade") {
-    return `Merhaba ${name}, MAUNA Couture’dan kiraladığınız ${product} için iade tarihiniz bugündür. Gecikme yaşanmaması için bilginize sunarız.`;
+  async function completeReturn(item: any) {
+    await supabase.from("rentals").update({ status: "tamamlandi" }).eq("id", item.id);
+    if (item.product_id) await supabase.from("products").update({ status: "stokta" }).eq("id", item.product_id);
+    load();
   }
 
-  return `Merhaba ${name}, MAUNA Couture işleminiz hakkında bilgilendirme için yazıyoruz.`;
-}
+  const q = search.trim().toLowerCase();
+  const customerResults = useMemo(() => {
+    if (!q) return [];
+    return customers.filter(c =>
+      [c.full_name, c.phone, c.instagram].filter(Boolean).join(" ").toLowerCase().includes(q)
+    ).slice(0, 5).map(c => {
+      const cRentals = rentals.filter(r => r.customer_id === c.id);
+      const cSales   = sales.filter(s => s.customer_id === c.id);
+      const remaining = [...cRentals, ...cSales].reduce((s, x) => s + Number(x.remaining_amount || 0), 0);
+      return { ...c, remaining, operationCount: cRentals.length + cSales.length };
+    });
+  }, [q, customers, rentals, sales]);
 
+  const productResults = useMemo(() => {
+    if (!q) return [];
+    return products.filter(p =>
+      [p.name, p.barcode, p.category, p.color, p.size].filter(Boolean).join(" ").toLowerCase().includes(q)
+    ).slice(0, 5);
+  }, [q, products]);
 
-function Hero({ label, value, danger = false }: any) {
   return (
-    <div className={`rounded-2xl p-4 text-center backdrop-blur-xl ${danger ? "bg-red-500/20" : "bg-white/10"}`}>
-      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">{label}</div>
-      <div className="mt-2 text-2xl font-black text-white">{value}</div>
-    </div>
-  );
-}
+    <AppShell title="Bugün">
+      <div className="space-y-5 pb-24 lg:space-y-7 lg:pb-0">
 
-function SectionTitle({ icon, title, sub }: any) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">{icon}</div>
-      <div>
-        <h2 className="premium-title text-xl">{title}</h2>
-        <p className="premium-muted text-sm">{sub}</p>
-      </div>
-    </div>
-  );
-}
-
-function FlowCard({ item, onCompleteDelivery, onCompleteReturn }: any) {
-  const isReturn = item.flowType === "İade";
-  const isFitting = item.flowType === "Prova";
-  return (
-    <div className="rounded-[1.35rem] border border-[#eadfce] bg-white/70 p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${isReturn ? "bg-red-100 text-red-700" : isFitting ? "bg-[#b69463]/15 text-[#b69463]" : "bg-[#211b16]/10 text-[#211b16]"}`}>
-            {isReturn ? <RotateCcw size={20} /> : isFitting ? <UserRound size={20} /> : <Package size={20} />}
+        {/* Header */}
+        <section className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white">
+          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">MAUNA Personel</p>
+          <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Bugün ne var?</h1>
+          <p className="mt-2 text-sm text-white/70">{formatDate(today)} — Tüm operasyonlar tek ekranda</p>
+          <div className="mt-5 grid grid-cols-3 gap-2 lg:grid-cols-6">
+            {[
+              ["Prova", stats.fittingsToday.length, false],
+              ["Teslim", stats.deliveries.length, false],
+              ["İade", stats.returns.length, false],
+              ["Geciken", stats.overdue.length, true],
+              ["Hazır", stats.readyFittings.length, false],
+              ["Ödeme", stats.unpaid.length, stats.unpaid.length > 0],
+            ].map(([label, value, danger]) => (
+              <div key={label as string} className={`rounded-2xl p-3 text-center ${danger ? "bg-red-500/30" : "bg-white/10"}`}>
+                <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50">{label}</div>
+                <div className="mt-1 text-2xl font-black text-white">{value as number}</div>
+              </div>
+            ))}
           </div>
-          <div>
-            <h3 className="font-black text-[#211b16]">{item.flowTime} — {item.flowType}</h3>
-            <p className="mt-1 text-xs font-bold text-[#8a7f72]">
-              {[item.customer_name, item.product_name].filter(Boolean).join(" • ") || "Detay yok"}
-            </p>
+        </section>
+
+        {/* Arama */}
+        <section className="premium-card p-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/75 px-4 py-3">
+            <Search size={18} className="text-[#b69463]" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Müşteri adı, telefon, ürün veya barkod ara..."
+              className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-[#a79b8d]" />
+          </div>
+
+          {(customerResults.length > 0 || productResults.length > 0) && (
+            <div className="mt-3 space-y-2">
+              {customerResults.map(c => (
+                <div key={c.id} className="rounded-2xl border border-[#eadfce] bg-white/80 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-black text-[#211b16]">{c.full_name}</div>
+                      <div className="mt-0.5 text-xs text-[#9d8b74]">{c.phone}</div>
+                      <div className="mt-2 flex gap-2">
+                        <span className="rounded-full bg-[#f7f0e7] px-3 py-1 text-[11px] font-black text-[#6d6256]">{c.operationCount} işlem</span>
+                        {c.remaining > 0 && <span className="rounded-full bg-red-100 px-3 py-1 text-[11px] font-black text-red-700">{c.remaining.toLocaleString("tr-TR")} ₺ borç</span>}
+                      </div>
+                    </div>
+                    <Link href={`/customers/${c.id}`} className="shrink-0 rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white">Kart</Link>
+                  </div>
+                </div>
+              ))}
+              {productResults.map(p => (
+                <div key={p.id} className="rounded-2xl border border-[#eadfce] bg-white/80 p-4">
+                  <div className="flex items-center gap-3">
+                    {p.image_url
+                      ? <img src={p.image_url} className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                      : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f7f0e7] text-[#b69463]"><Package size={18} /></div>
+                    }
+                    <div className="flex-1">
+                      <div className="font-black text-[#211b16]">{p.name}</div>
+                      <div className="text-xs text-[#9d8b74]">{[p.category, p.color, p.size, p.barcode].filter(Boolean).join(" · ")}</div>
+                    </div>
+                    <span className={`shrink-0 rounded-xl px-3 py-1 text-xs font-black ${p.status === "stokta" ? "bg-green-100 text-green-700" : p.status === "satildi" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-700"}`}>
+                      {p.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.2fr_.8fr]">
+
+          {/* Günlük akış */}
+          <section className="premium-card p-5 lg:p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]"><Clock size={20} /></div>
+              <div>
+                <h2 className="text-xl font-black text-[#1f1b16]">Günlük Akış</h2>
+                <p className="text-sm text-[#8b8177]">Bugünkü prova, teslim ve iadeler</p>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {loading ? (
+                <div className="space-y-2">
+                  {[1,2,3].map(i => <div key={i} className="h-20 animate-pulse rounded-2xl bg-[#f7f0e7]" />)}
+                </div>
+              ) : todayFlow.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-[#d9c9b5] p-10 text-center text-sm font-bold text-[#8a7f72]">
+                  Bugün için planlanmış işlem yok 🎉
+                </div>
+              ) : todayFlow.map(item => {
+                const isReturn  = item.flowType === "İade";
+                const isFitting = item.flowType === "Prova";
+                const customerName = item.customers?.full_name || "—";
+                const phone        = item.customers?.phone || "";
+                const productName  = item.products?.name || "—";
+                const productImg   = item.products?.image_url;
+
+                const waMsg = isFitting
+                  ? `Merhaba ${customerName}, MAUNA Couture prova randevunuz bugün saat ${item.fitting_time?.slice(0,5) || ""} olarak planlanmıştır. Sizi bekliyoruz.`
+                  : isReturn
+                  ? `Merhaba ${customerName}, MAUNA Couture'dan kiraladığınız ${productName} için iade tarihiniz bugündür.`
+                  : `Merhaba ${customerName}, ${productName} tesliminiz bugün planlanmıştır. MAUNA Couture olarak sizi bekliyoruz.`;
+
+                return (
+                  <div key={`${item.id}-${item.flowType}`} className="rounded-2xl border border-[#eadfce] bg-white/80 p-4">
+                    <div className="flex items-start gap-3">
+                      {productImg
+                        ? <img src={productImg} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+                        : <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${isReturn ? "bg-red-100 text-red-600" : isFitting ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"}`}>
+                            {isReturn ? <RotateCcw size={20} /> : isFitting ? <UserRound size={20} /> : <Package size={20} />}
+                          </div>
+                      }
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`rounded-lg px-2 py-0.5 text-[11px] font-black ${isReturn ? "bg-red-100 text-red-700" : isFitting ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                            {item.flowType}
+                          </span>
+                          <span className="text-xs font-black text-[#9d8b74]">{item.flowTime?.slice(0,5)}</span>
+                        </div>
+                        <div className="mt-1 font-black text-[#211b16]">{customerName}</div>
+                        <div className="text-xs text-[#9d8b74]">{productName}</div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {item.customer_id && (
+                            <Link href={`/customers/${item.customer_id}`} className="rounded-xl bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Müşteri</Link>
+                          )}
+                          {phone && (
+                            <a href={whatsappLink(phone, waMsg)} target="_blank" className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WhatsApp</a>
+                          )}
+                          {item.flowType === "Teslim" && (
+                            <button onClick={() => completeDelivery(item)} className="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-black text-white">Teslim Edildi ✓</button>
+                          )}
+                          {item.flowType === "İade" && (
+                            <button onClick={() => completeReturn(item)} className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">İadeyi Al ✓</button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Sağ panel */}
+          <div className="space-y-5">
+
+            {/* Kritik uyarılar */}
+            <section className="premium-card p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-red-100 text-red-600"><AlertTriangle size={20} /></div>
+                <div>
+                  <h2 className="text-xl font-black text-[#1f1b16]">Kritik Uyarılar</h2>
+                  <p className="text-sm text-[#8b8177]">Geciken ve bekleyen işlemler</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {stats.overdue.length === 0 && stats.unpaid.length === 0 && stats.readyFittings.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-[#d9c9b5] p-6 text-center text-sm font-bold text-[#8a7f72]">Kritik uyarı yok ✓</div>
+                ) : null}
+
+                {stats.overdue.map(item => (
+                  <div key={item.id} className="rounded-2xl border border-red-200 bg-red-50 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-wide text-red-700">Geciken İade</div>
+                        <div className="text-sm font-black text-[#211b16]">{item.customers?.full_name || "—"}</div>
+                        <div className="text-xs text-red-600">{item.products?.name} · İade: {formatDate(item.return_date)}</div>
+                      </div>
+                      {item.customers?.phone && (
+                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers.full_name}, MAUNA Couture kiraladığınız ${item.products?.name || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`)}
+                          target="_blank" className="shrink-0 rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
+                {stats.readyFittings.map(item => (
+                  <div key={item.id} className="rounded-2xl border border-amber-200 bg-amber-50 p-3">
+                    <div className="text-[10px] font-black uppercase tracking-wide text-amber-700">Teslime Hazır Prova</div>
+                    <div className="text-sm font-black text-[#211b16]">{item.customers?.full_name || "—"}</div>
+                    <div className="text-xs text-amber-600">{item.products?.name || "Ürün belirtilmedi"}</div>
+                  </div>
+                ))}
+
+                {stats.unpaid.slice(0, 4).map(item => (
+                  <div key={item.id} className="rounded-2xl border border-orange-200 bg-orange-50 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-wide text-orange-700">Kalan Ödeme</div>
+                        <div className="text-sm font-black text-[#211b16]">{item.customers?.full_name || "—"}</div>
+                        <div className="text-xs text-orange-600">{Number(item.remaining_amount).toLocaleString("tr-TR")} ₺</div>
+                      </div>
+                      {item.customers?.phone && (
+                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers?.full_name}, MAUNA Couture işleminiz için kalan ödemeniz ${Number(item.remaining_amount).toLocaleString("tr-TR")} ₺'dir.`)}
+                          target="_blank" className="shrink-0 rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Hızlı işlemler */}
+            <section className="premium-card p-5">
+              <h2 className="mb-4 text-xl font-black text-[#1f1b16]">Hızlı İşlemler</h2>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { href: "/rentals",   label: "Kiralama",  icon: <CalendarDays size={18} /> },
+                  { href: "/sales",     label: "Satış",     icon: <ShoppingBag size={18} /> },
+                  { href: "/returns",   label: "İade Al",   icon: <RotateCcw size={18} /> },
+                  { href: "/customers", label: "Müşteri",   icon: <UserRound size={18} /> },
+                  { href: "/fittings",  label: "Prova",     icon: <UserRound size={18} /> },
+                  { href: "/products",  label: "Ürünler",   icon: <Package size={18} /> },
+                ].map(item => (
+                  <Link key={item.href} href={item.href}
+                    className="flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-2xl border border-[#eadfce] bg-white/70 text-center text-xs font-black text-[#211b16] hover:bg-white/90">
+                    <span className="text-[#b69463]">{item.icon}</span>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          {item.customer_id ? (
-            <Link href={`/customers/${item.customer_id}`} className="rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white">
-              Müşteri Kartı
-            </Link>
-          ) : null}
-
-          {item.product_id ? (
-            <Link href={`/products/${item.product_id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-2 text-xs font-black text-[#211b16]">
-              Ürün Kartı
-            </Link>
-          ) : null}
-
-          {whatsappLink(customerPhone(item.customers || [], item.customer_id, item.customer_name), operationMessage(item)) ? (
-            <a
-              href={whatsappLink(customerPhone(item.customers || [], item.customer_id, item.customer_name), operationMessage(item))}
-              target="_blank"
-              className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white"
-            >
-              WhatsApp
-            </a>
-          ) : null}
-
-          {item.flowType === "Teslim" ? (
-            <button
-              onClick={() => onCompleteDelivery(item)}
-              className="rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white"
-            >
-              Teslim Edildi
-            </button>
-          ) : null}
-
-          {item.flowType === "İade" ? (
-            <button
-              onClick={() => onCompleteReturn(item)}
-              className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white"
-            >
-              İadeyi Al
-            </button>
-          ) : null}
-
-          <span className={`rounded-2xl px-4 py-2 text-xs font-black ${
-            item.flowType === "Prova"
-              ? item.status === "teslime_hazir"
-                ? "bg-green-100 text-green-700"
-                : item.status === "geldi"
-                  ? "bg-[#b69463]/15 text-[#b69463]"
-                  : "bg-[#f7f0e7] text-[#211b16]"
-              : "bg-[#f7f0e7] text-[#211b16]"
-          }`}>
-            {item.flowType === "Prova" ? statusText(item.status || "bekliyor") : item.status || "aktif"}
-          </span>
-        </div>
       </div>
-    </div>
+    </AppShell>
   );
-}
-
-function Warning({ title, text, whatsappUrl }: any) {
-  return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="text-xs font-black uppercase tracking-[0.18em] text-red-700">{title}</div>
-          <div className="mt-1 text-sm font-bold text-[#211b16]">{text}</div>
-        </div>
-
-        {whatsappUrl ? (
-          <a href={whatsappUrl} target="_blank" className="rounded-2xl bg-green-600 px-4 py-2 text-xs font-black text-white">
-            WhatsApp
-          </a>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function Quick({ href, title, icon }: any) {
-  return (
-    <Link href={href} className="flex min-h-20 flex-col items-center justify-center gap-2 rounded-2xl border border-[#eadfce] bg-white/70 p-3 text-center text-sm font-black text-[#211b16]">
-      <span className="text-[#b69463]">{icon}</span>
-      {title}
-    </Link>
-  );
-}
-
-function Empty({ text, compact = false }: any) {
-  return (
-    <div className={`rounded-3xl border border-dashed border-[#d9c9b5] text-center text-sm font-bold text-[#8a7f72] ${compact ? "p-6" : "p-10"}`}>
-      {text}
-    </div>
-  );
-}
-
-
-function MiniBadge({ label, value, danger = false }: any) {
-  return (
-    <span className={`rounded-full px-3 py-1 text-[11px] font-black ${
-      danger ? "bg-red-100 text-red-700" : "bg-[#f7f0e7] text-[#6d6256]"
-    }`}>
-      {label}: {value}
-    </span>
-  );
-}
-
-
-function statusText(status: string) {
-  if (status === "bekliyor") return "Bekliyor";
-  if (status === "geldi") return "Geldi";
-  if (status === "tamamlandi") return "Tamamlandı";
-  if (status === "teslime_hazir") return "Teslime Hazır";
-  return status;
 }

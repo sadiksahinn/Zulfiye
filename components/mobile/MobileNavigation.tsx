@@ -25,16 +25,16 @@ export default function MobileNavigation() {
   const publicPages = ["/", "/forgot-password", "/reset-password", "/register", "/auth/confirm"];
   if (publicPages.includes(pathname)) return null;
 
-  const mainLinks = [
-    ["Bugün", "/today", Home],
-    ["Takvim", "/calendar", CalendarDays],
-    ["Kiralama", "/rentals", CalendarDays],
-    ["Prova", "/fittings", UserRound],
-    ["Müşteri", "/customers", UserRound],
-    ["Ürünler", "/products", Package],
-    ["İade", "/returns", RotateCcw],
-    ["Satış", "/sales", ShoppingBag],
-  ] as const;
+  const mainLinks: { name: string; href: string; Icon: React.ElementType }[] = [
+    { name: "Bugün",    href: "/today",     Icon: Home },
+    { name: "Kiralama", href: "/rentals",   Icon: CalendarDays },
+    { name: "Satış",    href: "/sales",     Icon: ShoppingBag },
+    { name: "Takvim",   href: "/calendar",  Icon: CalendarDays },
+    { name: "Müşteri",  href: "/customers", Icon: UserRound },
+    { name: "Provalar", href: "/fittings",  Icon: UserRound },
+    { name: "Ürünler",  href: "/products",  Icon: Package },
+    { name: "İade",     href: "/returns",   Icon: RotateCcw },
+  ];
 
   const adminLinks = [
     ["Yönetim", "/dashboard"],
@@ -48,16 +48,13 @@ export default function MobileNavigation() {
   return (
     <>
       <div className="fixed bottom-3 left-3 right-3 z-[99998] grid grid-cols-5 gap-2 rounded-[1.7rem] border border-white/20 bg-[#171411]/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
-        {mainLinks.slice(0, 5).map(([name, href, Icon]) => {
+        {mainLinks.slice(0, 5).map(({ name, href, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
-            <a
-              key={href}
-              href={href}
+            <a key={href} href={href}
               className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-black ${
                 active ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white" : "text-white/70"
-              }`}
-            >
+              }`}>
               <Icon size={18} />
               {name}
             </a>
@@ -90,7 +87,7 @@ export default function MobileNavigation() {
               <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
                 Personel İşlemleri
               </p>
-              {mainLinks.map(([name, href, Icon]) => (
+              {mainLinks.map(({ name, href, Icon }) => (
                 <a key={href} href={href} className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-4 font-bold text-white">
                   <Icon size={18} className="text-[#d8be8d]" />
                   {name}
