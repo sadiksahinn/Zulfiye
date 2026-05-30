@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null, profile: null, role: "staff", loading: true, logout: async () => {},
 });
 
-const publicRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
+const publicRoutes = ["/", "/register", "/forgot-password", "/reset-password", "/auth/confirm"];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);

@@ -27,11 +27,16 @@ export default function RegisterPage() {
 
     setLoading(true);
 
+    const confirmUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/auth/confirm`
+      : undefined;
+
     const { error } = await supabase.auth.signUp({
       email: email.trim().toLowerCase(),
       password,
       options: {
         data: { full_name: fullName.trim() },
+        emailRedirectTo: confirmUrl,
       },
     });
 
