@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Search, ShieldCheck, Sparkles, UserPlus } from "lucide-react";
+import {
+  CalendarDays, Search, UserPlus, X, ShoppingBag, ChevronRight, Package,
+} from "lucide-react";
 
 type Product = {
   id: string;
@@ -11,6 +13,7 @@ type Product = {
   name: string;
   product_code: string | null;
   model_name: string | null;
+  category: string;
   size: string | null;
   color: string | null;
   status: string;
@@ -18,104 +21,99 @@ type Product = {
   image_url: string | null;
 };
 
-type Customer = {
-  id: string;
-  full_name: string;
-  phone: string;
+type Customer = { id: string; full_name: string; phone: string };
+
+type BasketItem = {
+  product: Product;
+  price: number;
 };
+
+const CATEGORIES = ["Tümü", "Gelinlik", "Kınalık", "After Party", "Aksesuar", "Ayakkabı"];
+
+const EMPTY_FORM = {
+  deliveryDate: "", deliveryTime: "",
+  eventDate: "",    eventTime: "",
+  eventType: "Düğün",
+  returnDate: "",   returnTime: "",
+  depositAmount: "",
+  notes: "",
+};
+
+const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+
+function Label({ children }: { children: React.ReactNode }) {
+  return <label className="mb-1.5 block text-[11px] font-black uppercase tracking-[0.2em] text-[#b69463]">{children}</label>;
+}
 
 export default function RentalsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [activeCategory, setActiveCategory] = useState("Tümü");
   const [productSearch, setProductSearch] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [basket, setBasket] = useState<BasketItem[]>([]);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const [quickCustomer, setQuickCustomer] = useState({
-    fullName: "",
-    phone: "",
-  });
-
-  const [form, setForm] = useState({
-    deliveryDate: "",
-    deliveryTime: "",
-    eventDate: "",
-    eventTime: "",
-    eventType: "Düğün",
-    returnDate: "",
-    returnTime: "",
-    totalAmount: "",
-    depositAmount: "",
-    notes: "",
-  });
-
-  function updateForm(key: string, value: string) {
-    setForm((p) => ({ ...p, [key]: value }));
-  }
+  const [quickCustomer, setQuickCustomer] = useState({ fullName: "", phone: "" });
+  const [step, setStep] = useState<1 | 2>(1); // 1=müşteri+ürün, 2=tarih+ödeme
 
   async function loadData() {
-    const [productsRes, customersRes] = await Promise.all([
-      supabase.from("products").select("*").eq("status", "stokta").order("created_at", { ascending: false }),
-      supabase.from("customers").select("*").order("created_at", { ascending: false }),
+    const [pr, cr] = await Promise.all([
+      supabase.from("products").select("*").eq("status", "stokta").order("category"),
+      supabase.from("customers").select("id,full_name,phone").order("full_name"),
     ]);
-
-    setProducts((productsRes.data || []) as Product[]);
-    setCustomers((customersRes.data || []) as Customer[]);
+    setProducts((pr.data || []) as Product[]);
+    setCustomers((cr.data || []) as Customer[]);
   }
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
-  const productResults = useMemo(() => {
+  function set(k: string, v: string) { setForm(p => ({ ...p, [k]: v })); }
+
+  const filteredProducts = useMemo(() => {
     const q = productSearch.toLowerCase().trim();
-    if (!q) return [];
-
-    return products.filter((p) => {
-      return (
-        p.name?.toLowerCase().includes(q) ||
-        p.barcode?.toLowerCase().includes(q) ||
-        p.product_code?.toLowerCase().includes(q) ||
-        p.model_name?.toLowerCase().includes(q)
-      );
+    return products.filter(p => {
+      const catOk = activeCategory === "Tümü" || p.category === activeCategory;
+      const searchOk = !q || [p.name, p.barcode, p.product_code, p.model_name, p.color]
+        .filter(Boolean).join(" ").toLowerCase().includes(q);
+      return catOk && searchOk;
     });
-  }, [products, productSearch]);
+  }, [products, productSearch, activeCategory]);
 
   const customerResults = useMemo(() => {
     const q = customerSearch.toLowerCase().trim();
-    if (!q) return [];
+    if (!q || selectedCustomer) return [];
+    return customers.filter(c =>
+      c.full_name.toLowerCase().includes(q) || c.phone.includes(q)
+    ).slice(0, 6);
+  }, [customers, customerSearch, selectedCustomer]);
 
-    return customers.filter((c) => {
-      return c.full_name?.toLowerCase().includes(q) || c.phone?.includes(q);
-    });
-  }, [customers, customerSearch]);
+  function addToBasket(p: Product) {
+    if (basket.find(b => b.product.id === p.id)) return;
+    setBasket(prev => [...prev, { product: p, price: p.rental_price ?? 0 }]);
+  }
+
+  function removeFromBasket(id: string) {
+    setBasket(prev => prev.filter(b => b.product.id !== id));
+  }
+
+  function updatePrice(id: string, price: number) {
+    setBasket(prev => prev.map(b => b.product.id === id ? { ...b, price } : b));
+  }
+
+  const total = basket.reduce((s, b) => s + b.price, 0);
+  const deposit = Number(form.depositAmount || 0);
+  const remaining = total - deposit;
 
   async function createQuickCustomer() {
-    if (!quickCustomer.fullName || !quickCustomer.phone) {
-      setMessage("Müşteri adı ve telefon zorunludur.");
-      return;
-    }
-
-    const { data: userData } = await supabase.auth.getUser();
-
-    const { data, error } = await supabase
-      .from("customers")
-      .insert({
-        full_name: quickCustomer.fullName,
-        phone: quickCustomer.phone,
-        created_by: userData.user?.id,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      setMessage("Müşteri eklenemedi.");
-      return;
-    }
-
+    if (!quickCustomer.fullName || !quickCustomer.phone) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase.from("customers")
+      .insert({ full_name: quickCustomer.fullName, phone: quickCustomer.phone, created_by: user?.id })
+      .select().single();
+    if (error || !data) return;
     setSelectedCustomer(data as Customer);
     setCustomerSearch(data.full_name);
     setShowCustomerModal(false);
@@ -123,338 +121,386 @@ export default function RentalsPage() {
     loadData();
   }
 
-  async function createRental() {
-    setMessage("");
+  async function saveRental() {
+    setMessage(null);
+    if (!selectedCustomer) { setMessage({ text: "Müşteri seçimi zorunludur.", ok: false }); return; }
+    if (basket.length === 0) { setMessage({ text: "En az bir ürün ekleyin.", ok: false }); return; }
+    if (!form.deliveryDate || !form.returnDate) { setMessage({ text: "Teslim ve iade tarihi zorunludur.", ok: false }); return; }
 
-    if (!selectedProduct || !selectedCustomer) {
-      setMessage("Ürün ve müşteri seçimi zorunludur.");
-      return;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!form.deliveryDate || !form.returnDate) {
-      setMessage("Teslim ve iade tarihi zorunludur.");
-      return;
-    }
+    const { data: rental, error } = await supabase.from("rentals").insert({
+      customer_id:      selectedCustomer.id,
+      product_id:       basket[0].product.id,
+      rental_date:      new Date().toISOString().slice(0, 10),
+      delivery_date:    form.deliveryDate,
+      delivery_time:    form.deliveryTime || null,
+      event_date:       form.eventDate || null,
+      event_time:       form.eventTime || null,
+      event_type:       form.eventType,
+      return_date:      form.returnDate,
+      return_time:      form.returnTime || null,
+      total_amount:     total,
+      deposit_amount:   deposit,
+      remaining_amount: remaining,
+      status:           "planlandi",
+      notes:            form.notes,
+      created_by:       user?.id,
+    }).select().single();
 
-    if (selectedProduct.status === "satildi") {
-      setMessage("Bu ürün satılmıştır. Kiralama yapılamaz.");
-      return;
-    }
+    if (error || !rental) { setMessage({ text: "Kiralama kaydedilemedi.", ok: false }); return; }
 
-    const { data: conflicts } = await supabase
-      .from("rentals")
-      .select("*")
-      .eq("product_id", selectedProduct.id)
-      .in("status", ["aktif", "rezerve", "planlandi"])
-      .lte("delivery_date", form.returnDate)
-      .gte("return_date", form.deliveryDate);
+    // rental_items kaydet
+    await supabase.from("rental_items").insert(
+      basket.map(b => ({ rental_id: rental.id, product_id: b.product.id, price: b.price }))
+    );
 
-    if (conflicts && conflicts.length > 0) {
-      setMessage("Bu ürün seçilen tarih aralığında zaten kiralanmış veya rezerve edilmiş.");
-      return;
-    }
+    // Tüm ürünleri rezerve et
+    await Promise.all(basket.map(b =>
+      supabase.from("products").update({ status: "rezerve" }).eq("id", b.product.id)
+    ));
 
-    const { data: userData } = await supabase.auth.getUser();
+    // Takvim olayları
+    const baseTitle = `${selectedCustomer.full_name} - ${basket.map(b => b.product.category).join(", ")}`;
+    const calEvents = [
+      { title: `Teslim: ${baseTitle}`, event_type: "delivery", event_date: form.deliveryDate, event_time: form.deliveryTime || null },
+      form.eventDate ? { title: `${form.eventType}: ${baseTitle}`, event_type: "rental", event_date: form.eventDate, event_time: form.eventTime || null } : null,
+      { title: `İade: ${baseTitle}`, event_type: "return", event_date: form.returnDate, event_time: form.returnTime || null },
+    ].filter(Boolean).map(e => ({ ...e, customer_id: selectedCustomer.id, rental_id: rental.id, created_by: user?.id }));
 
-    const total = Number(form.totalAmount || selectedProduct.rental_price || 0);
-    const deposit = Number(form.depositAmount || 0);
-    const remaining = total - deposit;
+    await supabase.from("calendar_events").insert(calEvents as any[]);
 
-    const { data: rental, error } = await supabase
-      .from("rentals")
-      .insert({
-        product_id: selectedProduct.id,
-        customer_id: selectedCustomer.id,
-        rental_date: new Date().toISOString().slice(0, 10),
-        delivery_date: form.deliveryDate,
-        delivery_time: form.deliveryTime || null,
-        event_date: form.eventDate || null,
-        event_time: form.eventTime || null,
-        event_type: form.eventType,
-        return_date: form.returnDate,
-        return_time: form.returnTime || null,
-        total_amount: total,
-        deposit_amount: deposit,
-        remaining_amount: remaining,
-        status: "planlandi",
-        notes: form.notes,
-        created_by: userData.user?.id,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      setMessage("Kiralama kaydedilemedi.");
-      return;
-    }
-
-    await supabase.from("products").update({ status: "rezerve" }).eq("id", selectedProduct.id);
-
-    const baseTitle = `${selectedProduct.name} ${selectedProduct.color || ""} ${selectedProduct.size || ""} - ${selectedCustomer.full_name}`;
-
-    await supabase.from("calendar_events").insert([
-      {
-        product_id: selectedProduct.id,
-        customer_id: selectedCustomer.id,
-        rental_id: rental.id,
-        title: `Teslim: ${baseTitle}`,
-        event_type: "delivery",
-        event_date: form.deliveryDate,
-        event_time: form.deliveryTime || null,
-        description: `Ürün teslim edilecek. Barkod: ${selectedProduct.barcode}`,
-        created_by: userData.user?.id,
-      },
-      form.eventDate
-        ? {
-            product_id: selectedProduct.id,
-            customer_id: selectedCustomer.id,
-            rental_id: rental.id,
-            title: `${form.eventType}: ${baseTitle}`,
-            event_type: "rental",
-            event_date: form.eventDate,
-            event_time: form.eventTime || null,
-            description: `Etkinlik günü. Ürün müşteride olacak.`,
-            created_by: userData.user?.id,
-          }
-        : null,
-      {
-        product_id: selectedProduct.id,
-        customer_id: selectedCustomer.id,
-        rental_id: rental.id,
-        title: `İade: ${baseTitle}`,
-        event_type: "return",
-        event_date: form.returnDate,
-        event_time: form.returnTime || null,
-        description: `Ürün en geç bu tarihte iade alınacak.`,
-        created_by: userData.user?.id,
-      },
-    ].filter((event): event is NonNullable<typeof event> => event !== null));
-
-    setMessage("Kiralama oluşturuldu, ürün rezerve edildi ve takvime işlendi.");
-    setSelectedProduct(null);
+    setMessage({ text: `Kiralama oluşturuldu! ${basket.length} ürün rezerve edildi.`, ok: true });
+    setBasket([]);
     setSelectedCustomer(null);
-    setProductSearch("");
     setCustomerSearch("");
-    setForm({
-      deliveryDate: "",
-      deliveryTime: "",
-      eventDate: "",
-      eventTime: "",
-      eventType: "Düğün",
-      returnDate: "",
-      returnTime: "",
-      totalAmount: "",
-      depositAmount: "",
-      notes: "",
-    });
+    setProductSearch("");
+    setForm(EMPTY_FORM);
+    setStep(1);
     loadData();
   }
 
   return (
     <AppShell title="Kiralama">
-      <div className="space-y-5 lg:space-y-8">
-        <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)] lg:p-7">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Kiralama Yönetimi</p>
-          <h2 className="mt-3 text-3xl font-black tracking-[-0.05em] lg:text-4xl">Kiralama operasyonları</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
-            Ürün, müşteri, teslim, iade ve ödeme akışını tek ekrandan yönetin.
-          </p>
+      <div className="space-y-5">
+
+        {/* Header */}
+        <div className="rounded-[2rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white lg:p-7">
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Kiralama</p>
+          <h2 className="mt-2 text-3xl font-black tracking-[-0.05em]">Yeni Kiralama</h2>
+          <p className="mt-1 text-sm text-white/60">Birden fazla ürünü tek siparişte kirala</p>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        <div className="xl:col-span-2 premium-card p-5 lg:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
-              <Sparkles size={21} />
-            </div>
-            <div>
-              <h2 className="premium-title text-2xl">Kiralama Oluştur</h2>
-              <p className="premium-muted mt-1 text-sm">Ürün ve müşteri eşleştir, takvime otomatik işle.</p>
-            </div>
-          </div>
+        {/* Adım göstergesi */}
+        <div className="flex gap-3">
+          {[{ n: 1, label: "Müşteri & Ürünler" }, { n: 2, label: "Tarih & Ödeme" }].map(s => (
+            <button
+              key={s.n}
+              onClick={() => setStep(s.n as 1 | 2)}
+              className={`flex flex-1 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-black transition ${
+                step === s.n
+                  ? "border-[#b69463] bg-[#b69463]/10 text-[#b69463]"
+                  : "border-[#eadfce] bg-white/60 text-[#9d8b74]"
+              }`}
+            >
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${
+                step === s.n ? "bg-[#b69463] text-white" : "bg-[#eadfce] text-[#9d8b74]"
+              }`}>{s.n}</span>
+              {s.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="md:col-span-2">
-              <label className="text-sm premium-muted">Ürün Ara</label>
-              <input
-                className="input mt-2"
-                placeholder="Barkod / QR / ürün adı / model adı"
-                value={productSearch}
-                onChange={(e) => {
-                  setProductSearch(e.target.value);
-                  setSelectedProduct(null);
-                }}
-              />
+        {/* ADIM 1: Müşteri + Ürünler */}
+        {step === 1 && (
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
 
-              {productResults.length > 0 && !selectedProduct && (
-                <div className="mt-3 rounded-3xl border border-[#eadfce] bg-white/80 p-3 space-y-2">
-                  {productResults.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        setSelectedProduct(p);
-                        setProductSearch(`${p.name} ${p.color || ""} ${p.size || ""}`);
-                        updateForm("totalAmount", String(p.rental_price || ""));
-                      }}
-                      className="w-full flex items-center gap-4 rounded-2xl p-3 hover:bg-[#f7f0e7] text-left"
-                    >
-                      {p.image_url && <img src={p.image_url} className="h-16 w-16 rounded-xl object-cover" />}
-                      <div>
-                        <div className="font-semibold text-[#211b16]">
-                          {p.name} {p.color || ""} {p.size || ""}
-                        </div>
-                        <div className="text-sm premium-muted">{p.barcode}</div>
+            {/* Sol: Müşteri + Ürün arama */}
+            <div className="space-y-5">
+
+              {/* Müşteri */}
+              <div className="premium-card p-5">
+                <Label>Müşteri</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      className={inputCls}
+                      placeholder="İsim veya telefon ara..."
+                      value={customerSearch}
+                      onChange={e => { setCustomerSearch(e.target.value); setSelectedCustomer(null); }}
+                    />
+                    {customerResults.length > 0 && (
+                      <div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-2xl border border-[#eadfce] bg-white shadow-xl">
+                        {customerResults.map(c => (
+                          <button key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(c.full_name); }}
+                            className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f7f0e7] first:rounded-t-2xl last:rounded-b-2xl">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#b69463]/15 text-[#b69463] font-black text-sm">
+                              {c.full_name[0]}
+                            </div>
+                            <div>
+                              <div className="text-sm font-black text-[#211b16]">{c.full_name}</div>
+                              <div className="text-xs text-[#9d8b74]">{c.phone}</div>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                    </button>
-                  ))}
+                    )}
+                  </div>
+                  <button onClick={() => setShowCustomerModal(true)}
+                    className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-[#211b16] px-4 py-3 text-sm font-black text-white">
+                    <UserPlus size={16} /> Yeni
+                  </button>
                 </div>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <div className="flex items-end gap-3">
-                <div className="flex-1">
-                  <label className="text-sm premium-muted">Müşteri Ara</label>
-                  <input
-                    className="input mt-2"
-                    placeholder="Müşteri adı veya telefon"
-                    value={customerSearch}
-                    onChange={(e) => {
-                      setCustomerSearch(e.target.value);
-                      setSelectedCustomer(null);
-                    }}
-                  />
-                </div>
-
-                <button
-                  onClick={() => setShowCustomerModal(true)}
-                  className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] px-5 py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.20)] transition hover:scale-[1.01]"
-                >
-                  <UserPlus size={18} /> Yeni Müşteri
-                </button>
+                {selectedCustomer && (
+                  <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#b69463]/10 px-4 py-3">
+                    <div>
+                      <div className="text-sm font-black text-[#211b16]">{selectedCustomer.full_name}</div>
+                      <div className="text-xs text-[#9d8b74]">{selectedCustomer.phone}</div>
+                    </div>
+                    <button onClick={() => { setSelectedCustomer(null); setCustomerSearch(""); }}
+                      className="rounded-xl bg-white/70 p-1.5 text-[#9d8b74]"><X size={14} /></button>
+                  </div>
+                )}
               </div>
 
-              {customerResults.length > 0 && !selectedCustomer && (
-                <div className="mt-3 rounded-3xl border border-[#eadfce] bg-white/80 p-3 space-y-2">
-                  {customerResults.map((c) => (
-                    <button
-                      key={c.id}
-                      onClick={() => {
-                        setSelectedCustomer(c);
-                        setCustomerSearch(c.full_name);
-                      }}
-                      className="w-full rounded-2xl p-4 hover:bg-[#f7f0e7] text-left"
-                    >
-                      <div className="font-semibold text-[#211b16]">{c.full_name}</div>
-                      <div className="text-sm premium-muted">{c.phone}</div>
+              {/* Ürün arama */}
+              <div className="premium-card p-5">
+                <Label>Ürün Ekle</Label>
+                <input className={inputCls + " mb-3"} placeholder="Barkod, model adı, renk..."
+                  value={productSearch} onChange={e => setProductSearch(e.target.value)} />
+
+                {/* Kategori sekmeleri */}
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {CATEGORIES.map(cat => (
+                    <button key={cat} onClick={() => setActiveCategory(cat)}
+                      className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-black transition ${
+                        activeCategory === cat
+                          ? "bg-[#b69463] text-white shadow-sm"
+                          : "bg-[#f7f0e7] text-[#7d6c58]"
+                      }`}>
+                      {cat}
                     </button>
                   ))}
                 </div>
+
+                {/* Ürün listesi */}
+                <div className="mt-3 max-h-72 space-y-2 overflow-y-auto pr-1">
+                  {filteredProducts.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-[#9d8b74]">Ürün bulunamadı</p>
+                  ) : filteredProducts.map(p => {
+                    const inBasket = basket.some(b => b.product.id === p.id);
+                    return (
+                      <button key={p.id} onClick={() => addToBasket(p)} disabled={inBasket}
+                        className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                          inBasket
+                            ? "border-[#b69463]/30 bg-[#b69463]/8 opacity-60"
+                            : "border-[#eadfce] bg-white/70 hover:border-[#b69463] hover:bg-[#b69463]/5"
+                        }`}>
+                        {p.image_url
+                          ? <img src={p.image_url} className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+                          : <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f7f0e7] text-[#b69463]"><Package size={18} /></div>
+                        }
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-black text-[#211b16]">{p.name}</div>
+                          <div className="text-xs text-[#9d8b74]">{[p.category, p.color, p.size].filter(Boolean).join(" · ")}</div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <div className="text-sm font-black text-[#b69463]">{p.rental_price?.toLocaleString("tr-TR")} ₺</div>
+                          {inBasket && <div className="text-[10px] text-[#b69463]">Sepette</div>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Sağ: Sepet */}
+            <div className="premium-card p-5">
+              <div className="flex items-center justify-between">
+                <Label>Sepet</Label>
+                <span className="rounded-xl bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">
+                  {basket.length} ürün
+                </span>
+              </div>
+
+              {basket.length === 0 ? (
+                <div className="mt-6 flex flex-col items-center gap-3 rounded-3xl border border-dashed border-[#d9c9b5] py-12 text-center">
+                  <ShoppingBag size={32} className="text-[#d9c9b5]" />
+                  <p className="text-sm text-[#9d8b74]">Soldaki listeden ürün ekleyin</p>
+                </div>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  {basket.map(({ product: p, price }) => (
+                    <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/80 p-3">
+                      {p.image_url
+                        ? <img src={p.image_url} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+                        : <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f7f0e7] text-[#b69463]"><Package size={20} /></div>
+                      }
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-black text-[#211b16]">{p.name}</div>
+                        <div className="text-xs text-[#9d8b74]">{[p.category, p.color, p.size].filter(Boolean).join(" · ")}</div>
+                        <div className="mt-1 flex items-center gap-1">
+                          <input
+                            type="number"
+                            className="w-28 rounded-xl border border-[#eadfce] bg-white px-3 py-1.5 text-sm font-black text-[#211b16] outline-none focus:border-[#b69463]"
+                            value={price}
+                            onChange={e => updatePrice(p.id, Number(e.target.value))}
+                          />
+                          <span className="text-xs text-[#9d8b74]">₺</span>
+                        </div>
+                      </div>
+                      <button onClick={() => removeFromBasket(p.id)}
+                        className="shrink-0 rounded-xl bg-red-50 p-2 text-red-400 hover:bg-red-100">
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {basket.length > 0 && (
+                <div className="mt-4 space-y-2 rounded-2xl bg-[#f7f0e7] p-4">
+                  {basket.map(({ product: p, price }) => (
+                    <div key={p.id} className="flex justify-between text-sm">
+                      <span className="text-[#6d6256]">{p.category} — {p.name}</span>
+                      <span className="font-black text-[#211b16]">{price.toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between border-t border-[#eadfce] pt-2 text-base font-black">
+                    <span className="text-[#211b16]">Toplam</span>
+                    <span className="text-[#b69463]">{total.toLocaleString("tr-TR")} ₺</span>
+                  </div>
+                </div>
+              )}
+
+              {basket.length > 0 && selectedCustomer && (
+                <button onClick={() => setStep(2)}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  Tarih & Ödeme <ChevronRight size={18} />
+                </button>
               )}
             </div>
+          </div>
+        )}
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Teslim Tarihi *</label>
-              <input className="input" type="date" value={form.deliveryDate} onChange={(e) => updateForm("deliveryDate", e.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Teslim Saati</label>
-              <input className="input" type="time" value={form.deliveryTime} onChange={(e) => updateForm("deliveryTime", e.target.value)} />
-            </div>
+        {/* ADIM 2: Tarih + Ödeme */}
+        {step === 2 && (
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Etkinlik Tarihi</label>
-              <input className="input" type="date" value={form.eventDate} onChange={(e) => updateForm("eventDate", e.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Etkinlik Saati</label>
-              <input className="input" type="time" value={form.eventTime} onChange={(e) => updateForm("eventTime", e.target.value)} />
-            </div>
+            <div className="premium-card p-5 lg:p-7">
+              <Label>Teslim</Label>
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih *</label>
+                  <input className={inputCls + " mt-1"} type="date" value={form.deliveryDate} onChange={e => set("deliveryDate", e.target.value)} /></div>
+                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
+                  <input className={inputCls + " mt-1"} type="time" value={form.deliveryTime} onChange={e => set("deliveryTime", e.target.value)} /></div>
+              </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Etkinlik Türü</label>
-              <select className="input" value={form.eventType} onChange={(e) => updateForm("eventType", e.target.value)}>
-                <option>Düğün</option>
-                <option>Kına</option>
-                <option>Nişan</option>
-                <option>After Party</option>
-                <option>Çekim</option>
+              <Label>Etkinlik</Label>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih</label>
+                  <input className={inputCls + " mt-1"} type="date" value={form.eventDate} onChange={e => set("eventDate", e.target.value)} /></div>
+                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
+                  <input className={inputCls + " mt-1"} type="time" value={form.eventTime} onChange={e => set("eventTime", e.target.value)} /></div>
+              </div>
+              <select className={inputCls + " mb-5"} value={form.eventType} onChange={e => set("eventType", e.target.value)}>
+                <option>Düğün</option><option>Kına</option><option>Nişan</option>
+                <option>After Party</option><option>Çekim</option>
               </select>
+
+              <Label>İade</Label>
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih *</label>
+                  <input className={inputCls + " mt-1"} type="date" value={form.returnDate} onChange={e => set("returnDate", e.target.value)} /></div>
+                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
+                  <input className={inputCls + " mt-1"} type="time" value={form.returnTime} onChange={e => set("returnTime", e.target.value)} /></div>
+              </div>
+
+              <Label>Notlar</Label>
+              <textarea className={inputCls + " min-h-[80px] resize-none"} placeholder="Kiralama notu..."
+                value={form.notes} onChange={e => set("notes", e.target.value)} />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Toplam Tutar ₺</label>
-              <input className="input" type="number" inputMode="decimal" min="0" placeholder="0" value={form.totalAmount} onChange={(e) => updateForm("totalAmount", e.target.value)} />
-            </div>
+            <div className="premium-card p-5 lg:p-7">
+              <Label>Özet & Ödeme</Label>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Kapora ₺</label>
-              <input className="input" type="number" inputMode="decimal" min="0" placeholder="0" value={form.depositAmount} onChange={(e) => updateForm("depositAmount", e.target.value)} />
-            </div>
+              {/* Müşteri */}
+              <div className="mb-4 rounded-2xl bg-[#f7f0e7] p-4">
+                <p className="text-xs font-black text-[#9d8b74]">Müşteri</p>
+                <p className="mt-1 font-black text-[#211b16]">{selectedCustomer?.full_name}</p>
+                <p className="text-sm text-[#9d8b74]">{selectedCustomer?.phone}</p>
+              </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">İade Tarihi *</label>
-              <input className="input" type="date" value={form.returnDate} onChange={(e) => updateForm("returnDate", e.target.value)} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">İade Saati</label>
-              <input className="input" type="time" value={form.returnTime} onChange={(e) => updateForm("returnTime", e.target.value)} />
-            </div>
+              {/* Ürünler */}
+              <div className="mb-4 space-y-2 rounded-2xl bg-[#f7f0e7] p-4">
+                <p className="text-xs font-black text-[#9d8b74]">Ürünler ({basket.length})</p>
+                {basket.map(({ product: p, price }) => (
+                  <div key={p.id} className="flex justify-between text-sm">
+                    <span className="text-[#6d6256]">{p.category} — {p.name}</span>
+                    <span className="font-black">{price.toLocaleString("tr-TR")} ₺</span>
+                  </div>
+                ))}
+                <div className="flex justify-between border-t border-[#e4d9c9] pt-2 font-black">
+                  <span>Toplam</span>
+                  <span className="text-[#b69463]">{total.toLocaleString("tr-TR")} ₺</span>
+                </div>
+              </div>
 
-            <div className="md:col-span-2 flex flex-col gap-1.5">
-              <label className="text-xs font-black text-[#6d6256]">Notlar</label>
-              <textarea className="input min-h-24" placeholder="Kiralama notu..." value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} />
+              {/* Ödeme */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                  <label className="text-xs font-bold text-[#9d8b74]">Kapora ₺</label>
+                  <input className={inputCls + " mt-1"} type="number" min="0" placeholder="0"
+                    value={form.depositAmount} onChange={e => set("depositAmount", e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#9d8b74]">Kalan ₺</label>
+                  <div className={inputCls + " mt-1 bg-[#f7f0e7] font-black text-[#b69463]"}>
+                    {remaining.toLocaleString("tr-TR")}
+                  </div>
+                </div>
+              </div>
+
+              {message && (
+                <div className={`mb-4 rounded-2xl border p-4 text-sm font-bold ${
+                  message.ok ? "border-green-200 bg-green-50 text-green-700" : "border-red-100 bg-red-50 text-red-600"
+                }`}>{message.text}</div>
+              )}
+
+              <div className="flex gap-3">
+                <button onClick={() => setStep(1)}
+                  className="flex-1 rounded-2xl border border-[#eadfce] py-4 text-sm font-black text-[#6d6256]">
+                  ← Geri
+                </button>
+                <button onClick={saveRental}
+                  className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  <CalendarDays size={18} /> Kiralama Kaydet
+                </button>
+              </div>
             </div>
           </div>
-
-          {message && <div className="mt-6 rounded-2xl bg-white/70 border border-[#eadfce] p-4 text-[#6d6256]">{message}</div>}
-
-          <button onClick={createRental} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)] transition hover:scale-[1.01]">
-            <CalendarDays size={18} />
-            Kiralama Kaydet ve Takvime İşle
-          </button>
-        </div>
-
-        <div className="premium-card p-5 lg:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
-              <ShieldCheck size={21} />
-            </div>
-            <div>
-              <h2 className="premium-title text-2xl">Ürün Teyidi</h2>
-              <p className="premium-muted mt-1 text-sm">Seçilen ürün bilgileri</p>
-            </div>
-          </div>
-
-          {selectedProduct ? (
-            <div className="mt-6">
-              {selectedProduct.image_url && <img src={selectedProduct.image_url} className="h-80 w-full rounded-3xl object-cover" />}
-              <h3 className="mt-5 text-2xl font-semibold text-[#211b16]">
-                {selectedProduct.name} {selectedProduct.color || ""} {selectedProduct.size || ""}
-              </h3>
-              <p className="mt-2 premium-muted">{selectedProduct.barcode}</p>
-              <p className="mt-4 rounded-2xl bg-white/70 p-4 text-[#6d6256]">
-                Durum: {selectedProduct.status}
-              </p>
-            </div>
-          ) : (
-            <div className="mt-6 rounded-3xl border border-dashed border-[#d9c9b5] p-10 text-center premium-muted">
-              Ürün seçilince fotoğraf ve detaylar burada görünecek.
-            </div>
-          )}
-        </div>
-        </div>
+        )}
       </div>
 
+      {/* Hızlı müşteri modal */}
       {showCustomerModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6">
-          <div className="w-full max-w-md rounded-[2rem] bg-white p-8 shadow-2xl">
-            <h2 className="text-3xl font-semibold text-[#211b16]">Hızlı Müşteri Ekle</h2>
-            <div className="mt-6 grid gap-4">
-              <input className="input" placeholder="Ad Soyad" value={quickCustomer.fullName} onChange={(e) => setQuickCustomer((p) => ({ ...p, fullName: e.target.value }))} />
-              <input className="input" placeholder="Telefon" value={quickCustomer.phone} onChange={(e) => setQuickCustomer((p) => ({ ...p, phone: e.target.value }))} />
-              <button onClick={createQuickCustomer} className="premium-button py-4">Ekle ve Seç</button>
-              <button onClick={() => setShowCustomerModal(false)} className="rounded-2xl border border-[#eadfce] py-4">Vazgeç</button>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
+          <div className="w-full max-w-md rounded-[2rem] bg-white p-7 shadow-2xl">
+            <h2 className="text-2xl font-black text-[#211b16]">Hızlı Müşteri Ekle</h2>
+            <div className="mt-5 space-y-3">
+              <input className={inputCls} placeholder="Ad Soyad *"
+                value={quickCustomer.fullName} onChange={e => setQuickCustomer(p => ({ ...p, fullName: e.target.value }))} />
+              <input className={inputCls} placeholder="Telefon *"
+                value={quickCustomer.phone} onChange={e => setQuickCustomer(p => ({ ...p, phone: e.target.value }))} />
+              <button onClick={createQuickCustomer}
+                className="w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white">
+                Ekle ve Seç
+              </button>
+              <button onClick={() => setShowCustomerModal(false)}
+                className="w-full rounded-2xl border border-[#eadfce] py-3 text-sm font-black text-[#6d6256]">
+                Vazgeç
+              </button>
             </div>
           </div>
         </div>
