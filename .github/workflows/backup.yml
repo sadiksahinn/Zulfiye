@@ -1,0 +1,103 @@
+name: Haftalık Veritabanı Yedekleme
+
+on:
+  schedule:
+    - cron: '0 1 * * 0'   # Her Pazar 04:00 Türkiye saati (01:00 UTC)
+  workflow_dispatch:        # Manuel tetikleme butonu
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Node.js kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Supabase JS yükle
+        run: npm install @supabase/supabase-js
+
+      - name: Veritabanını yedekle
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node << 'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+          const fs = require('fs');
+          const path = require('path');
+
+          const supabase = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY,
+            { auth: { persistSession: false } }
+          );
+
+          const TABLES = [
+            'branches', 'profiles', 'customers', 'products',
+            'rentals', 'rental_items', 'sales', 'sale_items',
+            'fittings', 'payments', 'expenses', 'calendar_events',
+            'accounting_records', 'alteration_records', 'cleaning_records',
+            'damage_reports', 'notifications', 'sms_templates',
+            'product_logs', 'activity_logs', 'barcode_counters'
+          ];
+
+          async function backup() {
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const dir = `backup_${timestamp}`;
+            fs.mkdirSync(dir, { recursive: true });
+
+            let summary = { date: timestamp, tables: {} };
+
+            for (const table of TABLES) {
+              const { data, error } = await supabase
+                .from(table)
+                .select('*')
+                .order('created_at', { ascending: true })
+                .limit(100000);
+
+              if (error) {
+                console.error(`${table}: HATA - ${error.message}`);
+                summary.tables[table] = { error: error.message };
+              } else {
+                const count = (data || []).length;
+                fs.writeFileSync(
+                  path.join(dir, `${table}.json`),
+                  JSON.stringify(data, null, 2)
+                );
+                console.log(`${table}: ${count} kayıt yedeklendi`);
+                summary.tables[table] = { count };
+              }
+            }
+
+            fs.writeFileSync(
+              path.join(dir, '_ozet.json'),
+              JSON.stringify(summary, null, 2)
+            );
+
+            console.log('\nYedekleme tamamlandı:', timestamp);
+            console.log('Toplam tablo:', TABLES.length);
+          }
+
+          backup().catch(console.error);
+          EOF
+
+      - name: Yedekleri sıkıştır
+        run: |
+          TIMESTAMP=$(date +%Y-%m-%d)
+          tar -czf "mauna_backup_${TIMESTAMP}.tar.gz" "backup_${TIMESTAMP}/"
+          echo "BACKUP_FILE=mauna_backup_${TIMESTAMP}.tar.gz" >> $GITHUB_ENV
+
+      - name: Yedekleri yükle (90 gün saklanır)
+        uses: actions/upload-artifact@v4
+        with:
+          name: mauna-backup-${{ github.run_number }}
+          path: ${{ env.BACKUP_FILE }}
+          retention-days: 90
+
+      - name: Özet göster
+        run: |
+          TIMESTAMP=$(date +%Y-%m-%d)
+          echo "=== MAUNA Couture Yedekleme Özeti ==="
+          cat "backup_${TIMESTAMP}/_ozet.json"
