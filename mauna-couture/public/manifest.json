@@ -1,0 +1,23 @@
+{
+  "name": "MAUNA Couture ERP",
+  "short_name": "MAUNA",
+  "description": "MAUNA Couture operasyon yönetim sistemi",
+  "theme_color": "#b69463",
+  "background_color": "#f7f0e7",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/dashboard",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
