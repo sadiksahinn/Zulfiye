@@ -37,7 +37,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select("*")
       .eq("id", userId)
       .maybeSingle();
-
     setProfile(data || null);
     setRole((data?.role as any) || "staff");
   }
@@ -45,17 +44,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
+    // Maksimum 4 saniye loading — sonra zorla bitir
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        setLoading(false);
+      }
+    }, 4000);
+
     async function loadUser() {
       setLoading(true);
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!mounted) return;
 
       setUser(session?.user ?? null);
-
       if (session?.user?.id) {
         await loadProfile(session.user.id);
       } else {
@@ -64,51 +65,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setLoading(false);
+      clearTimeout(timeout);
 
       const isPublicRoute = publicRoutes.includes(pathname);
-
-      if (!session && !isPublicRoute) {
-        router.replace("/");
-        return;
-      }
-
-      if (session && pathname === "/") {
-        router.replace("/today");
-      }
+      if (!session && !isPublicRoute) { router.replace("/"); return; }
+      if (session && pathname === "/") { router.replace("/today"); }
     }
 
     loadUser();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
-
       setUser(session?.user ?? null);
-
       if (session?.user?.id) {
         await loadProfile(session.user.id);
       } else {
         setProfile(null);
         setRole("staff");
       }
-
       setLoading(false);
+      clearTimeout(timeout);
 
       const isPublicRoute = publicRoutes.includes(pathname);
-
-      if (!session && !isPublicRoute) {
-        router.replace("/");
-        return;
-      }
-
-      if (session && pathname === "/") {
-        router.replace("/today");
-      }
+      if (!session && !isPublicRoute) { router.replace("/"); return; }
+      if (session && pathname === "/") { router.replace("/today"); }
     });
 
     return () => {
       mounted = false;
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, [pathname, router]);
