@@ -6,6 +6,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import {
   CalendarDays,
   Home,
+  LogOut,
   Menu,
   Package,
   RotateCcw,
@@ -17,9 +18,10 @@ import {
 export default function MobileNavigation() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { role } = useAuth();
+  const { role, logout, user } = useAuth();
+  const userEmail = typeof user === "object" && user && "email" in user ? String(user.email) : "";
 
-  const publicPages = ["/", "/forgot-password", "/reset-password", "/register"];
+  const publicPages = ["/", "/forgot-password", "/reset-password", "/register", "/auth/confirm"];
   if (publicPages.includes(pathname)) return null;
 
   const mainLinks = [
@@ -105,6 +107,27 @@ export default function MobileNavigation() {
                   ))}
                 </>
               ) : null}
+            </div>
+
+            <div className="mt-6 rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#b69463] to-[#d8bd84] font-black text-white">
+                  {userEmail.slice(0, 1).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-black text-white">
+                    {role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : "Personel"}
+                  </div>
+                  <div className="truncate text-[11px] text-zinc-400">{userEmail}</div>
+                </div>
+              </div>
+              <button
+                onClick={() => { setOpen(false); logout(); }}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black text-white"
+              >
+                <LogOut size={16} />
+                Çıkış Yap
+              </button>
             </div>
           </div>
         </div>
