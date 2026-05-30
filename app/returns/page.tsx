@@ -26,15 +26,21 @@ export default function ReturnsPage() {
 
   async function load() {
     setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("rentals")
+        .select("*")
+        .in("status", ["aktif", "gecikti"])
+        .order("return_date", { ascending: true });
 
-    const { data } = await supabase
-      .from("rentals")
-      .select("*")
-      .in("status", ["aktif", "gecikti"])
-      .order("return_date", { ascending: true });
-
-    setRentals((data || []) as Rental[]);
-    setLoading(false);
+      if (error) throw error;
+      setRentals((data || []) as Rental[]);
+    } catch (err) {
+      console.error("İade kayıtları yüklenemedi:", err);
+      setRentals([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
