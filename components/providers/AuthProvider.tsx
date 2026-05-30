@@ -13,11 +13,7 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
-  profile: null,
-  role: "staff",
-  loading: true,
-  logout: async () => {},
+  user: null, profile: null, role: "staff", loading: true, logout: async () => {},
 });
 
 const publicRoutes = ["/", "/register", "/forgot-password", "/reset-password"];
@@ -27,49 +23,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<any>(null);
   const [role, setRole] = useState<"staff" | "admin" | "super_admin">("staff");
   const [loading, setLoading] = useState(true);
-
   const router = useRouter();
   const pathname = usePathname();
 
   async function loadProfile(userId: string) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .maybeSingle();
+    const { data } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
     setProfile(data || null);
     setRole((data?.role as any) || "staff");
   }
 
   useEffect(() => {
     let mounted = true;
-
-    // Maksimum 4 saniye loading — sonra zorla bitir
-    const timeout = setTimeout(() => {
-      if (mounted && loading) {
-        setLoading(false);
-      }
-    }, 4000);
+    const timeout = setTimeout(() => { if (mounted) setLoading(false); }, 3000);
 
     async function loadUser() {
-      setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!mounted) return;
-
-      setUser(session?.user ?? null);
-      if (session?.user?.id) {
-        await loadProfile(session.user.id);
-      } else {
-        setProfile(null);
-        setRole("staff");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        setUser(session?.user ?? null);
+        if (session?.user?.id) await loadProfile(session.user.id);
+        else { setProfile(null); setRole("staff"); }
+        const isPublicRoute = publicRoutes.includes(pathname);
+        if (!session && !isPublicRoute) { router.replace("/"); }
+        else if (session && pathname === "/") { router.replace("/today"); }
+      } catch (e) {
+        console.error("Auth error:", e);
+      } finally {
+        if (mounted) { setLoading(false); clearTimeout(timeout); }
       }
-
-      setLoading(false);
-      clearTimeout(timeout);
-
-      const isPublicRoute = publicRoutes.includes(pathname);
-      if (!session && !isPublicRoute) { router.replace("/"); return; }
-      if (session && pathname === "/") { router.replace("/today"); }
     }
 
     loadUser();
@@ -77,32 +58,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
-      if (session?.user?.id) {
-        await loadProfile(session.user.id);
-      } else {
-        setProfile(null);
-        setRole("staff");
-      }
-      setLoading(false);
-      clearTimeout(timeout);
-
+      if (session?.user?.id) await loadProfile(session.user.id);
+      else { setProfile(null); setRole("staff"); }
+      if (mounted) { setLoading(false); clearTimeout(timeout); }
       const isPublicRoute = publicRoutes.includes(pathname);
-      if (!session && !isPublicRoute) { router.replace("/"); return; }
-      if (session && pathname === "/") { router.replace("/today"); }
+      if (!session && !isPublicRoute) router.replace("/");
+      else if (session && pathname === "/") router.replace("/today");
     });
 
-    return () => {
-      mounted = false;
-      clearTimeout(timeout);
-      subscription.unsubscribe();
-    };
+    return () => { mounted = false; clearTimeout(timeout); subscription.unsubscribe(); };
   }, [pathname, router]);
 
   async function logout() {
     await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
-    setRole("staff");
+    setUser(null); setProfile(null); setRole("staff");
     router.replace("/");
   }
 
@@ -113,6 +82,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export function useAuth() { return useContext(AuthContext); }
