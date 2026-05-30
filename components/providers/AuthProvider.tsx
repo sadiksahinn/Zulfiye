@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     loadUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
       if (session?.user?.id) await loadProfile(session.user.id);
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (mounted) { setLoading(false); clearTimeout(timeout); }
       const isPublicRoute = publicRoutes.includes(pathname);
       if (!session && !isPublicRoute) router.replace("/");
-      else if (session && pathname === "/") router.replace("/today");
+      else if (session && (pathname === "/" || event === "SIGNED_IN")) router.replace("/today");
     });
 
     return () => { mounted = false; clearTimeout(timeout); subscription.unsubscribe(); };
