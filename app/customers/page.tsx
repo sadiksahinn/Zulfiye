@@ -19,10 +19,14 @@ type Customer = {
 const EMPTY_FORM = {
   fullName: "", phone: "", instagram: "",
   photoVideo: "",
-  birthDate: "", engagementDate: "", weddingDate: "",
+  birthDate: "",
+  engagementDate: "", engagementTime: "",
+  weddingDate: "",    weddingTime: "",
   waist: "", hip: "", bust: "",
   address: "", notes: "",
-  fittingDate1: "", fittingDate2: "", fittingDate3: "",
+  fittingDate1: "", fittingTime1: "",
+  fittingDate2: "", fittingTime2: "",
+  fittingDate3: "", fittingTime3: "",
 };
 
 function range(from: number, to: number) {
@@ -91,15 +95,20 @@ export default function CustomersPage() {
       photo_video:     form.photoVideo || null,
       birth_date:      form.birthDate || null,
       engagement_date: form.engagementDate || null,
+      engagement_time: form.engagementTime || null,
       wedding_date:    form.weddingDate || null,
+      wedding_time:    form.weddingTime || null,
       waist:           form.waist ? Number(form.waist) : null,
       hip:             form.hip   ? Number(form.hip)   : null,
       bust:            form.bust  ? Number(form.bust)  : null,
       address:         form.address || null,
       notes:           form.notes || null,
       fitting_date_1:  form.fittingDate1 || null,
+      fitting_time_1:  form.fittingTime1 || null,
       fitting_date_2:  form.fittingDate2 || null,
+      fitting_time_2:  form.fittingTime2 || null,
       fitting_date_3:  form.fittingDate3 || null,
+      fitting_time_3:  form.fittingTime3 || null,
       created_by:      user?.id,
     });
     if (error) { setMessage("Müşteri kaydedilemedi."); return; }
@@ -154,14 +163,22 @@ export default function CustomersPage() {
                 onChange={(e) => set("birthDate", e.target.value)} />
             </Field>
 
-            <Field label="Nişan Tarihi">
-              <input className={inputCls} type="date" value={form.engagementDate}
-                onChange={(e) => set("engagementDate", e.target.value)} />
+            <Field label="Nişan Tarihi & Saati">
+              <div className="flex gap-2">
+                <input className={inputCls} type="date" value={form.engagementDate}
+                  onChange={(e) => set("engagementDate", e.target.value)} />
+                <input className={inputCls + " w-32 shrink-0"} type="time" value={form.engagementTime}
+                  onChange={(e) => set("engagementTime", e.target.value)} />
+              </div>
             </Field>
 
-            <Field label="Düğün Tarihi">
-              <input className={inputCls} type="date" value={form.weddingDate}
-                onChange={(e) => set("weddingDate", e.target.value)} />
+            <Field label="Düğün Tarihi & Saati">
+              <div className="flex gap-2">
+                <input className={inputCls} type="date" value={form.weddingDate}
+                  onChange={(e) => set("weddingDate", e.target.value)} />
+                <input className={inputCls + " w-32 shrink-0"} type="time" value={form.weddingTime}
+                  onChange={(e) => set("weddingTime", e.target.value)} />
+              </div>
             </Field>
 
             {/* Ölçüler */}
@@ -206,20 +223,18 @@ export default function CustomersPage() {
             {/* Prova tarihleri */}
             <SectionTitle>Prova Tarihleri</SectionTitle>
 
-            <Field label="Prova 1">
-              <input className={inputCls} type="date" value={form.fittingDate1}
-                onChange={(e) => set("fittingDate1", e.target.value)} />
-            </Field>
-
-            <Field label="Prova 2">
-              <input className={inputCls} type="date" value={form.fittingDate2}
-                onChange={(e) => set("fittingDate2", e.target.value)} />
-            </Field>
-
-            <Field label="Prova 3">
-              <input className={inputCls} type="date" value={form.fittingDate3}
-                onChange={(e) => set("fittingDate3", e.target.value)} />
-            </Field>
+            {[1, 2, 3].map((n) => (
+              <Field key={n} label={`Prova ${n} Tarihi & Saati`}>
+                <div className="flex gap-2">
+                  <input className={inputCls} type="date"
+                    value={(form as any)[`fittingDate${n}`]}
+                    onChange={(e) => set(`fittingDate${n}`, e.target.value)} />
+                  <input className={inputCls + " w-32 shrink-0"} type="time"
+                    value={(form as any)[`fittingTime${n}`]}
+                    onChange={(e) => set(`fittingTime${n}`, e.target.value)} />
+                </div>
+              </Field>
+            ))}
 
           </div>
 
