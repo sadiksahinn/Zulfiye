@@ -353,24 +353,58 @@ export default function RentalsPage() {
               )}
             </div>
 
-            <input className="input" type="date" value={form.deliveryDate} onChange={(e) => updateForm("deliveryDate", e.target.value)} />
-            <input className="input" type="time" value={form.deliveryTime} onChange={(e) => updateForm("deliveryTime", e.target.value)} />
-            <input className="input" type="date" value={form.eventDate} onChange={(e) => updateForm("eventDate", e.target.value)} />
-            <input className="input" type="time" value={form.eventTime} onChange={(e) => updateForm("eventTime", e.target.value)} />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Teslim Tarihi *</label>
+              <input className="input" type="date" value={form.deliveryDate} onChange={(e) => updateForm("deliveryDate", e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Teslim Saati</label>
+              <input className="input" type="time" value={form.deliveryTime} onChange={(e) => updateForm("deliveryTime", e.target.value)} />
+            </div>
 
-            <select className="input" value={form.eventType} onChange={(e) => updateForm("eventType", e.target.value)}>
-              <option>Düğün</option>
-              <option>Kına</option>
-              <option>Nişan</option>
-              <option>After Party</option>
-              <option>Çekim</option>
-            </select>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Etkinlik Tarihi</label>
+              <input className="input" type="date" value={form.eventDate} onChange={(e) => updateForm("eventDate", e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Etkinlik Saati</label>
+              <input className="input" type="time" value={form.eventTime} onChange={(e) => updateForm("eventTime", e.target.value)} />
+            </div>
 
-            <input className="input" type="number" inputMode="decimal" min="0" placeholder="Toplam tutar ₺" value={form.totalAmount} onChange={(e) => updateForm("totalAmount", e.target.value)} />
-            <input className="input" type="number" inputMode="decimal" min="0" placeholder="Kapora ₺" value={form.depositAmount} onChange={(e) => updateForm("depositAmount", e.target.value)} />
-            <input className="input" type="date" value={form.returnDate} onChange={(e) => updateForm("returnDate", e.target.value)} />
-            <input className="input" type="time" value={form.returnTime} onChange={(e) => updateForm("returnTime", e.target.value)} />
-            <textarea className="input md:col-span-2 min-h-28" placeholder="Not" value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Etkinlik Türü</label>
+              <select className="input" value={form.eventType} onChange={(e) => updateForm("eventType", e.target.value)}>
+                <option>Düğün</option>
+                <option>Kına</option>
+                <option>Nişan</option>
+                <option>After Party</option>
+                <option>Çekim</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Toplam Tutar ₺</label>
+              <input className="input" type="number" inputMode="decimal" min="0" placeholder="0" value={form.totalAmount} onChange={(e) => updateForm("totalAmount", e.target.value)} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Kapora ₺</label>
+              <input className="input" type="number" inputMode="decimal" min="0" placeholder="0" value={form.depositAmount} onChange={(e) => updateForm("depositAmount", e.target.value)} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">İade Tarihi *</label>
+              <input className="input" type="date" value={form.returnDate} onChange={(e) => updateForm("returnDate", e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">İade Saati</label>
+              <input className="input" type="time" value={form.returnTime} onChange={(e) => updateForm("returnTime", e.target.value)} />
+            </div>
+
+            <div className="md:col-span-2 flex flex-col gap-1.5">
+              <label className="text-xs font-black text-[#6d6256]">Notlar</label>
+              <textarea className="input min-h-24" placeholder="Kiralama notu..." value={form.notes} onChange={(e) => updateForm("notes", e.target.value)} />
+            </div>
           </div>
 
           {message && <div className="mt-6 rounded-2xl bg-white/70 border border-[#eadfce] p-4 text-[#6d6256]">{message}</div>}
