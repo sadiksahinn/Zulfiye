@@ -143,6 +143,12 @@ select.input {
   border-radius: 9999px;
 }
 
+/* Date/time: native X clear butonu pill şekilde tıklanamaz olur */
+input[type="date"],
+input[type="time"] {
+  border-radius: 0.875rem !important;
+}
+
 /* Number input arrows kaldır */
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
