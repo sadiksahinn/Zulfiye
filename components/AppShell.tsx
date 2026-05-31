@@ -122,7 +122,7 @@ export default function AppShell({
                           active ? "bg-white/25 text-white" : "text-[#9d8a72] group-hover:text-white"
                         }`}
                       >
-                        <Icon size={17} strokeWidth={2.4} />
+                        <Icon size={20} strokeWidth={2.2} />
                       </span>
                       <span>{item.name}</span>
                     </a>
@@ -155,7 +155,7 @@ export default function AppShell({
                             active ? "bg-white/25 text-white" : "text-[#6a5c48] group-hover:text-white"
                           }`}
                         >
-                          <Icon size={17} strokeWidth={2.2} />
+                          <Icon size={20} strokeWidth={2.2} />
                         </span>
                         <span>{item.name}</span>
                       </a>

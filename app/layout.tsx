@@ -1,5 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["300", "400", "600"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import MobileNavigation from "@/components/mobile/MobileNavigation";
 import MaunaLoader from "@/components/MaunaLoader";
@@ -24,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>
+      <body className={cormorant.variable}>
         <ResetPWA />
         <AuthProvider>
             <MaunaLoader />
