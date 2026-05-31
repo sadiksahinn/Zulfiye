@@ -8,7 +8,7 @@ import {
   CalendarDays,
   Home,
   LogOut,
-  Menu,
+  MoreHorizontal,
   Package,
   RotateCcw,
   ShoppingBag,
@@ -29,6 +29,13 @@ export default function MobileNavigation() {
     { name: "Bugün",    href: "/today",     Icon: Home },
     { name: "Kiralama", href: "/rentals",   Icon: CalendarDays },
     { name: "Satış",    href: "/sales",     Icon: ShoppingBag },
+    { name: "Müşteri",  href: "/customers", Icon: UserRound },
+  ];
+
+  const allLinks: { name: string; href: string; Icon: React.ElementType }[] = [
+    { name: "Bugün",    href: "/today",     Icon: Home },
+    { name: "Kiralama", href: "/rentals",   Icon: CalendarDays },
+    { name: "Satış",    href: "/sales",     Icon: ShoppingBag },
     { name: "Takvim",   href: "/calendar",  Icon: CalendarDays },
     { name: "Müşteri",  href: "/customers", Icon: UserRound },
     { name: "Provalar", href: "/fittings",  Icon: UserRound },
@@ -45,46 +52,106 @@ export default function MobileNavigation() {
     ...(role === "super_admin" ? [["Aktivite Günlüğü", "/logs"]] : []),
   ];
 
+  const isMenuActive = open || !mainLinks.some(l => pathname === l.href || pathname.startsWith(`${l.href}/`));
+
   return (
     <>
-      {/* Bottom pill nav */}
-      <div className="fixed bottom-3 left-3 right-3 z-[99998] flex items-center justify-around rounded-full border border-white/10 bg-[#141210]/97 px-2 py-2 shadow-[0_20px_60px_rgba(0,0,0,.35)] backdrop-blur-2xl lg:hidden">
-        {mainLinks.slice(0, 5).map(({ name, href, Icon }) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`);
-          return (
-            <a
-              key={href}
-              href={href}
-              className={`flex flex-col items-center justify-center gap-0.5 rounded-full px-3 py-2.5 text-[9px] font-black transition-all duration-200 ${
-                active
-                  ? "bg-gradient-to-br from-[#b69463] to-[#d8bd84] text-white shadow-[0_4px_16px_rgba(182,148,99,.40)]"
-                  : "text-white/50 hover:text-white/80"
-              }`}
+      {/* ── Magic Navigation Bar ── */}
+      <div className="fixed bottom-3 left-3 right-3 z-[99998] h-[88px] lg:hidden">
+
+        {/* Bar background */}
+        <div className="absolute bottom-0 inset-x-0 h-[64px] rounded-[2rem] bg-[#0f0d0b]/95 shadow-[0_20px_60px_rgba(0,0,0,.40),0_4px_16px_rgba(0,0,0,.25)] backdrop-blur-2xl" />
+
+        {/* Items */}
+        <div className="absolute inset-0 flex items-end justify-around px-3 pb-2">
+
+          {mainLinks.map(({ name, href, Icon }) => {
+            const active = pathname === href || pathname.startsWith(`${href}/`);
+            return (
+              <a key={href} href={href} className="flex flex-col items-center gap-1">
+                {/* Floating icon circle */}
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-full transition-all"
+                  style={{
+                    transform: active ? "translateY(-22px)" : "translateY(0px)",
+                    transitionDuration: "400ms",
+                    transitionTimingFunction: active
+                      ? "cubic-bezier(0.34,1.56,0.64,1)"
+                      : "cubic-bezier(0.4,0,0.2,1)",
+                    background: active
+                      ? "linear-gradient(135deg, #b69463, #d8bd84)"
+                      : "transparent",
+                    boxShadow: active
+                      ? "0 8px 28px rgba(182,148,99,.55), 0 2px 8px rgba(182,148,99,.3)"
+                      : "none",
+                  }}
+                >
+                  <Icon
+                    size={19}
+                    strokeWidth={2.3}
+                    style={{
+                      color: active ? "#fff" : "rgba(255,255,255,0.38)",
+                      transition: "color 300ms ease",
+                    }}
+                  />
+                </div>
+                {/* Label */}
+                <span
+                  className="text-[9px] font-black leading-none transition-all duration-300"
+                  style={{
+                    color: active ? "#d8bd84" : "rgba(255,255,255,0.32)",
+                    marginTop: active ? "-14px" : "0px",
+                  }}
+                >
+                  {name}
+                </span>
+              </a>
+            );
+          })}
+
+          {/* Menü butonu */}
+          <button
+            onClick={() => setOpen(true)}
+            className="flex flex-col items-center gap-1"
+          >
+            <div
+              className="flex h-11 w-11 items-center justify-center rounded-full transition-all"
+              style={{
+                transform: isMenuActive && !mainLinks.some(l => pathname === l.href || pathname.startsWith(`${l.href}/`)) ? "translateY(-22px)" : "translateY(0px)",
+                transitionDuration: "400ms",
+                transitionTimingFunction: "cubic-bezier(0.34,1.56,0.64,1)",
+                background: open ? "linear-gradient(135deg, #b69463, #d8bd84)" : "transparent",
+                boxShadow: open ? "0 8px 28px rgba(182,148,99,.55)" : "none",
+              }}
             >
-              <Icon size={17} strokeWidth={2.3} />
-              <span className="leading-none">{name}</span>
-            </a>
-          );
-        })}
+              <MoreHorizontal
+                size={19}
+                strokeWidth={2.3}
+                style={{ color: open ? "#fff" : "rgba(255,255,255,0.38)", transition: "color 300ms" }}
+              />
+            </div>
+            <span
+              className="text-[9px] font-black leading-none"
+              style={{ color: open ? "#d8bd84" : "rgba(255,255,255,0.32)" }}
+            >
+              Menü
+            </span>
+          </button>
+
+        </div>
       </div>
 
-      {/* Menu button */}
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed right-4 top-4 z-[99999] flex items-center gap-2 rounded-full bg-[#141210] px-4 py-3 text-white shadow-[0_8px_24px_rgba(0,0,0,.30)] lg:hidden"
-      >
-        <Menu size={20} strokeWidth={2.5} />
-        <span className="text-sm font-black">Menü</span>
-      </button>
-
-      {/* Drawer */}
+      {/* ── Drawer ── */}
       {open && (
-        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)}>
+        <div
+          className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        >
           <div
-            className="absolute bottom-3 right-3 top-3 w-[82vw] max-w-[340px] overflow-y-auto rounded-[2rem] bg-[#141210] p-5 text-white shadow-2xl"
+            className="absolute bottom-3 right-3 top-3 w-[82vw] max-w-[340px] overflow-y-auto rounded-[2rem] bg-[#0f0d0b] p-5 text-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Drawer header */}
+            {/* Header */}
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <div className="text-xl font-black tracking-[0.22em]">MAUNA</div>
@@ -102,12 +169,13 @@ export default function MobileNavigation() {
               <p className="px-3 pb-1 text-[9px] font-black uppercase tracking-[0.28em] text-[#5a4f42]">
                 Personel İşlemleri
               </p>
-              {mainLinks.map(({ name, href, Icon }) => {
+              {allLinks.map(({ name, href, Icon }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`);
                 return (
                   <a
                     key={href}
                     href={href}
+                    onClick={() => setOpen(false)}
                     className={`flex items-center gap-3 rounded-full px-4 py-3 font-bold transition-all ${
                       active
                         ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_4px_16px_rgba(182,148,99,.30)]"
@@ -120,7 +188,7 @@ export default function MobileNavigation() {
                 );
               })}
 
-              {role !== "staff" ? (
+              {role !== "staff" && (
                 <>
                   <p className="px-3 pb-1 pt-4 text-[9px] font-black uppercase tracking-[0.28em] text-[#5a4f42]">
                     Yönetim
@@ -129,16 +197,17 @@ export default function MobileNavigation() {
                     <a
                       key={href}
                       href={href}
+                      onClick={() => setOpen(false)}
                       className="block rounded-full px-4 py-3 font-bold text-white/55 transition hover:bg-white/8 hover:text-white/80"
                     >
                       {name}
                     </a>
                   ))}
                 </>
-              ) : null}
+              )}
             </div>
 
-            {/* User section */}
+            {/* User */}
             <div className="mt-5 rounded-[1.5rem] bg-white/[0.05] p-4 ring-1 ring-white/8">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#b69463] to-[#d8bd84] text-sm font-black text-white">
