@@ -7,6 +7,38 @@ import {
   CalendarDays, Search, UserPlus, X, ShoppingBag, ChevronRight, Package,
 } from "lucide-react";
 
+const dtCls = "w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+
+function DateTimeRow({ dateKey, timeKey, form, set }: { dateKey: string; timeKey: string; form: any; set: (k: string, v: string) => void }) {
+  const d = form[dateKey] as string;
+  const t = form[timeKey] as string;
+  return (
+    <div className="flex min-w-0 gap-2">
+      <div className="relative min-w-0 flex-1">
+        {!d && <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-sm text-[#c4b5a5]">gg / aa / yyyy</span>}
+        <input className={dtCls} type="date" value={d} onChange={e => set(dateKey, e.target.value)} />
+        {d && (
+          <button type="button" onClick={() => set(dateKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+      <div className="relative w-[6.5rem] shrink-0">
+        {!t && <span className="pointer-events-none absolute inset-0 flex items-center px-3 text-sm text-[#c4b5a5]">--:--</span>}
+        <input className="w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-3 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]"
+          type="time" value={t} onChange={e => set(timeKey, e.target.value)} />
+        {t && (
+          <button type="button" onClick={() => set(timeKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type Product = {
   id: string;
   barcode: string;
@@ -390,19 +422,13 @@ export default function RentalsPage() {
 
             <div className="premium-card p-5 lg:p-7">
               <Label>Teslim</Label>
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih *</label>
-                  <input className={inputCls + " mt-1"} type="date" value={form.deliveryDate} onChange={e => set("deliveryDate", e.target.value)} /></div>
-                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
-                  <input className={inputCls + " mt-1"} type="time" value={form.deliveryTime} onChange={e => set("deliveryTime", e.target.value)} /></div>
+              <div className="mb-5">
+                <DateTimeRow dateKey="deliveryDate" timeKey="deliveryTime" form={form} set={set} />
               </div>
 
               <Label>Etkinlik</Label>
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih</label>
-                  <input className={inputCls + " mt-1"} type="date" value={form.eventDate} onChange={e => set("eventDate", e.target.value)} /></div>
-                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
-                  <input className={inputCls + " mt-1"} type="time" value={form.eventTime} onChange={e => set("eventTime", e.target.value)} /></div>
+              <div className="mb-3">
+                <DateTimeRow dateKey="eventDate" timeKey="eventTime" form={form} set={set} />
               </div>
               <select className={inputCls + " mb-5"} value={form.eventType} onChange={e => set("eventType", e.target.value)}>
                 <option>Düğün</option><option>Kına</option><option>Nişan</option>
@@ -410,11 +436,8 @@ export default function RentalsPage() {
               </select>
 
               <Label>İade</Label>
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div><label className="text-xs font-bold text-[#9d8b74]">Tarih *</label>
-                  <input className={inputCls + " mt-1"} type="date" value={form.returnDate} onChange={e => set("returnDate", e.target.value)} /></div>
-                <div><label className="text-xs font-bold text-[#9d8b74]">Saat</label>
-                  <input className={inputCls + " mt-1"} type="time" value={form.returnTime} onChange={e => set("returnTime", e.target.value)} /></div>
+              <div className="mb-5">
+                <DateTimeRow dateKey="returnDate" timeKey="returnTime" form={form} set={set} />
               </div>
 
               <Label>Notlar</Label>

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, Clock, Package, Search, UserRound } from "lucide-react";
+import { CalendarDays, Clock, Package, Search, UserRound, X } from "lucide-react";
 
 type Fitting = {
   id: string;
@@ -28,6 +28,37 @@ const STATUS_OPTIONS = [
 ];
 
 const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+
+function DateTimeRow({ dateKey, timeKey, form, set }: { dateKey: string; timeKey: string; form: any; set: (k: string, v: string) => void }) {
+  const d = form[dateKey] as string;
+  const t = form[timeKey] as string;
+  const dtCls = "w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+  return (
+    <div className="flex min-w-0 gap-2">
+      <div className="relative min-w-0 flex-1">
+        {!d && <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-sm text-[#c4b5a5]">gg / aa / yyyy</span>}
+        <input className={dtCls} type="date" value={d} onChange={e => set(dateKey, e.target.value)} />
+        {d && (
+          <button type="button" onClick={() => set(dateKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+      <div className="relative w-[6.5rem] shrink-0">
+        {!t && <span className="pointer-events-none absolute inset-0 flex items-center px-3 text-sm text-[#c4b5a5]">--:--</span>}
+        <input className="w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-3 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]"
+          type="time" value={t} onChange={e => set(timeKey, e.target.value)} />
+        {t && (
+          <button type="button" onClick={() => set(timeKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function formatDate(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
@@ -244,10 +275,7 @@ export default function FittingsPage() {
               {/* Tarih & Saat */}
               <div>
                 <label className="mb-1.5 block text-[11px] font-black uppercase tracking-[0.2em] text-[#b69463]">Prova Tarihi & Saati *</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <input className={inputCls} type="date" value={form.fittingDate} onChange={e => set("fittingDate", e.target.value)} />
-                  <input className={inputCls} type="time" value={form.fittingTime} onChange={e => set("fittingTime", e.target.value)} />
-                </div>
+                <DateTimeRow dateKey="fittingDate" timeKey="fittingTime" form={form} set={set} />
               </div>
 
               {/* Notlar */}

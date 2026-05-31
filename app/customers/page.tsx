@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { Camera, CalendarDays, Search, UserRound } from "lucide-react";
+import { CalendarDays, Search, UserRound, X } from "lucide-react";
 
 type Customer = {
   id: string;
@@ -56,6 +56,65 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 const selectCls = inputCls + " appearance-none";
+const dtCls = "w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+
+function DateInput({ fieldKey, form, set }: { fieldKey: string; form: any; set: (k: string, v: string) => void }) {
+  const val = form[fieldKey] as string;
+  return (
+    <div className="relative">
+      {!val && (
+        <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-sm text-[#c4b5a5]">
+          gg / aa / yyyy
+        </span>
+      )}
+      <input className={dtCls} type="date" value={val} onChange={e => set(fieldKey, e.target.value)} />
+      {val && (
+        <button type="button" onClick={() => set(fieldKey, "")}
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+          <X size={12} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function DateTimeRow({ dateKey, timeKey, form, set }: { dateKey: string; timeKey: string; form: any; set: (k: string, v: string) => void }) {
+  const d = form[dateKey] as string;
+  const t = form[timeKey] as string;
+  return (
+    <div className="flex min-w-0 gap-2">
+      <div className="relative min-w-0 flex-1">
+        {!d && (
+          <span className="pointer-events-none absolute inset-0 flex items-center px-4 text-sm text-[#c4b5a5]">
+            gg / aa / yyyy
+          </span>
+        )}
+        <input className={dtCls} type="date" value={d} onChange={e => set(dateKey, e.target.value)} />
+        {d && (
+          <button type="button" onClick={() => set(dateKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+      <div className="relative w-[6.5rem] shrink-0">
+        {!t && (
+          <span className="pointer-events-none absolute inset-0 flex items-center px-3 text-sm text-[#c4b5a5]">
+            --:--
+          </span>
+        )}
+        <input className="w-full rounded-[0.875rem] border border-[#eadfce] bg-white/80 px-3 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]"
+          type="time" value={t} onChange={e => set(timeKey, e.target.value)} />
+        {t && (
+          <button type="button" onClick={() => set(timeKey, "")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#f0e8df] p-1 text-[#9d8b74] hover:bg-red-50 hover:text-red-500 transition">
+            <X size={11} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -159,26 +218,15 @@ export default function CustomersPage() {
             <SectionTitle>Tarihler</SectionTitle>
 
             <Field label="Doğum Tarihi">
-              <input className={inputCls} type="date" value={form.birthDate}
-                onChange={(e) => set("birthDate", e.target.value)} />
+              <DateInput fieldKey="birthDate" form={form} set={set} />
             </Field>
 
             <Field label="Nişan Tarihi & Saati">
-              <div className="flex gap-2">
-                <input className={inputCls} type="date" value={form.engagementDate}
-                  onChange={(e) => set("engagementDate", e.target.value)} />
-                <input className={inputCls + " w-32 shrink-0"} type="time" value={form.engagementTime}
-                  onChange={(e) => set("engagementTime", e.target.value)} />
-              </div>
+              <DateTimeRow dateKey="engagementDate" timeKey="engagementTime" form={form} set={set} />
             </Field>
 
             <Field label="Düğün Tarihi & Saati">
-              <div className="flex gap-2">
-                <input className={inputCls} type="date" value={form.weddingDate}
-                  onChange={(e) => set("weddingDate", e.target.value)} />
-                <input className={inputCls + " w-32 shrink-0"} type="time" value={form.weddingTime}
-                  onChange={(e) => set("weddingTime", e.target.value)} />
-              </div>
+              <DateTimeRow dateKey="weddingDate" timeKey="weddingTime" form={form} set={set} />
             </Field>
 
             {/* Ölçüler */}
@@ -225,14 +273,7 @@ export default function CustomersPage() {
 
             {[1, 2, 3].map((n) => (
               <Field key={n} label={`Prova ${n} Tarihi & Saati`}>
-                <div className="flex gap-2">
-                  <input className={inputCls} type="date"
-                    value={(form as any)[`fittingDate${n}`]}
-                    onChange={(e) => set(`fittingDate${n}`, e.target.value)} />
-                  <input className={inputCls + " w-32 shrink-0"} type="time"
-                    value={(form as any)[`fittingTime${n}`]}
-                    onChange={(e) => set(`fittingTime${n}`, e.target.value)} />
-                </div>
+                <DateTimeRow dateKey={`fittingDate${n}`} timeKey={`fittingTime${n}`} form={form} set={set} />
               </Field>
             ))}
 
