@@ -87,8 +87,8 @@ export default function MobileNavigation() {
                   }}
                 >
                   <Icon
-                    size={19}
-                    strokeWidth={2.3}
+                    size={22}
+                    strokeWidth={2.2}
                     style={{
                       color: active ? "#fff" : "rgba(255,255,255,0.38)",
                       transition: "color 300ms ease",
@@ -97,7 +97,7 @@ export default function MobileNavigation() {
                 </div>
                 {/* Label */}
                 <span
-                  className="text-[9px] font-black leading-none transition-all duration-300"
+                  className="text-[11px] font-black leading-none transition-all duration-300"
                   style={{
                     color: active ? "#d8bd84" : "rgba(255,255,255,0.32)",
                     marginTop: active ? "-14px" : "0px",
@@ -131,7 +131,7 @@ export default function MobileNavigation() {
               />
             </div>
             <span
-              className="text-[9px] font-black leading-none"
+              className="text-[11px] font-black leading-none"
               style={{ color: open ? "#d8bd84" : "rgba(255,255,255,0.32)" }}
             >
               Menü
