@@ -35,13 +35,13 @@ export default function ResetPasswordPage() {
             placeholder="Yeni şifre"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-2xl border border-[#e6dbcf] px-5 py-4 outline-none focus:border-[#b69463]"
+            className="w-full rounded-full border border-[#e6dbcf] px-5 py-4 outline-none focus:border-[#b69463]"
           />
         </div>
 
         <button
           onClick={handleUpdatePassword}
-          className="mt-5 w-full rounded-2xl bg-[#b69463] py-4 text-white font-semibold"
+          className="mt-5 w-full rounded-full bg-[#b69463] py-4 text-white font-semibold"
         >
           Şifreyi Güncelle
         </button>

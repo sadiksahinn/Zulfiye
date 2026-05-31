@@ -16,7 +16,7 @@ type BasketItem = { product: Product; price: number };
 
 const CATEGORIES = ["Tümü", "Gelinlik", "Kınalık", "After Party", "Aksesuar", "Ayakkabı"];
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 export default function SalesPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -146,7 +146,7 @@ export default function SalesPage() {
         <div className="flex gap-3">
           {[{ n: 1, label: "Müşteri & Ürünler" }, { n: 2, label: "Ödeme & Tamamla" }].map(s => (
             <button key={s.n} onClick={() => setStep(s.n as 1 | 2)}
-              className={`flex flex-1 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-black transition ${
+              className={`flex flex-1 items-center gap-2 rounded-full border px-4 py-3 text-sm font-black transition ${
                 step === s.n ? "border-[#b69463] bg-[#b69463]/10 text-[#b69463]" : "border-[#eadfce] bg-white/60 text-[#9d8b74]"
               }`}>
               <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${
@@ -174,7 +174,7 @@ export default function SalesPage() {
                         {customerResults.map(c => (
                           <button key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(c.full_name); }}
                             className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f7f0e7] first:rounded-t-2xl last:rounded-b-2xl">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#b69463]/15 font-black text-sm text-[#b69463]">{c.full_name[0]}</div>
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#b69463]/15 font-black text-sm text-[#b69463]">{c.full_name[0]}</div>
                             <div>
                               <div className="text-sm font-black text-[#211b16]">{c.full_name}</div>
                               <div className="text-xs text-[#9d8b74]">{c.phone}</div>
@@ -185,12 +185,12 @@ export default function SalesPage() {
                     )}
                   </div>
                   <button onClick={() => setShowCustomerModal(true)}
-                    className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-[#211b16] px-4 py-3 text-sm font-black text-white">
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#211b16] px-4 py-3 text-sm font-black text-white">
                     <UserPlus size={16} /> Yeni
                   </button>
                 </div>
                 {selectedCustomer && (
-                  <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#b69463]/10 px-4 py-3">
+                  <div className="mt-3 flex items-center justify-between rounded-full bg-[#b69463]/10 px-4 py-3">
                     <div>
                       <div className="text-sm font-black text-[#211b16]">{selectedCustomer.full_name}</div>
                       <div className="text-xs text-[#9d8b74]">{selectedCustomer.phone}</div>
@@ -245,7 +245,7 @@ export default function SalesPage() {
             <div className="premium-card p-5">
               <div className="flex items-center justify-between">
                 <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#b69463]">Sepet</p>
-                <span className="rounded-xl bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">{basket.length} ürün</span>
+                <span className="rounded-full bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">{basket.length} ürün</span>
               </div>
 
               {basket.length === 0 ? (
@@ -265,7 +265,7 @@ export default function SalesPage() {
                         <div className="truncate text-sm font-black text-[#211b16]">{p.name}</div>
                         <div className="text-xs text-[#9d8b74]">{[p.category, p.color, p.size].filter(Boolean).join(" · ")}</div>
                         <div className="mt-1 flex items-center gap-1">
-                          <input type="number" className="w-28 rounded-xl border border-[#eadfce] bg-white px-3 py-1.5 text-sm font-black outline-none focus:border-[#b69463]"
+                          <input type="number" className="w-28 rounded-full border border-[#eadfce] bg-white px-3 py-1.5 text-sm font-black outline-none focus:border-[#b69463]"
                             value={price} onChange={e => updatePrice(p.id, Number(e.target.value))} />
                           <span className="text-xs text-[#9d8b74]">₺</span>
                         </div>
@@ -294,7 +294,7 @@ export default function SalesPage() {
 
               {basket.length > 0 && selectedCustomer && (
                 <button onClick={() => setStep(2)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
                   Ödeme <ChevronRight size={18} />
                 </button>
               )}
@@ -363,9 +363,9 @@ export default function SalesPage() {
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)}
-                  className="flex-1 rounded-2xl border border-[#eadfce] py-4 text-sm font-black text-[#6d6256]">← Geri</button>
+                  className="flex-1 rounded-full border border-[#eadfce] py-4 text-sm font-black text-[#6d6256]">← Geri</button>
                 <button onClick={createSale}
-                  className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  className="flex flex-[2] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
                   <ShoppingBag size={18} /> Satışı Tamamla
                 </button>
               </div>
@@ -381,7 +381,7 @@ export default function SalesPage() {
             <div className="mt-5 space-y-3">
               <input className={inputCls} placeholder="Ad Soyad *" value={quickCustomer.fullName} onChange={e => setQuickCustomer(p => ({ ...p, fullName: e.target.value }))} />
               <input className={inputCls} placeholder="Telefon *" value={quickCustomer.phone} onChange={e => setQuickCustomer(p => ({ ...p, phone: e.target.value }))} />
-              <button onClick={createQuickCustomer} className="w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white">Ekle ve Seç</button>
+              <button onClick={createQuickCustomer} className="w-full rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white">Ekle ve Seç</button>
               <button onClick={() => setShowCustomerModal(false)} className="w-full rounded-2xl border border-[#eadfce] py-3 text-sm font-black text-[#6d6256]">Vazgeç</button>
             </div>
           </div>

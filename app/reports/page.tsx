@@ -139,7 +139,7 @@ export default function ReportsPage() {
           <label className="text-xs font-black text-[#9d8b74]">Dönem:</label>
           <select
             value={filterMonth} onChange={e=>setFilterMonth(e.target.value)}
-            className="rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-2.5 text-sm font-bold text-[#211b16] outline-none">
+            className="rounded-full border border-[#eadfce] bg-white/80 px-4 py-2.5 text-sm font-bold text-[#211b16] outline-none">
             <option value="all">Tüm zamanlar</option>
             {monthOptions.map(m=>{
               const [y,mo] = m.split("-");
@@ -238,7 +238,7 @@ export default function ReportsPage() {
                 ["Toplam Gider",     money(metrics.expenseTotal),false],
                 ["Net Kâr",          money(metrics.netProfit),   metrics.netProfit<0],
               ].map(([l,v,danger])=>(
-                <div key={l as string} className={`flex items-center justify-between rounded-2xl border px-4 py-3 ${danger?"border-red-200 bg-red-50":"border-[#eadfce] bg-white/60"}`}>
+                <div key={l as string} className={`flex items-center justify-between rounded-full border px-4 py-3 ${danger?"border-red-200 bg-red-50":"border-[#eadfce] bg-white/60"}`}>
                   <span className={`text-sm font-bold ${danger?"text-red-700":"text-[#6d6256]"}`}>{l as string}</span>
                   <span className={`text-sm font-black ${danger?"text-red-700":"text-[#211b16]"}`}>{v as string}</span>
                 </div>
@@ -254,7 +254,7 @@ export default function ReportsPage() {
             <p className="mb-4 text-sm text-[#9d8b74]">{debtors.length} müşteri · Toplam {money(debtors.reduce((s,d)=>s+d.debt,0))}</p>
             <div className="space-y-2">
               {debtors.map(d=>(
-                <div key={d.id} className="flex items-center justify-between rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3">
+                <div key={d.id} className="flex items-center justify-between rounded-full border border-orange-200 bg-orange-50 px-4 py-3">
                   <div>
                     <div className="font-black text-[#211b16]">{d.name}</div>
                     <div className="text-xs text-[#9d8b74]">{d.phone}</div>
@@ -264,9 +264,9 @@ export default function ReportsPage() {
                     {d.phone && (
                       <a href={`https://wa.me/${d.phone.replace(/\D/g,"").replace(/^0/,"90")}?text=${encodeURIComponent(`Merhaba ${d.name}, MAUNA Couture işleminiz için kalan ödemeniz ${money(d.debt)}'dir.`)}`}
                         target="_blank"
-                        className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
+                        className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                     )}
-                    <Link href={`/customers/${d.id}`} className="rounded-xl bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Kart</Link>
+                    <Link href={`/customers/${d.id}`} className="rounded-full bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Kart</Link>
                   </div>
                 </div>
               ))}
@@ -279,7 +279,7 @@ export default function ReportsPage() {
           <div className="premium-card p-5">
             <h2 className="mb-4 text-xl font-black text-[#1f1b16]">Son Kiralamalar</h2>
             {filteredRentals.slice(0,6).map(r=>(
-              <div key={r.id} className="mb-2 flex items-center justify-between rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3">
+              <div key={r.id} className="mb-2 flex items-center justify-between rounded-full border border-[#eadfce] bg-white/70 px-4 py-3">
                 <div>
                   <div className="text-sm font-black text-[#211b16]">{r.customers?.full_name||"—"}</div>
                   <div className="text-xs text-[#9d8b74]">{r.products?.name||"—"} · {r.created_at?.slice(0,10)}</div>
@@ -293,7 +293,7 @@ export default function ReportsPage() {
           <div className="premium-card p-5">
             <h2 className="mb-4 text-xl font-black text-[#1f1b16]">Son Satışlar</h2>
             {filteredSales.slice(0,6).map(s=>(
-              <div key={s.id} className="mb-2 flex items-center justify-between rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3">
+              <div key={s.id} className="mb-2 flex items-center justify-between rounded-full border border-[#eadfce] bg-white/70 px-4 py-3">
                 <div>
                   <div className="text-sm font-black text-[#211b16]">{s.customers?.full_name||"—"}</div>
                   <div className="text-xs text-[#9d8b74]">{s.products?.name||"—"} · {s.sale_date||s.created_at?.slice(0,10)}</div>

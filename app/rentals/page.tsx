@@ -39,7 +39,7 @@ const EMPTY_FORM = {
   notes: "",
 };
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-[11px] font-black uppercase tracking-[0.2em] text-[#b69463]">{children}</label>;
@@ -197,7 +197,7 @@ export default function RentalsPage() {
             <button
               key={s.n}
               onClick={() => setStep(s.n as 1 | 2)}
-              className={`flex flex-1 items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-black transition ${
+              className={`flex flex-1 items-center gap-2 rounded-full border px-4 py-3 text-sm font-black transition ${
                 step === s.n
                   ? "border-[#b69463] bg-[#b69463]/10 text-[#b69463]"
                   : "border-[#eadfce] bg-white/60 text-[#9d8b74]"
@@ -234,7 +234,7 @@ export default function RentalsPage() {
                         {customerResults.map(c => (
                           <button key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(c.full_name); }}
                             className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f7f0e7] first:rounded-t-2xl last:rounded-b-2xl">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#b69463]/15 text-[#b69463] font-black text-sm">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463] font-black text-sm">
                               {c.full_name[0]}
                             </div>
                             <div>
@@ -247,12 +247,12 @@ export default function RentalsPage() {
                     )}
                   </div>
                   <button onClick={() => setShowCustomerModal(true)}
-                    className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-[#211b16] px-4 py-3 text-sm font-black text-white">
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-[#211b16] px-4 py-3 text-sm font-black text-white">
                     <UserPlus size={16} /> Yeni
                   </button>
                 </div>
                 {selectedCustomer && (
-                  <div className="mt-3 flex items-center justify-between rounded-2xl bg-[#b69463]/10 px-4 py-3">
+                  <div className="mt-3 flex items-center justify-between rounded-full bg-[#b69463]/10 px-4 py-3">
                     <div>
                       <div className="text-sm font-black text-[#211b16]">{selectedCustomer.full_name}</div>
                       <div className="text-xs text-[#9d8b74]">{selectedCustomer.phone}</div>
@@ -319,7 +319,7 @@ export default function RentalsPage() {
             <div className="premium-card p-5">
               <div className="flex items-center justify-between">
                 <Label>Sepet</Label>
-                <span className="rounded-xl bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">
+                <span className="rounded-full bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">
                   {basket.length} ürün
                 </span>
               </div>
@@ -343,7 +343,7 @@ export default function RentalsPage() {
                         <div className="mt-1 flex items-center gap-1">
                           <input
                             type="number"
-                            className="w-28 rounded-xl border border-[#eadfce] bg-white px-3 py-1.5 text-sm font-black text-[#211b16] outline-none focus:border-[#b69463]"
+                            className="w-28 rounded-full border border-[#eadfce] bg-white px-3 py-1.5 text-sm font-black text-[#211b16] outline-none focus:border-[#b69463]"
                             value={price}
                             onChange={e => updatePrice(p.id, Number(e.target.value))}
                           />
@@ -376,7 +376,7 @@ export default function RentalsPage() {
 
               {basket.length > 0 && selectedCustomer && (
                 <button onClick={() => setStep(2)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
                   Tarih & Ödeme <ChevronRight size={18} />
                 </button>
               )}
@@ -470,11 +470,11 @@ export default function RentalsPage() {
 
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)}
-                  className="flex-1 rounded-2xl border border-[#eadfce] py-4 text-sm font-black text-[#6d6256]">
+                  className="flex-1 rounded-full border border-[#eadfce] py-4 text-sm font-black text-[#6d6256]">
                   ← Geri
                 </button>
                 <button onClick={saveRental}
-                  className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
+                  className="flex flex-[2] items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 text-sm font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]">
                   <CalendarDays size={18} /> Kiralama Kaydet
                 </button>
               </div>
@@ -494,7 +494,7 @@ export default function RentalsPage() {
               <input className={inputCls} placeholder="Telefon *"
                 value={quickCustomer.phone} onChange={e => setQuickCustomer(p => ({ ...p, phone: e.target.value }))} />
               <button onClick={createQuickCustomer}
-                className="w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white">
+                className="w-full rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white">
                 Ekle ve Seç
               </button>
               <button onClick={() => setShowCustomerModal(false)}

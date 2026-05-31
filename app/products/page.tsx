@@ -30,7 +30,7 @@ const EMPTY_FORM = {
   purchasePrice: "", salePrice: "", rentalPrice: "", notes: "",
 };
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -160,7 +160,7 @@ export default function ProductsPage() {
           )}
 
           <button onClick={createProduct} disabled={loading}
-            className="mt-5 w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)] disabled:opacity-60">
+            className="mt-5 w-full rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)] disabled:opacity-60">
             {loading ? "Ekleniyor..." : "Ürün Ekle — Barkod & QR Oluştur"}
           </button>
         </div>
@@ -258,7 +258,7 @@ export default function ProductsPage() {
                   <div className="rounded-xl bg-white p-2.5"><p className="text-xs text-[#9d8b74]">Satış</p><p className="font-black">{(p.sale_price || 0).toLocaleString("tr-TR")} ₺</p></div>
                   <div className="rounded-xl bg-white p-2.5"><p className="text-xs text-[#9d8b74]">Kiralama</p><p className="font-black">{(p.rental_price || 0).toLocaleString("tr-TR")} ₺</p></div>
                 </div>
-                <a href={`/products/${p.id}`} className="mt-4 block rounded-2xl bg-[#211b16] py-3 text-center text-sm font-black text-white">Ürün Detayı</a>
+                <a href={`/products/${p.id}`} className="mt-4 block rounded-full bg-[#211b16] py-3 text-center text-sm font-black text-white">Ürün Detayı</a>
                 <div className="mt-4 rounded-xl bg-white p-3 text-center">
                   <Barcode value={p.barcode} height={40} fontSize={10} />
                   <p className="mt-1 text-xs font-black">{p.barcode}</p>

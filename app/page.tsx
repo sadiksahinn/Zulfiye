@@ -155,7 +155,7 @@ export default function LoginPage() {
             </label>
           </div>
 
-          {message && <div className="mt-4 rounded-2xl border border-[#eadfce] bg-[#fcfaf7] px-4 py-3 text-sm font-bold text-[#7d6c58]">{message}</div>}
+          {message && <div className="mt-4 rounded-full border border-[#eadfce] bg-[#fcfaf7] px-4 py-3 text-sm font-bold text-[#7d6c58]">{message}</div>}
 
           <button onClick={login} disabled={loading} className="mt-5 flex w-full items-center justify-between rounded-[1.35rem] bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-3 pl-5 pr-3 text-base font-black text-white shadow-[0_22px_55px_rgba(182,148,99,.30)] disabled:opacity-60">
             <span>{loading ? copy.loading : copy.login}</span>

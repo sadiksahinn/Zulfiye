@@ -139,7 +139,7 @@ export default function ReturnsPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-red-500/20 p-4 backdrop-blur-xl">
+              <div className="rounded-full bg-red-500/20 p-4 backdrop-blur-xl">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-red-100">
                   Geciken
                 </div>
@@ -160,7 +160,7 @@ export default function ReturnsPage() {
 
         <div className="premium-card p-6">
 
-          <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-4">
+          <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-4">
             <Search size={18} className="text-[#b69463]" />
 
             <input
@@ -235,7 +235,7 @@ export default function ReturnsPage() {
                     <button
                       onClick={() => completeReturn(rental)}
                       disabled={processingId === rental.id}
-                      className="flex items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-6 py-4 text-sm font-black text-white transition active:scale-[0.98] disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 rounded-full bg-[#211b16] px-6 py-4 text-sm font-black text-white transition active:scale-[0.98] disabled:opacity-60"
                     >
                       <CheckCircle2 size={18} />
                       {processingId === rental.id ? "İşleniyor..." : "İadeyi Tamamla"}

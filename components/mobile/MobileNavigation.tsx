@@ -47,60 +47,90 @@ export default function MobileNavigation() {
 
   return (
     <>
-      <div className="fixed bottom-3 left-3 right-3 z-[99998] grid grid-cols-5 gap-2 rounded-[1.7rem] border border-white/20 bg-[#171411]/95 p-2 shadow-2xl backdrop-blur-xl lg:hidden">
+      {/* Bottom pill nav */}
+      <div className="fixed bottom-3 left-3 right-3 z-[99998] flex items-center justify-around rounded-full border border-white/10 bg-[#141210]/97 px-2 py-2 shadow-[0_20px_60px_rgba(0,0,0,.35)] backdrop-blur-2xl lg:hidden">
         {mainLinks.slice(0, 5).map(({ name, href, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
-            <a key={href} href={href}
-              className={`flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-black ${
-                active ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white" : "text-white/70"
-              }`}>
-              <Icon size={18} />
-              {name}
+            <a
+              key={href}
+              href={href}
+              className={`flex flex-col items-center justify-center gap-0.5 rounded-full px-3 py-2.5 text-[9px] font-black transition-all duration-200 ${
+                active
+                  ? "bg-gradient-to-br from-[#b69463] to-[#d8bd84] text-white shadow-[0_4px_16px_rgba(182,148,99,.40)]"
+                  : "text-white/50 hover:text-white/80"
+              }`}
+            >
+              <Icon size={17} strokeWidth={2.3} />
+              <span className="leading-none">{name}</span>
             </a>
           );
         })}
       </div>
 
+      {/* Menu button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed right-4 top-4 z-[99999] flex items-center gap-2 rounded-2xl bg-[#171411] px-5 py-4 text-white shadow-2xl lg:hidden"
+        className="fixed right-4 top-4 z-[99999] flex items-center gap-2 rounded-full bg-[#141210] px-4 py-3 text-white shadow-[0_8px_24px_rgba(0,0,0,.30)] lg:hidden"
       >
-        <Menu size={22} />
-        <span className="text-sm font-bold">Menü</span>
+        <Menu size={20} strokeWidth={2.5} />
+        <span className="text-sm font-black">Menü</span>
       </button>
 
+      {/* Drawer */}
       {open && (
-        <div className="fixed inset-0 z-[99999] bg-black/45">
-          <div className="absolute bottom-3 right-3 top-3 w-[82vw] max-w-[340px] overflow-y-auto rounded-[1.7rem] bg-[#171411] p-5 text-white shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
+        <div className="fixed inset-0 z-[99999] bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)}>
+          <div
+            className="absolute bottom-3 right-3 top-3 w-[82vw] max-w-[340px] overflow-y-auto rounded-[2rem] bg-[#141210] p-5 text-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drawer header */}
+            <div className="mb-5 flex items-center justify-between">
               <div>
-                <div className="text-2xl font-black tracking-[0.25em]">MAUNA</div>
-                <div className="text-xs tracking-[0.3em] text-[#d8be8d]">COUTURE OPERATION</div>
+                <div className="text-xl font-black tracking-[0.22em]">MAUNA</div>
+                <div className="text-[10px] tracking-[0.30em] text-[#c4a96e]">COUTURE OPERATION</div>
               </div>
-              <button onClick={() => setOpen(false)} className="rounded-xl bg-white/10 p-3">
-                <X size={22} />
+              <button
+                onClick={() => setOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/16"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <div className="grid gap-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+            <div className="space-y-1">
+              <p className="px-3 pb-1 text-[9px] font-black uppercase tracking-[0.28em] text-[#5a4f42]">
                 Personel İşlemleri
               </p>
-              {mainLinks.map(({ name, href, Icon }) => (
-                <a key={href} href={href} className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-4 font-bold text-white">
-                  <Icon size={18} className="text-[#d8be8d]" />
-                  {name}
-                </a>
-              ))}
+              {mainLinks.map(({ name, href, Icon }) => {
+                const active = pathname === href || pathname.startsWith(`${href}/`);
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-full px-4 py-3 font-bold transition-all ${
+                      active
+                        ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_4px_16px_rgba(182,148,99,.30)]"
+                        : "text-white/75 hover:bg-white/8 hover:text-white"
+                    }`}
+                  >
+                    <Icon size={16} className={active ? "text-white" : "text-[#9d8a72]"} />
+                    {name}
+                  </a>
+                );
+              })}
 
               {role !== "staff" ? (
                 <>
-                  <p className="mt-4 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+                  <p className="px-3 pb-1 pt-4 text-[9px] font-black uppercase tracking-[0.28em] text-[#5a4f42]">
                     Yönetim
                   </p>
                   {adminLinks.map(([name, href]) => (
-                    <a key={href} href={href} className="rounded-2xl bg-white/[0.06] px-4 py-4 font-bold text-white/85">
+                    <a
+                      key={href}
+                      href={href}
+                      className="block rounded-full px-4 py-3 font-bold text-white/55 transition hover:bg-white/8 hover:text-white/80"
+                    >
                       {name}
                     </a>
                   ))}
@@ -108,23 +138,24 @@ export default function MobileNavigation() {
               ) : null}
             </div>
 
-            <div className="mt-6 rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4">
+            {/* User section */}
+            <div className="mt-5 rounded-[1.5rem] bg-white/[0.05] p-4 ring-1 ring-white/8">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#b69463] to-[#d8bd84] font-black text-white">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#b69463] to-[#d8bd84] text-sm font-black text-white">
                   {userEmail.slice(0, 1).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-black text-white">
                     {role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : "Personel"}
                   </div>
-                  <div className="truncate text-[11px] text-zinc-400">{userEmail}</div>
+                  <div className="truncate text-[11px] text-zinc-500">{userEmail}</div>
                 </div>
               </div>
               <button
                 onClick={() => { setOpen(false); logout(); }}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black text-white"
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-white/8 px-4 py-2.5 text-sm font-bold text-zinc-300 ring-1 ring-white/10 transition hover:bg-white/14 hover:text-white"
               >
-                <LogOut size={16} />
+                <LogOut size={15} />
                 Çıkış Yap
               </button>
             </div>

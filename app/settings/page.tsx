@@ -134,7 +134,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-2xl bg-[#211b16] px-8 py-4 text-sm font-black text-white transition active:scale-[0.98] disabled:opacity-60"
+            className="flex items-center gap-2 rounded-full bg-[#211b16] px-8 py-4 text-sm font-black text-white transition active:scale-[0.98] disabled:opacity-60"
           >
             <Save size={17} />
             {saving ? "Kaydediliyor..." : "Kaydet"}
@@ -162,7 +162,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-[#eadfce] bg-[#faf7f3] px-5 py-4">
+    <label className="flex cursor-pointer items-center justify-between rounded-full border border-[#eadfce] bg-[#faf7f3] px-5 py-4">
       <span className="text-sm font-bold text-[#211b16]">{label}</span>
       <div
         onClick={() => onChange(!checked)}

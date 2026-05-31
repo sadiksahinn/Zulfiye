@@ -27,7 +27,7 @@ const STATUS_OPTIONS = [
   { key: "teslime_hazir",  label: "Teslime Hazır",    cls: "bg-purple-50 border-purple-200 text-purple-700" },
 ];
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 function formatDate(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
@@ -160,7 +160,7 @@ export default function FittingsPage() {
               <div>
                 <label className="mb-1.5 block text-[11px] font-black uppercase tracking-[0.2em] text-[#b69463]">Müşteri *</label>
                 <div className="relative">
-                  <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-3">
                     <Search size={16} className="shrink-0 text-[#b69463]" />
                     <input value={customerSearch} placeholder="Ad soyad veya telefon"
                       onChange={e => { setCustomerSearch(e.target.value); setSelectedCustomer(null); }}
@@ -171,7 +171,7 @@ export default function FittingsPage() {
                       {customerResults.map(c => (
                         <button key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(c.full_name); }}
                           className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#f7f0e7] first:rounded-t-2xl last:rounded-b-2xl">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#b69463]/15 font-black text-sm text-[#b69463]">{c.full_name[0]}</div>
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#b69463]/15 font-black text-sm text-[#b69463]">{c.full_name[0]}</div>
                           <div>
                             <div className="text-sm font-black text-[#211b16]">{c.full_name}</div>
                             <div className="text-xs text-[#9d8b74]">{c.phone}</div>
@@ -182,7 +182,7 @@ export default function FittingsPage() {
                   )}
                 </div>
                 {selectedCustomer && (
-                  <div className="mt-2 flex items-center gap-3 rounded-2xl bg-[#b69463]/10 px-4 py-2.5">
+                  <div className="mt-2 flex items-center gap-3 rounded-full bg-[#b69463]/10 px-4 py-2.5">
                     <UserRound size={16} className="text-[#b69463]" />
                     <span className="text-sm font-black text-[#211b16]">{selectedCustomer.full_name}</span>
                     <span className="text-xs text-[#9d8b74]">{selectedCustomer.phone}</span>
@@ -204,7 +204,7 @@ export default function FittingsPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3">
+                <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-3">
                   <Search size={16} className="shrink-0 text-[#b69463]" />
                   <input value={productSearch} placeholder="Ürün adı, barkod, renk..."
                     onChange={e => { setProductSearch(e.target.value); setSelectedProduct(null); }}
@@ -231,7 +231,7 @@ export default function FittingsPage() {
                 )}
 
                 {selectedProduct && (
-                  <div className="mt-2 flex items-center gap-3 rounded-2xl bg-[#b69463]/10 px-4 py-2.5">
+                  <div className="mt-2 flex items-center gap-3 rounded-full bg-[#b69463]/10 px-4 py-2.5">
                     <Package size={16} className="text-[#b69463]" />
                     <div>
                       <span className="text-[10px] font-black text-[#b69463]">{selectedProduct.category}</span>
@@ -270,7 +270,7 @@ export default function FittingsPage() {
               )}
 
               <button onClick={createFitting}
-                className="w-full rounded-2xl bg-[#211b16] py-4 font-black text-white">
+                className="w-full rounded-full bg-[#211b16] py-4 font-black text-white">
                 Prova Kaydet ve Takvime İşle
               </button>
             </div>
@@ -280,7 +280,7 @@ export default function FittingsPage() {
           <div className="premium-card p-5 lg:p-7">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black text-[#1f1b16]">Prova Listesi</h2>
-              <span className="rounded-xl bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">{visibleFittings.length} randevu</span>
+              <span className="rounded-full bg-[#b69463]/10 px-3 py-1 text-xs font-black text-[#b69463]">{visibleFittings.length} randevu</span>
             </div>
 
             {/* Filtre */}

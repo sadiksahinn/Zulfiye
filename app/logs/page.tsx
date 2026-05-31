@@ -48,7 +48,7 @@ function formatTime(iso: string) {
   return d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
 }
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 export default function LogsPage() {
   const { role, loading } = useAuth();
@@ -184,7 +184,7 @@ export default function LogsPage() {
               <div key={day}>
                 {/* Gün başlığı */}
                 <div className="mb-3 flex items-center gap-3">
-                  <div className="flex items-center gap-2 rounded-2xl bg-[#211b16] px-4 py-2 text-sm font-black text-white">
+                  <div className="flex items-center gap-2 rounded-full bg-[#211b16] px-4 py-2 text-sm font-black text-white">
                     <CalendarDays size={14} />
                     {formatDate(day)}
                   </div>

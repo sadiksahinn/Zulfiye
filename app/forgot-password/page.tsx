@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
 
       <section className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center">
         <div className="w-full max-w-md rounded-[2rem] border border-[#eadfce] bg-white/85 p-8 shadow-[0_40px_110px_rgba(118,93,60,.18)] backdrop-blur-2xl">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
             <KeyRound size={24} />
           </div>
 
@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
               E-posta
             </label>
 
-            <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/75 px-4 py-4 shadow-inner">
+            <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/75 px-4 py-4 shadow-inner">
               <Mail size={18} className="text-[#9d8b74]" />
               <input
                 type="email"
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
           <button
             onClick={handleReset}
             disabled={loading}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#211b16] py-4 font-black text-white disabled:opacity-60"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#211b16] py-4 font-black text-white disabled:opacity-60"
           >
             <Send size={18} /> {loading ? "Gönderiliyor..." : "Link Gönder"}
           </button>

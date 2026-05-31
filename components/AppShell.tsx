@@ -68,9 +68,11 @@ export default function AppShell({
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f7f0e7] text-[#211b16]">
-        <div className="rounded-[2rem] border border-[#eadfce] bg-white/70 p-8 text-center shadow-xl">
-          <div className="text-sm font-black uppercase tracking-[0.24em] text-[#b69463]">MAUNA</div>
-          <div className="mt-2 text-2xl font-black">Yetki kontrol ediliyor...</div>
+        <div className="rounded-[2rem] border border-[#eadfce] bg-white/80 p-10 text-center shadow-2xl backdrop-blur-xl">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#171411] px-4 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-[#d8be8d]">
+            MAUNA
+          </div>
+          <div className="mt-4 text-2xl font-black tracking-tight">Yetki kontrol ediliyor…</div>
         </div>
       </main>
     );
@@ -78,24 +80,30 @@ export default function AppShell({
 
   return (
     <main className="min-h-screen bg-[#f7f0e7] text-[#211b16]">
-      <div className="mx-auto flex w-full max-w-[1700px] gap-6 p-0 lg:p-6">
-        <aside className="hidden min-h-[calc(100vh-3rem)] w-[330px] shrink-0 flex-col rounded-[2rem] border border-white/10 bg-[#171411] p-5 font-sans text-white shadow-[0_28px_90px_rgba(33,27,22,.28)] lg:flex">
-          <div className="mb-7 flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-[1.35rem] bg-white p-2 shadow-[0_18px_45px_rgba(0,0,0,.22)]">
+      <div className="mx-auto flex w-full max-w-[1700px] gap-5 p-0 lg:p-5">
+
+        {/* Desktop Sidebar */}
+        <aside className="desktop-sidebar hidden min-h-[calc(100vh-2.5rem)] w-[300px] shrink-0 flex-col rounded-[2rem] bg-[#141210] p-5 font-sans text-white shadow-[0_32px_80px_rgba(0,0,0,.30)] lg:flex">
+
+          {/* Logo */}
+          <div className="mb-6 flex items-center gap-3.5">
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-white p-2 shadow-[0_12px_30px_rgba(0,0,0,.22)]">
               <img src="/mauna-logo.png" alt="MAUNA" className="h-full w-full object-contain" />
             </div>
             <div>
-              <div className="text-2xl font-black tracking-[0.18em]">MAUNA</div>
-              <div className="text-xs tracking-[0.28em] text-[#d8be8d]">COUTURE v1</div>
+              <div className="text-xl font-black tracking-[0.18em]">MAUNA</div>
+              <div className="text-[10px] tracking-[0.28em] text-[#c4a96e]">COUTURE</div>
             </div>
           </div>
 
-          <nav className="flex-1 overflow-y-auto pr-1">
-            <div className="mb-4">
-              <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto space-y-6 pr-0.5">
+
+            <div>
+              <div className="mb-2 px-3 text-[9px] font-black uppercase tracking-[0.30em] text-[#5a4f42]">
                 Günlük Operasyon
               </div>
-              <div className="space-y-2">
+              <div className="space-y-0.5">
                 {operationMenu.map((item) => {
                   const Icon = item.icon;
                   const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -103,20 +111,20 @@ export default function AppShell({
                     <a
                       key={item.href}
                       href={item.href}
-                      className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
+                      className={`group flex items-center gap-3 rounded-full px-4 py-3 text-[14px] font-bold tracking-[-0.01em] transition-all duration-200 ${
                         active
-                          ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
-                          : "text-zinc-200 hover:bg-white/10 hover:text-white"
+                          ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_8px_24px_rgba(182,148,99,.30)]"
+                          : "text-zinc-300 hover:bg-white/8 hover:text-white"
                       }`}
                     >
                       <span
-                        className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
-                          active ? "bg-white/20 text-white" : "bg-white/8 text-[#d8be8d] group-hover:bg-white/12"
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                          active ? "bg-white/25 text-white" : "text-[#9d8a72] group-hover:text-white"
                         }`}
                       >
-                        <Icon size={20} strokeWidth={2.35} />
+                        <Icon size={17} strokeWidth={2.4} />
                       </span>
-                      <span className="leading-none">{item.name}</span>
+                      <span>{item.name}</span>
                     </a>
                   );
                 })}
@@ -124,11 +132,11 @@ export default function AppShell({
             </div>
 
             {role !== "staff" ? (
-              <div className="mt-8">
-                <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#d8be8d]">
+              <div>
+                <div className="mb-2 px-3 text-[9px] font-black uppercase tracking-[0.30em] text-[#5a4f42]">
                   Yönetim Paneli
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-0.5">
                   {managementMenu.map((item) => {
                     const Icon = item.icon;
                     const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -136,20 +144,20 @@ export default function AppShell({
                       <a
                         key={item.href}
                         href={item.href}
-                        className={`group flex items-center gap-4 rounded-[1.15rem] px-4 py-3.5 text-[16px] font-black tracking-[-0.015em] transition ${
+                        className={`group flex items-center gap-3 rounded-full px-4 py-3 text-[14px] font-bold tracking-[-0.01em] transition-all duration-200 ${
                           active
-                            ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_18px_38px_rgba(182,148,99,.26)]"
-                            : "text-zinc-400 hover:bg-white/10 hover:text-white"
+                            ? "bg-gradient-to-r from-[#b69463] to-[#d8bd84] text-white shadow-[0_8px_24px_rgba(182,148,99,.30)]"
+                            : "text-zinc-500 hover:bg-white/8 hover:text-white"
                         }`}
                       >
                         <span
-                          className={`flex h-10 w-10 items-center justify-center rounded-[0.95rem] transition ${
-                            active ? "bg-white/20 text-white" : "bg-white/8 text-[#8f7a58] group-hover:bg-white/12"
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                            active ? "bg-white/25 text-white" : "text-[#6a5c48] group-hover:text-white"
                           }`}
                         >
-                          <Icon size={20} strokeWidth={2.2} />
+                          <Icon size={17} strokeWidth={2.2} />
                         </span>
-                        <span className="leading-none">{item.name}</span>
+                        <span>{item.name}</span>
                       </a>
                     );
                   })}
@@ -158,43 +166,43 @@ export default function AppShell({
             ) : null}
           </nav>
 
-          <div className="mt-5 rounded-[1.4rem] border border-white/10 bg-white/[0.06] p-4 shadow-inner">
-            <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-[#d8be8d]">
-              Kullanıcı Bilgilerim
-            </div>
+          {/* User Card */}
+          <div className="mt-5 rounded-[1.5rem] bg-white/[0.05] p-4 ring-1 ring-white/8">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#b69463] to-[#d8bd84] font-black text-white">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#b69463] to-[#d8bd84] text-sm font-black text-white shadow-[0_4px_12px_rgba(182,148,99,.35)]">
                 {userEmail.slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-black text-white">
                   {role === "super_admin" ? "Super Admin" : role === "admin" ? "Admin" : "Personel"}
                 </div>
-                <div className="truncate text-xs text-zinc-400">{userEmail}</div>
+                <div className="truncate text-[11px] text-zinc-500">{userEmail}</div>
               </div>
             </div>
             <button
               type="button"
               onClick={logout}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-black text-zinc-100 transition hover:bg-white/15"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-white/8 px-4 py-2.5 text-sm font-bold text-zinc-300 ring-1 ring-white/10 transition-all hover:bg-white/14 hover:text-white"
             >
-              <LogOut size={17} />
+              <LogOut size={15} />
               Çıkış Yap
             </button>
           </div>
         </aside>
 
-        <section className="min-w-0 flex-1 rounded-none border border-white/70 bg-white/60 shadow-xl backdrop-blur-xl lg:rounded-[2rem]">
-          <header className="px-5 pb-6 pt-10 lg:px-8 lg:pt-8">
-            <p className="text-[10px] tracking-[0.32em] text-[#b69463]">
-              MAUNA COUTURE OPERATING SYSTEM
-            </p>
-            <h1 className="mt-2 text-[30px] font-black tracking-[-0.05em] lg:text-5xl">
+        {/* Main Content */}
+        <section className="min-w-0 flex-1 rounded-none border border-[#ede4d8]/60 bg-white/65 shadow-xl shadow-amber-900/5 backdrop-blur-2xl lg:rounded-[2rem]">
+          <header className="px-5 pb-5 pt-8 lg:px-8 lg:pt-8">
+            <div className="inline-flex items-center rounded-full bg-[#171411] px-3.5 py-1 text-[9px] font-black uppercase tracking-[0.28em] text-[#c4a96e]">
+              MAUNA COUTURE
+            </div>
+            <h1 className="mt-3 text-[28px] font-black tracking-[-0.045em] text-[#211b16] lg:text-5xl">
               {title}
             </h1>
           </header>
-          <div className="p-3 pb-28 lg:p-8">{children}</div>
+          <div className="p-4 pb-28 lg:p-8">{children}</div>
         </section>
+
       </div>
     </main>
   );

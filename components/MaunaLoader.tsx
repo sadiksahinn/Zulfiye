@@ -31,12 +31,9 @@ export default function MaunaLoader() {
           </div>
         </div>
 
-        <div className="mt-7 text-center">
-          <div className="text-2xl font-black tracking-[0.22em] text-[#211b16]">
-            MAUNA
-          </div>
-          <div className="mt-1 text-xs font-bold tracking-[0.35em] text-[#b69463]">
-            COUTURE
+        <div className="mauna-loader-badge mt-8">
+          <div className="rounded-full border border-[#e2d5c3] bg-white/80 px-5 py-1.5 text-[11px] font-semibold tracking-[0.28em] text-[#8a7459] shadow-sm backdrop-blur-sm">
+            mauna couture
           </div>
         </div>
       </div>

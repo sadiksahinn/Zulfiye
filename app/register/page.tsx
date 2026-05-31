@@ -56,7 +56,7 @@ export default function RegisterPage() {
 
       <section className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center">
         <div className="w-full max-w-md rounded-[2rem] border border-[#eadfce] bg-white/85 p-8 shadow-[0_40px_110px_rgba(118,93,60,.18)] backdrop-blur-2xl">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
             <UserPlus size={24} />
           </div>
 
@@ -83,7 +83,7 @@ export default function RegisterPage() {
           <button
             onClick={register}
             disabled={loading}
-            className="mt-6 w-full rounded-2xl bg-[#211b16] py-4 font-black text-white disabled:opacity-60"
+            className="mt-6 w-full rounded-full bg-[#211b16] py-4 font-black text-white disabled:opacity-60"
           >
             {loading ? "Hesap oluşturuluyor..." : "Hesap Oluştur"}
           </button>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
 
 function Field({ icon, placeholder, value, onChange, type = "text" }: any) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/75 px-4 py-4 shadow-inner">
+    <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/75 px-4 py-4 shadow-inner">
       <span className="text-[#9d8b74]">{icon}</span>
       <input
         type={type}

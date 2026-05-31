@@ -132,7 +132,7 @@ export default function DashboardPage() {
 
           <div className="premium-card p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
                 <Wallet size={20} />
               </div>
               <div>
@@ -146,7 +146,7 @@ export default function DashboardPage() {
               <h3 className="mt-2 text-3xl font-black tracking-[-0.04em]">{stats.remaining.toLocaleString("tr-TR")} TL</h3>
             </div>
 
-            <Link href="/accounting" className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-[#eadfce] bg-white px-4 py-4 text-sm font-black text-[#211b16]">
+            <Link href="/accounting" className="mt-4 flex items-center justify-center gap-2 rounded-full border border-[#eadfce] bg-white px-4 py-4 text-sm font-black text-[#211b16]">
               Muhasebeye Git <ArrowRight size={17} />
             </Link>
           </div>

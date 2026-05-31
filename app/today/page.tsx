@@ -133,7 +133,7 @@ export default function TodayPage() {
 
         {/* Arama */}
         <section className="premium-card p-4">
-          <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/75 px-4 py-3">
+          <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/75 px-4 py-3">
             <Search size={18} className="text-[#b69463]" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Müşteri adı, telefon, ürün veya barkod ara..."
@@ -153,7 +153,7 @@ export default function TodayPage() {
                         {c.remaining > 0 && <span className="rounded-full bg-red-100 px-3 py-1 text-[11px] font-black text-red-700">{c.remaining.toLocaleString("tr-TR")} ₺ borç</span>}
                       </div>
                     </div>
-                    <Link href={`/customers/${c.id}`} className="shrink-0 rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white">Kart</Link>
+                    <Link href={`/customers/${c.id}`} className="shrink-0 rounded-full bg-[#211b16] px-4 py-2 text-xs font-black text-white">Kart</Link>
                   </div>
                 </div>
               ))}
@@ -183,7 +183,7 @@ export default function TodayPage() {
           {/* Günlük akış */}
           <section className="premium-card p-5 lg:p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]"><Clock size={20} /></div>
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]"><Clock size={20} /></div>
               <div>
                 <h2 className="text-xl font-black text-[#1f1b16]">Günlük Akış</h2>
                 <p className="text-sm text-[#8b8177]">Bugünkü prova, teslim ve iadeler</p>
@@ -233,16 +233,16 @@ export default function TodayPage() {
                         <div className="text-xs text-[#9d8b74]">{productName}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {item.customer_id && (
-                            <Link href={`/customers/${item.customer_id}`} className="rounded-xl bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Müşteri</Link>
+                            <Link href={`/customers/${item.customer_id}`} className="rounded-full bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Müşteri</Link>
                           )}
                           {phone && (
-                            <a href={whatsappLink(phone, waMsg)} target="_blank" className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WhatsApp</a>
+                            <a href={whatsappLink(phone, waMsg)} target="_blank" className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WhatsApp</a>
                           )}
                           {item.flowType === "Teslim" && (
-                            <button onClick={() => completeDelivery(item)} className="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-black text-white">Teslim Edildi ✓</button>
+                            <button onClick={() => completeDelivery(item)} className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-black text-white">Teslim Edildi ✓</button>
                           )}
                           {item.flowType === "İade" && (
-                            <button onClick={() => completeReturn(item)} className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">İadeyi Al ✓</button>
+                            <button onClick={() => completeReturn(item)} className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">İadeyi Al ✓</button>
                           )}
                         </div>
                       </div>
@@ -281,7 +281,7 @@ export default function TodayPage() {
                       </div>
                       {item.customers?.phone && (
                         <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers.full_name}, MAUNA Couture kiraladığınız ${item.products?.name || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`)}
-                          target="_blank" className="shrink-0 rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
+                          target="_blank" className="shrink-0 rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                       )}
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export default function TodayPage() {
                       </div>
                       {item.customers?.phone && (
                         <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers?.full_name}, MAUNA Couture işleminiz için kalan ödemeniz ${Number(item.remaining_amount).toLocaleString("tr-TR")} ₺'dir.`)}
-                          target="_blank" className="shrink-0 rounded-xl bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
+                          target="_blank" className="shrink-0 rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                       )}
                     </div>
                   </div>

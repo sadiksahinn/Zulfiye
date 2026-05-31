@@ -141,7 +141,7 @@ export default function ProductDetailPage() {
         <div className="premium-card p-8">
           <h1 className="text-2xl font-black text-[#211b16]">Ürün bulunamadı.</h1>
           {message ? <p className="premium-muted mt-3 text-sm">{message}</p> : null}
-          <a href="/products" className="mt-6 inline-flex rounded-2xl bg-[#211b16] px-6 py-3 text-sm font-black text-white">
+          <a href="/products" className="mt-6 inline-flex rounded-full bg-[#211b16] px-6 py-3 text-sm font-black text-white">
             Ürün Listesine Dön
           </a>
         </div>
@@ -201,7 +201,7 @@ export default function ProductDetailPage() {
               <textarea className="input md:col-span-2 min-h-28" placeholder="Notlar" value={editForm.notes} onChange={(e) => updateEditField("notes", e.target.value)} />
             </div>
 
-            <button onClick={updateProduct} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#211b16] px-5 py-4 text-sm font-black text-white">
+            <button onClick={updateProduct} className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#211b16] px-5 py-4 text-sm font-black text-white">
               <Save size={18} /> Değişiklikleri Kaydet
             </button>
           </div>
@@ -267,10 +267,10 @@ export default function ProductDetailPage() {
             <div className="premium-card p-5 lg:p-6">
               <h2 className="premium-title text-xl">Hızlı İşlem</h2>
               <div className="mt-5 grid gap-3">
-                <a href={`/rentals?product=${product.id}`} className="rounded-2xl bg-[#211b16] px-4 py-4 text-center text-sm font-black text-white">
+                <a href={`/rentals?product=${product.id}`} className="rounded-full bg-[#211b16] px-4 py-4 text-center text-sm font-black text-white">
                   Kiralama Oluştur
                 </a>
-                <a href={`/sales?product=${product.id}`} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-4 text-center text-sm font-black text-[#211b16]">
+                <a href={`/sales?product=${product.id}`} className="rounded-full border border-[#eadfce] bg-white px-4 py-4 text-center text-sm font-black text-[#211b16]">
                   Satış Oluştur
                 </a>
               </div>

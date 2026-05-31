@@ -222,7 +222,7 @@ export default function CalendarPage() {
               ))}
             </div>
 
-            <div className="mb-5 flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3">
+            <div className="mb-5 flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-3">
               <CalendarDays size={16} className="text-[#b69463]" />
               <input value={search} onChange={e => setSearch(e.target.value)}
                 placeholder="Müşteri, etkinlik, tarih ara..."

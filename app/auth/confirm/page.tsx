@@ -100,7 +100,7 @@ export default function ConfirmPage() {
               </div>
               <button
                 onClick={() => router.replace("/today")}
-                className="mt-6 w-full rounded-2xl bg-[#211b16] py-4 font-black text-white"
+                className="mt-6 w-full rounded-full bg-[#211b16] py-4 font-black text-white"
               >
                 Hemen Giriş Yap
               </button>
@@ -117,7 +117,7 @@ export default function ConfirmPage() {
               </p>
               <button
                 onClick={() => router.replace("/")}
-                className="mt-8 w-full rounded-2xl bg-[#211b16] py-4 font-black text-white"
+                className="mt-8 w-full rounded-full bg-[#211b16] py-4 font-black text-white"
               >
                 Giriş Ekranına Dön
               </button>

@@ -83,7 +83,7 @@ export default function SmsPage() {
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[.8fr_1.2fr]">
           <div className="premium-card p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
                 <MessageSquareText size={20} />
               </div>
               <div>
@@ -124,14 +124,14 @@ export default function SmsPage() {
             )}
 
             <div className="mt-5 grid gap-3 lg:grid-cols-3">
-              <button onClick={copyMessage} className="rounded-2xl border border-[#eadfce] bg-white px-4 py-4 font-black text-[#211b16]">
+              <button onClick={copyMessage} className="rounded-full border border-[#eadfce] bg-white px-4 py-4 font-black text-[#211b16]">
                 <Copy className="mr-2 inline" size={18} />
                 {copied ? "Kopyalandı" : "Kopyala"}
               </button>
-              <a href={whatsappUrl} target="_blank" className="rounded-2xl bg-green-600 px-4 py-4 text-center font-black text-white">
+              <a href={whatsappUrl} target="_blank" className="rounded-full bg-green-600 px-4 py-4 text-center font-black text-white">
                 <Send className="mr-2 inline" size={18} />WhatsApp
               </a>
-              <button onClick={sendNetgsmSMS} disabled={sending} className="rounded-2xl bg-[#211b16] px-4 py-4 font-black text-white disabled:opacity-50">
+              <button onClick={sendNetgsmSMS} disabled={sending} className="rounded-full bg-[#211b16] px-4 py-4 font-black text-white disabled:opacity-50">
                 {sending ? "Gönderiliyor..." : "SMS Gönder"}
               </button>
             </div>

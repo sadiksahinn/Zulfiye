@@ -9,7 +9,7 @@ import {
   Phone, RotateCcw, Save, ShoppingBag, UserRound, Wallet, X,
 } from "lucide-react";
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 
 function formatDate(d?: string | null) {
   if (!d) return "—";
@@ -18,7 +18,7 @@ function formatDate(d?: string | null) {
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-2xl border border-[#eadfce] bg-white/60 px-4 py-3">
+    <div className="flex items-start justify-between gap-4 rounded-full border border-[#eadfce] bg-white/60 px-4 py-3">
       <span className="text-xs font-black uppercase tracking-[0.15em] text-[#9d8b74]">{label}</span>
       <span className="text-right text-sm font-black text-[#211b16]">{value || "—"}</span>
     </div>
@@ -130,7 +130,7 @@ export default function CustomerDetailPage() {
               </button>
               {wa && (
                 <a href={`https://wa.me/${wa}`} target="_blank"
-                  className="flex items-center gap-2 rounded-2xl bg-green-500 px-4 py-3 text-sm font-black text-white">
+                  className="flex items-center gap-2 rounded-full bg-green-500 px-4 py-3 text-sm font-black text-white">
                   <Phone size={16} /> WhatsApp
                 </a>
               )}
@@ -219,7 +219,7 @@ export default function CustomerDetailPage() {
             </div>
             <div className="mt-5 flex gap-3">
               <button onClick={() => setEditing(false)} className="flex-1 rounded-2xl border border-[#eadfce] py-3 text-sm font-black text-[#6d6256]">Vazgeç</button>
-              <button onClick={save} className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-[#211b16] py-3 text-sm font-black text-white">
+              <button onClick={save} className="flex flex-[2] items-center justify-center gap-2 rounded-full bg-[#211b16] py-3 text-sm font-black text-white">
                 <Save size={16} /> Kaydet
               </button>
             </div>

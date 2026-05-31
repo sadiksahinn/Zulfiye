@@ -3,6 +3,8 @@
 :root {
   --background: #f7f0e7;
   --foreground: #171717;
+  --accent: #b69463;
+  --accent-light: #d8bd84;
 }
 
 @theme inline {
@@ -24,20 +26,36 @@ body {
   color: #fff;
 }
 
-/* Premium Cards */
+/* Premium Cards — modern pill card */
 .premium-card {
-  border-radius: 2rem;
-  border: 1px solid rgba(234, 223, 206, 0.9);
-  background: rgba(255,255,255,0.72);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 24px 80px rgba(118, 93, 60, 0.12);
+  border-radius: 1.75rem;
+  border: 1px solid rgba(234, 223, 206, 0.7);
+  background: rgba(255,255,255,0.80);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 8px 32px rgba(118, 93, 60, 0.08), 0 2px 8px rgba(118,93,60,0.06);
+  position: relative;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.premium-card:hover {
+  box-shadow: 0 16px 48px rgba(118, 93, 60, 0.14), 0 4px 12px rgba(118,93,60,0.08);
+}
+
+.premium-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,.55), transparent 45%, rgba(182,148,99,.06));
+  opacity: .6;
 }
 
 /* Premium Titles */
 .premium-title {
   color: #211b16;
   letter-spacing: -0.04em;
-  font-weight: 650;
+  font-weight: 750;
 }
 
 /* Premium Muted Text */
@@ -45,36 +63,84 @@ body {
   color: #7a6d5e;
 }
 
-/* Premium Button */
+/* Premium Button — pill shape */
 .premium-button {
-  border-radius: 1rem;
+  border-radius: 9999px;
   background: linear-gradient(135deg, #b69463, #d8bd84);
   color: white;
   font-weight: 700;
-  box-shadow: 0 18px 45px rgba(182,148,99,0.25);
-  transition: all .2s ease;
+  letter-spacing: 0.01em;
+  box-shadow: 0 8px 24px rgba(182,148,99,0.28), 0 2px 8px rgba(182,148,99,0.18);
+  transition: all .22s cubic-bezier(.2,.8,.2,1);
 }
 
 .premium-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 24px 55px rgba(182,148,99,0.35);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(182,148,99,0.38), 0 4px 12px rgba(182,148,99,0.22);
 }
 
-/* Inputs */
+.premium-button:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Danger button */
+.danger-button {
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(192,57,43,0.28);
+  transition: all .22s cubic-bezier(.2,.8,.2,1);
+}
+
+.danger-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(192,57,43,0.38);
+}
+
+/* Ghost button */
+.ghost-button {
+  border-radius: 9999px;
+  border: 1.5px solid rgba(182,148,99,0.35);
+  background: rgba(255,255,255,0.6);
+  color: #5c4c3a;
+  font-weight: 700;
+  transition: all .22s cubic-bezier(.2,.8,.2,1);
+}
+
+.ghost-button:hover {
+  background: rgba(182,148,99,0.1);
+  border-color: rgba(182,148,99,0.6);
+  transform: translateY(-1px);
+}
+
+/* Inputs — softer pill */
 .input {
   width: 100%;
-  border-radius: 1rem;
-  border: 1px solid #e6dbcf;
-  background: rgba(255,255,255,0.82);
-  padding: 1rem 1.25rem;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(230,219,207,0.9);
+  background: rgba(255,255,255,0.88);
+  padding: 0.875rem 1.375rem;
   outline: none;
   color: #1f1b16;
   transition: all .2s ease;
+  font-size: 0.9375rem;
 }
 
 .input:focus {
   border-color: #b69463;
-  box-shadow: 0 0 0 4px rgba(182,148,99,0.12);
+  box-shadow: 0 0 0 4px rgba(182,148,99,0.14);
+  background: rgba(255,255,255,0.98);
+}
+
+/* Textarea stays rectangular but rounded */
+textarea.input {
+  border-radius: 1.25rem;
+}
+
+/* Select stays slightly rectangular */
+select.input {
+  border-radius: 9999px;
 }
 
 /* Number input arrows kaldır */
@@ -99,7 +165,7 @@ input[type=number] {
 
 .money-badge {
   position: absolute;
-  right: 1.2rem;
+  right: 1.375rem;
   top: 50%;
   transform: translateY(-50%);
   color: #8b7a66;
@@ -108,19 +174,31 @@ input[type=number] {
   font-size: 0.95rem;
 }
 
+/* Badge / pill tag */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 /* Smooth */
 * {
   scroll-behavior: smooth;
 }
+
 @media (max-width: 768px) {
   .premium-card {
-    border-radius: 1.4rem;
-    padding: 1.25rem !important;
+    border-radius: 1.25rem;
+    padding: 1.1rem !important;
   }
 
   .input {
-    padding: 0.85rem 1rem;
-    border-radius: 0.9rem;
+    padding: 0.8rem 1.125rem;
     font-size: 14px;
   }
 
@@ -149,33 +227,34 @@ input[type=number] {
 
 .mobile-bottom-nav {
   position: fixed;
-  left: 14px;
-  right: 14px;
-  bottom: 18px;
+  left: 12px;
+  right: 12px;
+  bottom: 14px;
   z-index: 70;
   display: none;
-  border-radius: 1.6rem;
-  background: rgba(23, 20, 17, 0.96);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 20px 60px rgba(0,0,0,.25);
-  padding: .7rem;
+  border-radius: 9999px;
+  background: rgba(20, 17, 14, 0.97);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.30), 0 4px 16px rgba(0,0,0,.2);
+  padding: .5rem .75rem;
 }
 
 @media (max-width: 1024px) {
   .mobile-bottom-nav {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: .4rem;
+    gap: .25rem;
   }
 
   .mobile-bottom-nav a,
   .mobile-bottom-nav button {
     color: white;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-align: center;
-    padding: .65rem .25rem;
-    border-radius: 1rem;
+    padding: .6rem .25rem;
+    border-radius: 9999px;
+    transition: all .18s ease;
   }
 
   .mobile-bottom-nav a:hover,
@@ -184,7 +263,7 @@ input[type=number] {
   }
 
   body {
-    padding-bottom: 90px;
+    padding-bottom: 88px;
   }
 }
 
@@ -227,18 +306,13 @@ input[type=number] {
   animation: maunaLoaderLogo 1.05s cubic-bezier(.2,.9,.2,1) both;
 }
 
-.premium-card {
-  position: relative;
+@keyframes loaderBadgeFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.premium-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(255,255,255,.42), transparent 38%, rgba(182,148,99,.08));
-  opacity: .55;
+.mauna-loader-badge {
+  animation: loaderBadgeFade 0.6s 0.55s ease-out both;
 }
 
 .dashboard-fade-in > * {
@@ -250,3 +324,8 @@ input[type=number] {
 .dashboard-fade-in > *:nth-child(4) { animation-delay: 0.12s; }
 .dashboard-fade-in > *:nth-child(5) { animation-delay: 0.16s; }
 .dashboard-fade-in > *:nth-child(6) { animation-delay: 0.20s; }
+
+@keyframes dashboardFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

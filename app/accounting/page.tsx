@@ -119,7 +119,7 @@ export default function AccountingPage() {
               <h2 className="premium-title text-xl">Tahsilat Listesi</h2>
               <p className="premium-muted text-sm">Kiralama ve satış bazlı ödeme takibi</p>
             </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3 lg:min-w-[340px]">
+            <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-3 lg:min-w-[340px]">
               <Search size={18} className="text-[#b69463]" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Müşteri, ürün veya tarih ara..." className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-[#a79b8d]" />
             </div>

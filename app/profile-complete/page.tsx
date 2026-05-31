@@ -77,7 +77,7 @@ export default function ProfileCompletePage() {
           </div>
         )}
 
-        <button onClick={saveProfile} className="mt-6 w-full rounded-2xl bg-[#b69463] py-4 text-white font-semibold">
+        <button onClick={saveProfile} className="mt-6 w-full rounded-full bg-[#b69463] py-4 text-white font-semibold">
           Profili Tamamla
         </button>
       </div>

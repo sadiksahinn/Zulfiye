@@ -95,7 +95,7 @@ export default function StaffPage() {
         <section className="grid grid-cols-1 gap-5 xl:grid-cols-[.75fr_1.25fr]">
           <div className="premium-card p-5 lg:p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
                 <ShieldCheck size={21} />
               </div>
               <div>
@@ -114,7 +114,7 @@ export default function StaffPage() {
           <div className="premium-card p-5 lg:p-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
                   <Users size={21} />
                 </div>
                 <div>
@@ -141,7 +141,7 @@ export default function StaffPage() {
                   <div key={profile.id} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#211b16] text-white">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#211b16] text-white">
                           <UserRound size={18} />
                         </div>
                         <div>

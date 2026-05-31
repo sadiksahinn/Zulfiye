@@ -54,7 +54,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const inputCls = "w-full rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
+const inputCls = "w-full rounded-full border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]";
 const selectCls = inputCls + " appearance-none";
 
 export default function CustomersPage() {
@@ -250,7 +250,7 @@ export default function CustomersPage() {
 
           <button
             onClick={createCustomer}
-            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]"
+            className="mt-6 w-full rounded-full bg-gradient-to-r from-[#b69463] to-[#d8bd84] py-4 font-black text-white shadow-[0_18px_42px_rgba(182,148,99,.24)]"
           >
             Müşteri Ekle
           </button>
@@ -263,7 +263,7 @@ export default function CustomersPage() {
               <h2 className="text-2xl font-black text-[#1f1b16]">Müşteri Listesi</h2>
               <p className="premium-muted mt-1 text-sm">{customers.length} kayıtlı müşteri</p>
             </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-[#eadfce] bg-white/70 px-4 py-3 lg:min-w-[260px]">
+            <div className="flex items-center gap-3 rounded-full border border-[#eadfce] bg-white/70 px-4 py-3 lg:min-w-[260px]">
               <Search size={18} className="text-[#b69463]" />
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder="Müşteri ara..." className="w-full bg-transparent text-sm font-bold outline-none placeholder:text-[#a79b8d]" />
@@ -280,7 +280,7 @@ export default function CustomersPage() {
                 <div key={c.id} className="rounded-2xl border border-[#eadfce] bg-white/70 p-4 transition hover:bg-white/90">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#b69463]/15 text-[#b69463]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
                         <UserRound size={19} />
                       </div>
                       <div>
@@ -296,7 +296,7 @@ export default function CustomersPage() {
                       </div>
                     </div>
                     <Link href={`/customers/${c.id}`}
-                      className="shrink-0 rounded-2xl bg-[#211b16] px-4 py-2 text-xs font-black text-white">
+                      className="shrink-0 rounded-full bg-[#211b16] px-4 py-2 text-xs font-black text-white">
                       Karta Git
                     </Link>
                   </div>
