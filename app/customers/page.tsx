@@ -19,6 +19,9 @@ type Customer = {
 const EMPTY_FORM = {
   fullName: "", phone: "", instagram: "",
   photoVideo: "",
+  photoVideoDate: "",
+  photoVideoDress: false,
+  photoVideoMakeup: false,
   birthDate: "",
   engagementDate: "", engagementTime: "",
   weddingDate: "",    weddingTime: "",
@@ -148,27 +151,30 @@ export default function CustomersPage() {
     }
     const { data: { user } } = await supabase.auth.getUser();
     const { error } = await supabase.from("customers").insert({
-      full_name:       form.fullName.trim(),
-      phone:           form.phone.trim(),
-      instagram:       form.instagram || null,
-      photo_video:     form.photoVideo || null,
-      birth_date:      form.birthDate || null,
-      engagement_date: form.engagementDate || null,
-      engagement_time: form.engagementTime || null,
-      wedding_date:    form.weddingDate || null,
-      wedding_time:    form.weddingTime || null,
-      waist:           form.waist ? Number(form.waist) : null,
-      hip:             form.hip   ? Number(form.hip)   : null,
-      bust:            form.bust  ? Number(form.bust)  : null,
-      address:         form.address || null,
-      notes:           form.notes || null,
-      fitting_date_1:  form.fittingDate1 || null,
-      fitting_time_1:  form.fittingTime1 || null,
-      fitting_date_2:  form.fittingDate2 || null,
-      fitting_time_2:  form.fittingTime2 || null,
-      fitting_date_3:  form.fittingDate3 || null,
-      fitting_time_3:  form.fittingTime3 || null,
-      created_by:      user?.id,
+      full_name:          form.fullName.trim(),
+      phone:              form.phone.trim(),
+      instagram:          form.instagram || null,
+      photo_video:        form.photoVideo || null,
+      photo_video_date:   form.photoVideo === "var" ? (form.photoVideoDate || null) : null,
+      photo_video_dress:  form.photoVideo === "var" ? form.photoVideoDress : false,
+      photo_video_makeup: form.photoVideo === "var" ? form.photoVideoMakeup : false,
+      birth_date:         form.birthDate || null,
+      engagement_date:    form.engagementDate || null,
+      engagement_time:    form.engagementTime || null,
+      wedding_date:       form.weddingDate || null,
+      wedding_time:       form.weddingTime || null,
+      waist:              form.waist ? Number(form.waist) : null,
+      hip:                form.hip   ? Number(form.hip)   : null,
+      bust:               form.bust  ? Number(form.bust)  : null,
+      address:            form.address || null,
+      notes:              form.notes || null,
+      fitting_date_1:     form.fittingDate1 || null,
+      fitting_time_1:     form.fittingTime1 || null,
+      fitting_date_2:     form.fittingDate2 || null,
+      fitting_time_2:     form.fittingTime2 || null,
+      fitting_date_3:     form.fittingDate3 || null,
+      fitting_time_3:     form.fittingTime3 || null,
+      created_by:         user?.id,
     });
     if (error) { setMessage("Müşteri kaydedilemedi."); return; }
     setMessage("Müşteri başarıyla eklendi.");
@@ -207,11 +213,42 @@ export default function CustomersPage() {
             </Field>
 
             <Field label="Fotoğraf & Video Çekimi">
-              <select className={selectCls} value={form.photoVideo} onChange={(e) => set("photoVideo", e.target.value)}>
-                <option value="">Seçilmedi</option>
-                <option value="nar_film">Nar Film</option>
-                <option value="diger">Diğer</option>
-              </select>
+              <div className="flex gap-2">
+                {["yok", "var"].map((v) => (
+                  <button key={v} type="button" onClick={() => set("photoVideo", v)}
+                    className={`flex-1 rounded-full border py-3 text-sm font-black transition ${
+                      form.photoVideo === v
+                        ? v === "var"
+                          ? "border-[#b69463] bg-[#b69463] text-white"
+                          : "border-[#c4b5a5] bg-[#f5ede2] text-[#6d6256]"
+                        : "border-[#eadfce] text-[#9d8b74] hover:border-[#b69463]"
+                    }`}>
+                    {v === "var" ? "📷 Var" : "Yok"}
+                  </button>
+                ))}
+              </div>
+              {form.photoVideo === "var" && (
+                <div className="mt-3 space-y-3 rounded-2xl border border-[#eadfce] bg-[#faf6f0] p-4">
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-[0.2em] text-[#b69463]">Çekim Tarihi</label>
+                    <DateInput fieldKey="photoVideoDate" form={form} set={set} />
+                  </div>
+                  <div className="flex gap-3">
+                    <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-full border border-[#eadfce] bg-white px-4 py-3">
+                      <input type="checkbox" checked={form.photoVideoDress as boolean}
+                        onChange={(e) => setForm((p) => ({ ...p, photoVideoDress: e.target.checked }))}
+                        className="h-4 w-4 accent-[#b69463]" />
+                      <span className="text-sm font-bold text-[#211b16]">Gelinlik verilecek</span>
+                    </label>
+                    <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-full border border-[#eadfce] bg-white px-4 py-3">
+                      <input type="checkbox" checked={form.photoVideoMakeup as boolean}
+                        onChange={(e) => setForm((p) => ({ ...p, photoVideoMakeup: e.target.checked }))}
+                        className="h-4 w-4 accent-[#b69463]" />
+                      <span className="text-sm font-bold text-[#211b16]">Makyaj yapılacak</span>
+                    </label>
+                  </div>
+                </div>
+              )}
             </Field>
 
             {/* Tarihler */}
