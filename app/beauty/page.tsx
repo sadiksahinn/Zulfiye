@@ -79,6 +79,7 @@ const EMPTY_FORM = {
   event_date_3: "",
   event_time_3: "",
   event_type: "Düğün",
+  is_package: "hayir",
   price: "",
   deposit_amount: "",
   paid_amount: "",
@@ -220,6 +221,7 @@ export default function BeautyPage() {
       event_date_3: a.event_date_3 || "",
       event_time_3: a.event_time_3?.slice(0, 5) || "",
       event_type: a.event_type || "Düğün",
+      is_package: a.is_package || "hayir",
       price: String(a.price || ""),
       deposit_amount: String(a.deposit_amount || ""),
       paid_amount: String(a.paid_amount || ""),
@@ -247,9 +249,10 @@ export default function BeautyPage() {
       event_date_3: form.event_date_3 || null,
       event_time_3: form.event_time_3 || null,
       event_type: form.event_type,
-      price: Number(form.price) || 0,
-      deposit_amount: Number(form.deposit_amount) || 0,
-      paid_amount: Number(form.paid_amount) || 0,
+      is_package: form.is_package === "evet",
+      price: form.is_package === "evet" ? 0 : (Number(form.price) || 0),
+      deposit_amount: form.is_package === "evet" ? 0 : (Number(form.deposit_amount) || 0),
+      paid_amount: form.is_package === "evet" ? 0 : (Number(form.paid_amount) || 0),
       status: form.status,
       notes: form.notes,
       updated_at: new Date().toISOString(),
@@ -377,12 +380,10 @@ export default function BeautyPage() {
         <div className="grid gap-3 lg:grid-cols-2">
           {filtered.map((a) => {
             const remaining = Number(a.remaining_amount || 0);
-            const wp = a.customers?.phone
-              ? whatsappLink(
-                  a.customers.phone,
-                  `Merhaba ${a.customers.full_name}, ${a.appointment_date ? formatDate(a.appointment_date) : ""} tarihli ${a.service_type} rezervasyonunuz hakkında bilgi vermek istedik.`
-                )
-              : "";
+            const wpMsg = a.is_package
+              ? `Merhaba ${a.customers?.full_name}, ${a.appointment_date ? formatDate(a.appointment_date) : ""} tarihli ${a.service_type} randevunuzu hatırlatmak istedik. Zülfiye Canbolat Gelinlik olarak sizi bekliyoruz.`
+              : `Merhaba ${a.customers?.full_name}, ${a.appointment_date ? formatDate(a.appointment_date) : ""} tarihli ${a.service_type} randevunuzu hatırlatmak istedik.${remaining > 0 ? ` Kalan ödemeniz: ${formatMoney(remaining)}.` : ""} Zülfiye Canbolat Gelinlik olarak sizi bekliyoruz.`;
+            const wp = a.customers?.phone ? whatsappLink(a.customers.phone, wpMsg) : "";
             return (
               <div key={a.id}
                 className="relative rounded-[1.75rem] border border-[#eadfce] bg-white/80 p-5 shadow-sm transition hover:shadow-md">
@@ -402,6 +403,9 @@ export default function BeautyPage() {
                       {a.service_type === "Makyaj" && <Sparkles size={13} />}
                       {a.service_type === "Kuaför + Makyaj" && <><Scissors size={13} /><Sparkles size={13} /></>}
                       {a.service_type}
+                      {a.is_package && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-black text-emerald-700">Paket</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-1.5">
@@ -636,7 +640,32 @@ export default function BeautyPage() {
                 </select>
               </div>
 
+              {/* gelinlik paketi */}
+              <div>
+                <Label>Gelinlik Paketi mi?</Label>
+                <div className="flex gap-2">
+                  {[["hayir", "Hayır — Ücretli"], ["evet", "Evet — Paketten Geliyor"]].map(([val, label]) => (
+                    <button key={val} type="button" onClick={() => setF("is_package", val)}
+                      className={`flex-1 rounded-full border py-3 text-sm font-black transition ${
+                        form.is_package === val
+                          ? val === "evet"
+                            ? "border-emerald-500 bg-emerald-500 text-white"
+                            : "border-[#b69463] bg-[#b69463] text-white"
+                          : "border-[#eadfce] text-[#6d6256] hover:border-[#b69463]"
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {form.is_package === "evet" && (
+                  <div className="mt-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
+                    ✓ Paket müşterisi — fiyat bilgisi gönderilmeyecek
+                  </div>
+                )}
+              </div>
+
               {/* price */}
+              {form.is_package !== "evet" && (
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -687,6 +716,7 @@ export default function BeautyPage() {
                   <p className="mt-1 text-[11px] text-[#9d8b74] pl-2">Kapora alındığında otomatik dolar. Ek ödeme gelirse buraya toplam yazın.</p>
                 </div>
               </div>
+              )}
 
               {/* status */}
               <div>
