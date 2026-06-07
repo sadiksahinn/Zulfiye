@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { safeInsert } from "@/lib/offlineQueue";
 import {
   CalendarDays, ChevronRight, Search, Scissors, Sparkles, UserPlus, X, Check,
-  Phone, Trash2, Edit3,
+  Phone, Trash2, Edit3, Bell, MessageSquare,
 } from "lucide-react";
 
 /* ─── helpers ─── */
@@ -285,6 +285,62 @@ export default function BeautyPage() {
     load();
   }
 
+  async function confirmAndNotify(a: any) {
+    if (!confirm(`${a.customers?.full_name} için onay SMS'i ve WhatsApp mesajı gönderilsin mi?`)) return;
+
+    // Onay mesajı oluştur
+    const eventLines = [
+      a.event_date ? `📅 ${a.event_type || "Etkinlik"}: ${formatDate(a.event_date)}${a.event_time ? " • " + a.event_time.slice(0,5) : ""}` : null,
+      a.event_date_2 ? `📅 2. Gün: ${formatDate(a.event_date_2)}${a.event_time_2 ? " • " + a.event_time_2.slice(0,5) : ""}` : null,
+      a.event_date_3 ? `📅 3. Gün: ${formatDate(a.event_date_3)}${a.event_time_3 ? " • " + a.event_time_3.slice(0,5) : ""}` : null,
+    ].filter(Boolean).join("\n");
+
+    const priceInfo = a.is_package
+      ? ""
+      : `\n💰 Toplam: ${formatMoney(a.price)}\n✅ Ödenen: ${formatMoney(a.paid_amount)}${Number(a.remaining_amount) > 0 ? `\n⏳ Kalan: ${formatMoney(a.remaining_amount)}` : ""}`;
+
+    const msg =
+      `Sayın ${a.customers?.full_name}, Zülfiye Canbolat Gelinlik & Güzellik'te rezervasyonunuz onaylanmıştır.\n\n` +
+      `💇 Hizmet: ${a.service_type}\n` +
+      (a.appointment_date ? `🗓 Randevu: ${formatDate(a.appointment_date)}${a.appointment_time ? " • " + a.appointment_time.slice(0,5) : ""}\n` : "") +
+      (eventLines ? eventLines + "\n" : "") +
+      priceInfo +
+      `\n\nBizi tercih ettiğiniz için teşekkür ederiz. 🌸`;
+
+    // SMS gönder
+    let smsOk = false;
+    try {
+      const res = await fetch("/api/sms/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: a.customers?.phone, message: msg }),
+      });
+      const data = await res.json();
+      smsOk = data.success;
+      if (!data.success) console.warn("SMS hatası:", data.error);
+    } catch (e) {
+      console.warn("SMS gönderilemedi:", e);
+    }
+
+    // DB'de onayla
+    await supabase.from("beauty_appointments").update({
+      confirmed_at: new Date().toISOString(),
+      ...(smsOk ? { sms_sent_at: new Date().toISOString() } : {}),
+    }).eq("id", a.id);
+
+    load();
+
+    // WhatsApp aç
+    const wpUrl = whatsappLink(a.customers?.phone, msg);
+    if (wpUrl) window.open(wpUrl, "_blank");
+
+    if (smsOk) {
+      alert("✅ SMS gönderildi ve WhatsApp açıldı!");
+    } else {
+      alert("📱 WhatsApp açıldı. (SMS gönderilemedi — Net GSM ayarlarını kontrol edin)");
+    }
+  }
+
   /* filtered */
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -390,13 +446,19 @@ export default function BeautyPage() {
                 {/* header */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-base font-black text-[#211b16]">
                         {a.customers?.full_name || "—"}
                       </span>
                       <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-black ${STATUS_COLORS[a.status] || ""}`}>
                         {STATUS_LABELS[a.status] || a.status}
                       </span>
+                      {a.confirmed_at ? (
+                        <span className="flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[10px] font-black text-blue-700">
+                          <Check size={9} /> Onaylandı
+                          {a.sms_sent_at && <><MessageSquare size={9} className="ml-0.5" /> SMS</>}
+                        </span>
+                      ) : null}
                     </div>
                     <div className="mt-0.5 flex items-center gap-2 text-xs font-semibold text-[#b69463]">
                       {a.service_type === "Kuaför" && <Scissors size={13} />}
@@ -411,16 +473,19 @@ export default function BeautyPage() {
                   <div className="flex gap-1.5">
                     {wp && (
                       <a href={wp} target="_blank" rel="noreferrer"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition">
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition"
+                        title="WhatsApp">
                         <Phone size={14} />
                       </a>
                     )}
                     <button onClick={() => openEdit(a)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5ede2] text-[#b69463] hover:bg-[#eadfce] transition">
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5ede2] text-[#b69463] hover:bg-[#eadfce] transition"
+                      title="Düzenle">
                       <Edit3 size={14} />
                     </button>
                     <button onClick={() => deleteAppt(a.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 transition">
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 transition"
+                      title="Sil">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -476,9 +541,17 @@ export default function BeautyPage() {
                   <p className="mt-2 text-xs text-[#9d8b74] italic">"{a.notes}"</p>
                 )}
 
+                {/* Onayla & Bildir */}
+                {!a.confirmed_at && a.status === "rezerve" && (
+                  <button onClick={() => confirmAndNotify(a)}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 py-2.5 text-[12px] font-black text-white shadow hover:opacity-90 transition">
+                    <Bell size={14} /> Onayla &amp; Bildir (SMS + WhatsApp)
+                  </button>
+                )}
+
                 {/* quick status */}
                 {a.status === "rezerve" && (
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-2 flex gap-2">
                     <button onClick={() => quickStatus(a.id, "tamamlandi")}
                       className="flex-1 rounded-full bg-emerald-50 py-2 text-[11px] font-black text-emerald-700 hover:bg-emerald-100 transition">
                       ✓ Tamamlandı
