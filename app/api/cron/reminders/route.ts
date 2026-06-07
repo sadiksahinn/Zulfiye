@@ -110,7 +110,47 @@ export async function GET(request: Request) {
     results.push(`Gecikme SMS → ${name}: ${res.success ? "✓" : res.error}`);
   }
 
-  // ─── 6. Prova bildirimi kaydet ───────────────────────────────────────────────
+  // ─── 6. Yarınki kuaför & makyaj randevu hatırlatması ────────────────────────
+  const { data: tomorrowBeauty } = await supabase
+    .from("beauty_appointments")
+    .select("*, customers(full_name, phone)")
+    .eq("appointment_date", tomorrow)
+    .eq("status", "rezerve");
+
+  for (const b of tomorrowBeauty || []) {
+    const name  = b.customers?.full_name || "Müşteri";
+    const phone = b.customers?.phone;
+    if (!phone) continue;
+    const date = new Date(tomorrow + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
+    const time = b.appointment_time?.slice(0, 5);
+    const msg = `Merhaba ${name}, ${date}${time ? " saat " + time + "'de" : ""} ${b.service_type} randevunuz bulunmaktadır. Zülfiye Canbolat Gelinlik & Güzellik sizi bekliyor. 🌸`;
+    const res = await sendSMS(phone, msg);
+    if (res.success) smsSent++;
+    results.push(`Kuaför SMS → ${name}: ${res.success ? "✓" : res.error}`);
+  }
+
+  // ─── 7. Yarınki kuaför etkinlik günü hatırlatması ───────────────────────────
+  const { data: tomorrowBeautyEvent } = await supabase
+    .from("beauty_appointments")
+    .select("*, customers(full_name, phone)")
+    .or(`event_date.eq.${tomorrow},event_date_2.eq.${tomorrow},event_date_3.eq.${tomorrow}`)
+    .eq("status", "rezerve");
+
+  for (const b of tomorrowBeautyEvent || []) {
+    const name  = b.customers?.full_name || "Müşteri";
+    const phone = b.customers?.phone;
+    if (!phone) continue;
+    const date = new Date(tomorrow + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
+    const eventTime = b.event_date === tomorrow ? b.event_time :
+                      b.event_date_2 === tomorrow ? b.event_time_2 : b.event_time_3;
+    const time = eventTime?.slice(0, 5);
+    const msg = `Merhaba ${name}, ${date}${time ? " saat " + time + "'de" : ""} etkinliğiniz için ${b.service_type} hizmetiniz planlanmıştır. Zülfiye Canbolat Gelinlik & Güzellik sizi bekliyor. 🌸`;
+    const res = await sendSMS(phone, msg);
+    if (res.success) smsSent++;
+    results.push(`Etkinlik Kuaför SMS → ${name}: ${res.success ? "✓" : res.error}`);
+  }
+
+  // ─── 9. Prova bildirimi kaydet ───────────────────────────────────────────────
   if (smsSent > 0) {
     await supabase.from("notifications").insert({
       type:    "cron_sms",

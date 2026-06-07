@@ -3,14 +3,15 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, Package, RotateCcw, ShoppingBag, UserRound } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, List, Package, RotateCcw, Scissors, ShoppingBag, Sparkles, UserRound } from "lucide-react";
 
 const EVENT_CFG: Record<string, { label: string; dot: string; bg: string; text: string }> = {
-  delivery: { label: "Teslim",   dot: "bg-blue-500",   bg: "bg-blue-50 border-blue-200",    text: "text-blue-700" },
-  return:   { label: "İade",     dot: "bg-red-500",    bg: "bg-red-50 border-red-200",      text: "text-red-700" },
-  rental:   { label: "Etkinlik", dot: "bg-amber-500",  bg: "bg-amber-50 border-amber-200",  text: "text-amber-700" },
-  fitting:  { label: "Prova",    dot: "bg-purple-500", bg: "bg-purple-50 border-purple-200",text: "text-purple-700" },
-  sale:     { label: "Satış",    dot: "bg-green-500",  bg: "bg-green-50 border-green-200",  text: "text-green-700" },
+  delivery: { label: "Teslim",        dot: "bg-blue-500",   bg: "bg-blue-50 border-blue-200",    text: "text-blue-700" },
+  return:   { label: "İade",          dot: "bg-red-500",    bg: "bg-red-50 border-red-200",      text: "text-red-700" },
+  rental:   { label: "Etkinlik",      dot: "bg-amber-500",  bg: "bg-amber-50 border-amber-200",  text: "text-amber-700" },
+  fitting:  { label: "Prova",         dot: "bg-purple-500", bg: "bg-purple-50 border-purple-200",text: "text-purple-700" },
+  sale:     { label: "Satış",         dot: "bg-green-500",  bg: "bg-green-50 border-green-200",  text: "text-green-700" },
+  beauty:   { label: "Kuaför/Makyaj", dot: "bg-pink-500",   bg: "bg-pink-50 border-pink-200",    text: "text-pink-700" },
 };
 
 const DAYS   = ["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
@@ -29,11 +30,41 @@ export default function CalendarPage() {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   async function load() {
-    const { data } = await supabase
-      .from("calendar_events")
-      .select("*, customers(full_name,phone)")
-      .order("event_date", { ascending: true });
-    setEvents(data || []);
+    const [calRes, beautyRes] = await Promise.all([
+      supabase.from("calendar_events").select("*, customers(full_name,phone)").order("event_date", { ascending: true }),
+      supabase.from("beauty_appointments")
+        .select("id, appointment_date, appointment_time, event_date, event_time, event_date_2, event_time_2, event_date_3, event_time_3, service_type, status, customers(full_name,phone)")
+        .neq("status", "iptal")
+        .order("appointment_date", { ascending: true }),
+    ]);
+
+    // Beauty randevularını takvim formatına çevir
+    const beautyEvents: any[] = [];
+    for (const b of beautyRes.data || []) {
+      // Randevu günü
+      if (b.appointment_date) beautyEvents.push({
+        id: `beauty-appt-${b.id}`, event_date: b.appointment_date, event_time: b.appointment_time,
+        event_type: "beauty", title: `Randevu: ${b.service_type}`, customers: b.customers,
+      });
+      // 1-2-3. etkinlik günleri
+      if (b.event_date) beautyEvents.push({
+        id: `beauty-ev1-${b.id}`, event_date: b.event_date, event_time: b.event_time,
+        event_type: "beauty", title: `${b.service_type} (Etkinlik)`, customers: b.customers,
+      });
+      if (b.event_date_2) beautyEvents.push({
+        id: `beauty-ev2-${b.id}`, event_date: b.event_date_2, event_time: b.event_time_2,
+        event_type: "beauty", title: `${b.service_type} (2. Gün)`, customers: b.customers,
+      });
+      if (b.event_date_3) beautyEvents.push({
+        id: `beauty-ev3-${b.id}`, event_date: b.event_date_3, event_time: b.event_time_3,
+        event_type: "beauty", title: `${b.service_type} (3. Gün)`, customers: b.customers,
+      });
+    }
+
+    const all = [...(calRes.data || []), ...beautyEvents].sort((a, b) =>
+      (a.event_date || "").localeCompare(b.event_date || "")
+    );
+    setEvents(all);
   }
 
   useEffect(() => { load(); }, []);
@@ -240,9 +271,10 @@ export default function CalendarPage() {
                     <div key={event.id} className={`flex flex-col gap-3 rounded-[1.5rem] border p-4 lg:flex-row lg:items-center lg:justify-between ${cfg.bg} ${isPast ? "opacity-60" : ""}`}>
                       <div className="flex gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/60 ${cfg.text}`}>
-                          {event.event_type === "return" ? <RotateCcw size={16}/> :
+                          {event.event_type === "return"  ? <RotateCcw size={16}/> :
                            event.event_type === "fitting" ? <UserRound size={16}/> :
-                           event.event_type === "sale" ? <ShoppingBag size={16}/> : <Package size={16}/>}
+                           event.event_type === "sale"    ? <ShoppingBag size={16}/> :
+                           event.event_type === "beauty"  ? <Scissors size={16}/> : <Package size={16}/>}
                         </div>
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">

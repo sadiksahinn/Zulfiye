@@ -5,7 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertTriangle, Package, RotateCcw, ShoppingBag, TrendingUp, Users, Wallet } from "lucide-react";
+import { AlertTriangle, Package, RotateCcw, Scissors, ShoppingBag, TrendingUp, Users, Wallet } from "lucide-react";
 
 const MONTHS = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
 const COLORS = ["#b69463","#211b16","#d8bd84","#8a7058","#6d5a46","#c4a47a"];
@@ -19,19 +19,22 @@ export default function ReportsPage() {
   const [customers,setCustomers]= useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [beauty,   setBeauty]   = useState<any[]>([]);
   const [filterMonth, setFilterMonth] = useState<string>("all");
 
   async function load() {
-    const [r,s,p,c,f,e] = await Promise.all([
+    const [r,s,p,c,f,e,b] = await Promise.all([
       supabase.from("rentals").select("*, customers(full_name,phone), products(name,category)").order("created_at",{ascending:false}),
       supabase.from("sales").select("*, customers(full_name,phone), products(name,category)").order("created_at",{ascending:false}),
       supabase.from("products").select("*"),
       supabase.from("customers").select("*"),
       supabase.from("fittings").select("*"),
       supabase.from("expenses").select("*").order("expense_date",{ascending:false}),
+      supabase.from("beauty_appointments").select("*, customers(full_name,phone)").order("created_at",{ascending:false}),
     ]);
     setRentals(r.data||[]); setSales(s.data||[]); setProducts(p.data||[]);
     setCustomers(c.data||[]); setFittings(f.data||[]); setExpenses(e.data||[]);
+    setBeauty(b.data||[]);
   }
 
   useEffect(()=>{ load(); },[]);
@@ -48,13 +51,20 @@ export default function ReportsPage() {
     return sales.filter(s => s.created_at?.slice(0,7) === filterMonth);
   },[sales,filterMonth]);
 
+  const filteredBeauty = useMemo(()=>{
+    if(filterMonth==="all") return beauty;
+    return beauty.filter(b => b.created_at?.slice(0,7) === filterMonth);
+  },[beauty,filterMonth]);
+
   const metrics = useMemo(()=>{
     const rentalTotal   = filteredRentals.reduce((s,x)=>s+Number(x.total_amount||0),0);
     const saleTotal     = filteredSales.reduce((s,x)=>s+Number(x.total_amount||0),0);
-    const total         = rentalTotal + saleTotal;
+    const beautyTotal   = filteredBeauty.filter(b=>!b.is_package).reduce((s,x)=>s+Number(x.price||0),0);
+    const total         = rentalTotal + saleTotal + beautyTotal;
     const rentalPaid    = filteredRentals.reduce((s,x)=>s+Number(x.deposit_amount||0),0);
     const salePaid      = filteredSales.reduce((s,x)=>s+Number(x.paid_amount||0),0);
-    const paid          = rentalPaid + salePaid;
+    const beautyPaid    = filteredBeauty.filter(b=>!b.is_package).reduce((s,x)=>s+Number(x.paid_amount||0),0);
+    const paid          = rentalPaid + salePaid + beautyPaid;
     const remaining     = total - paid;
     const expenseTotal  = expenses.filter(e=> filterMonth==="all" || e.expense_date?.slice(0,7)===filterMonth).reduce((s,x)=>s+Number(x.amount||0),0);
     const netProfit     = paid - expenseTotal;
@@ -62,32 +72,38 @@ export default function ReportsPage() {
     const rented        = products.filter(x=>x.status==="kirada"||x.status==="rezerve").length;
     const sold          = products.filter(x=>x.status==="satildi").length;
     const overdue       = rentals.filter(x=>x.return_date < new Date().toISOString().slice(0,10) && !["tamamlandi","iptal"].includes(x.status)).length;
-    return { total, rentalTotal, saleTotal, paid, remaining, expenseTotal, netProfit, stock, rented, sold, overdue };
-  },[filteredRentals,filteredSales,expenses,products,rentals,filterMonth]);
+    const beautyActive  = beauty.filter(x=>x.status==="rezerve").length;
+    return { total, rentalTotal, saleTotal, beautyTotal, paid, remaining, expenseTotal, netProfit, stock, rented, sold, overdue, beautyActive };
+  },[filteredRentals,filteredSales,filteredBeauty,expenses,products,rentals,beauty,filterMonth]);
 
   // Aylık ciro grafiği
   const monthlyData = useMemo(()=>{
-    const map: Record<string, {rental:number;sale:number;expense:number}> = {};
+    const map: Record<string, {rental:number;sale:number;beauty:number;expense:number}> = {};
     rentals.filter(r=>r.created_at?.startsWith(thisYear)).forEach(r=>{
       const m = r.created_at.slice(5,7);
-      if(!map[m]) map[m]={rental:0,sale:0,expense:0};
+      if(!map[m]) map[m]={rental:0,sale:0,beauty:0,expense:0};
       map[m].rental += Number(r.total_amount||0);
     });
     sales.filter(s=>s.created_at?.startsWith(thisYear)).forEach(s=>{
       const m = s.created_at.slice(5,7);
-      if(!map[m]) map[m]={rental:0,sale:0,expense:0};
+      if(!map[m]) map[m]={rental:0,sale:0,beauty:0,expense:0};
       map[m].sale += Number(s.total_amount||0);
+    });
+    beauty.filter(b=>b.created_at?.startsWith(thisYear) && !b.is_package).forEach(b=>{
+      const m = b.created_at.slice(5,7);
+      if(!map[m]) map[m]={rental:0,sale:0,beauty:0,expense:0};
+      map[m].beauty += Number(b.price||0);
     });
     expenses.filter(e=>e.expense_date?.startsWith(thisYear)).forEach(e=>{
       const m = e.expense_date.slice(5,7);
-      if(!map[m]) map[m]={rental:0,sale:0,expense:0};
+      if(!map[m]) map[m]={rental:0,sale:0,beauty:0,expense:0};
       map[m].expense += Number(e.amount||0);
     });
     return Array.from({length:12},(_,i)=>{
       const key = String(i+1).padStart(2,"0");
-      return { month: MONTHS[i], rental: map[key]?.rental||0, sale: map[key]?.sale||0, expense: map[key]?.expense||0 };
+      return { month: MONTHS[i], rental: map[key]?.rental||0, sale: map[key]?.sale||0, beauty: map[key]?.beauty||0, expense: map[key]?.expense||0 };
     });
-  },[rentals,sales,expenses,thisYear]);
+  },[rentals,sales,beauty,expenses,thisYear]);
 
   // Kategori dağılımı
   const categoryData = useMemo(()=>{
@@ -99,7 +115,7 @@ export default function ReportsPage() {
   // Borçlu müşteriler
   const debtors = useMemo(()=>{
     const map: Record<string,{name:string;phone:string;debt:number;id:string}> = {};
-    [...filteredRentals,...filteredSales].forEach(x=>{
+    [...filteredRentals,...filteredSales,...filteredBeauty.filter(b=>!b.is_package)].forEach(x=>{
       const rem = Number(x.remaining_amount||0);
       if(rem<=0) return;
       const cid = x.customer_id;
@@ -107,7 +123,7 @@ export default function ReportsPage() {
       map[cid].debt += rem;
     });
     return Object.values(map).sort((a,b)=>b.debt-a.debt);
-  },[filteredRentals,filteredSales]);
+  },[filteredRentals,filteredSales,filteredBeauty]);
 
   // Ay seçenekleri
   const monthOptions = useMemo(()=>{
@@ -149,14 +165,15 @@ export default function ReportsPage() {
         </div>
 
         {/* Özet kartlar */}
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-7">
           {[
-            { title:"Ürün",    value:products.length, sub:`${metrics.stock} stokta`,  icon:<Package size={18}/>,     danger:false },
-            { title:"Müşteri", value:customers.length,sub:"Kayıtlı",                  icon:<Users size={18}/>,       danger:false },
-            { title:"Kiralama",value:filteredRentals.length,sub:"İşlem",             icon:<TrendingUp size={18}/>,  danger:false },
-            { title:"Satış",   value:filteredSales.length,sub:`${metrics.sold} ürün`, icon:<ShoppingBag size={18}/>, danger:false },
-            { title:"Kirada",  value:metrics.rented,  sub:"Aktif+Rezerve",           icon:<RotateCcw size={18}/>,   danger:false },
-            { title:"Geciken", value:metrics.overdue, sub:"İade bekleniyor",          icon:<AlertTriangle size={18}/>,danger:metrics.overdue>0 },
+            { title:"Ürün",        value:products.length,        sub:`${metrics.stock} stokta`,   icon:<Package size={18}/>,      danger:false },
+            { title:"Müşteri",     value:customers.length,       sub:"Kayıtlı",                   icon:<Users size={18}/>,        danger:false },
+            { title:"Kiralama",    value:filteredRentals.length, sub:"İşlem",                     icon:<TrendingUp size={18}/>,   danger:false },
+            { title:"Satış",       value:filteredSales.length,   sub:`${metrics.sold} ürün`,      icon:<ShoppingBag size={18}/>,  danger:false },
+            { title:"Kuaför/Mkj",  value:metrics.beautyActive,   sub:`${money(metrics.beautyTotal)} ciro`, icon:<Scissors size={18}/>, danger:false },
+            { title:"Kirada",      value:metrics.rented,         sub:"Aktif+Rezerve",             icon:<RotateCcw size={18}/>,    danger:false },
+            { title:"Geciken",     value:metrics.overdue,        sub:"İade bekleniyor",           icon:<AlertTriangle size={18}/>,danger:metrics.overdue>0 },
           ].map(m=>(
             <div key={m.title} className={`premium-card p-4 ${m.danger?"border-red-200":""}`}>
               <div className="flex items-center justify-between">
@@ -182,13 +199,14 @@ export default function ReportsPage() {
               <Tooltip
                 formatter={(v:any) => money(v)}
                 contentStyle={{borderRadius:12,border:"1px solid #eadfce",fontSize:12,fontWeight:700}}/>
-              <Bar dataKey="rental"  fill="#b69463" radius={[4,4,0,0]} name="rental"/>
-              <Bar dataKey="sale"    fill="#211b16" radius={[4,4,0,0]} name="sale"/>
-              <Bar dataKey="expense" fill="#e4c4a0" radius={[4,4,0,0]} name="expense"/>
+              <Bar dataKey="rental"  fill="#b69463" radius={[4,4,0,0]} name="Kiralama"/>
+              <Bar dataKey="sale"    fill="#211b16" radius={[4,4,0,0]} name="Satış"/>
+              <Bar dataKey="beauty"  fill="#ec4899" radius={[4,4,0,0]} name="Kuaför/Mkj"/>
+              <Bar dataKey="expense" fill="#e4c4a0" radius={[4,4,0,0]} name="Gider"/>
             </BarChart>
           </ResponsiveContainer>
-          <div className="mt-3 flex gap-4 justify-center">
-            {[["#b69463","Kiralama"],["#211b16","Satış"],["#e4c4a0","Gider"]].map(([c,l])=>(
+          <div className="mt-3 flex gap-4 justify-center flex-wrap">
+            {[["#b69463","Kiralama"],["#211b16","Satış"],["#ec4899","Kuaför/Mkj"],["#e4c4a0","Gider"]].map(([c,l])=>(
               <div key={l} className="flex items-center gap-1.5 text-xs font-bold text-[#9d8b74]">
                 <div className="h-3 w-3 rounded-full" style={{background:c}}/>
                 {l}
@@ -230,9 +248,10 @@ export default function ReportsPage() {
             <h2 className="mb-4 text-xl font-black text-[#1f1b16]">Finans Özeti</h2>
             <div className="space-y-2">
               {[
-                ["Kiralama Cirosu",  money(metrics.rentalTotal), false],
-                ["Satış Cirosu",     money(metrics.saleTotal),   false],
-                ["Toplam Ciro",      money(metrics.total),       false],
+                ["Kiralama Cirosu",    money(metrics.rentalTotal), false],
+                ["Satış Cirosu",       money(metrics.saleTotal),   false],
+                ["Kuaför/Makyaj Ciro", money(metrics.beautyTotal), false],
+                ["Toplam Ciro",        money(metrics.total),       false],
                 ["Tahsil Edilen",    money(metrics.paid),        false],
                 ["Bekleyen Ödeme",   money(metrics.remaining),   metrics.remaining>0],
                 ["Toplam Gider",     money(metrics.expenseTotal),false],
