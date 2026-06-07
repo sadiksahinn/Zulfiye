@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import {
-  ArrowLeft, CalendarDays, Camera, Edit2, Package,
+  ArrowLeft, CalendarDays, Camera, Edit2, MessageCircle, Package,
   Phone, RotateCcw, Save, Scissors, ShoppingBag, Sparkles, UserRound, Wallet, X,
 } from "lucide-react";
 
@@ -42,24 +42,43 @@ export default function CustomerDetailPage() {
   const [sales,    setSales]    = useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
   const [beauty,   setBeauty]   = useState<any[]>([]);
+  const [notes,    setNotes]    = useState<any[]>([]);
+  const [newNote,  setNewNote]  = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const [editing,  setEditing]  = useState(false);
   const [message,  setMessage]  = useState<{ text: string; ok: boolean } | null>(null);
   const [form, setForm] = useState<any>({});
 
   async function load() {
-    const [cr, rr, sr, fr, br] = await Promise.all([
+    const [cr, rr, sr, fr, br, nr] = await Promise.all([
       supabase.from("customers").select("*").eq("id", id).maybeSingle(),
       supabase.from("rentals").select("*, products(name,category,image_url,barcode)").eq("customer_id", id).order("created_at", { ascending: false }),
       supabase.from("sales").select("*, products(name,category,image_url)").eq("customer_id", id).order("created_at", { ascending: false }),
       supabase.from("fittings").select("*, products(name,category,image_url)").eq("customer_id", id).order("fitting_date", { ascending: false }),
       supabase.from("beauty_appointments").select("*").eq("customer_id", id).order("appointment_date", { ascending: false }),
+      supabase.from("customer_notes").select("*").eq("customer_id", id).order("created_at", { ascending: false }),
     ]);
     setCustomer(cr.data);
     setRentals(rr.data || []);
     setSales(sr.data || []);
     setFittings(fr.data || []);
     setBeauty(br.data || []);
+    setNotes(nr.data || []);
     if (cr.data) setForm(cr.data);
+  }
+
+  async function addNote() {
+    if (!newNote.trim()) return;
+    setSavingNote(true);
+    await supabase.from("customer_notes").insert({ customer_id: id, note: newNote.trim() });
+    setNewNote("");
+    setSavingNote(false);
+    load();
+  }
+
+  async function deleteNote(noteId: string) {
+    await supabase.from("customer_notes").delete().eq("id", noteId);
+    setNotes(prev => prev.filter(n => n.id !== noteId));
   }
 
   useEffect(() => { if (id) load(); }, [id]);
@@ -444,6 +463,61 @@ export default function CustomerDetailPage() {
                   </div>
                 </div>
               ))}
+            </section>
+
+            {/* Müşteri Notları / Timeline */}
+            <section className="premium-card p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <MessageCircle size={18} className="text-[#b69463]" />
+                <h2 className="text-xl font-black text-[#1f1b16]">Notlar & Tarihçe</h2>
+                <span className="ml-auto rounded-full bg-[#f5ede2] px-2.5 py-0.5 text-xs font-black text-[#b69463]">{notes.length}</span>
+              </div>
+
+              {/* Not ekle */}
+              <div className="mb-4 flex gap-2">
+                <textarea
+                  value={newNote}
+                  onChange={e => setNewNote(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); addNote(); }}}
+                  placeholder="Not ekle… (Enter ile kaydet)"
+                  rows={2}
+                  className="flex-1 resize-none rounded-2xl border border-[#eadfce] bg-white/80 px-4 py-3 text-sm font-semibold text-[#211b16] outline-none focus:border-[#b69463]"
+                />
+                <button
+                  onClick={addNote}
+                  disabled={savingNote || !newNote.trim()}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center self-end rounded-full bg-[#b69463] text-white disabled:opacity-40 hover:bg-[#a07d4f] transition">
+                  <Save size={16} />
+                </button>
+              </div>
+
+              {/* Notlar listesi */}
+              {notes.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#d9c9b5] p-5 text-center text-sm text-[#9d8b74]">
+                  Henüz not eklenmedi
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {notes.map(n => (
+                    <div key={n.id} className="group flex gap-3 rounded-2xl border border-[#eadfce] bg-white/70 p-3">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#b69463]/15 text-[#b69463]">
+                        <MessageCircle size={13} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-[#211b16] whitespace-pre-wrap">{n.note}</p>
+                        <p className="mt-1 text-[10px] text-[#9d8b74]">
+                          {new Date(n.created_at).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => deleteNote(n.id)}
+                        className="hidden group-hover:flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-400 hover:bg-red-100 transition">
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
           </div>
         </div>

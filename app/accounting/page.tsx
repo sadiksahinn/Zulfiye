@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CreditCard, Search, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
+import { CreditCard, Scissors, Search, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
 
 type Transaction = {
   id: string;
-  type: "rental" | "sale";
+  type: "rental" | "sale" | "beauty";
   customer_name?: string | null;
   product_name?: string | null;
   total_amount?: number | null;
@@ -18,7 +18,9 @@ type Transaction = {
   delivery_date?: string | null;
   return_date?: string | null;
   sale_date?: string | null;
+  appointment_date?: string | null;
   notes?: string | null;
+  is_package?: boolean | null;
   created_at?: string | null;
 };
 
@@ -27,15 +29,16 @@ export default function AccountingPage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
-  const [tab, setTab] = useState<"all" | "rental" | "sale">("all");
+  const [tab, setTab] = useState<"all" | "rental" | "sale" | "beauty">("all");
 
   async function loadAccounting() {
     setLoading(true);
     setMessage("");
 
-    const [rentalsRes, salesRes] = await Promise.all([
+    const [rentalsRes, salesRes, beautyRes] = await Promise.all([
       supabase.from("rentals").select("*").order("created_at", { ascending: false }),
       supabase.from("sales").select("*").order("created_at", { ascending: false }),
+      supabase.from("beauty_appointments").select("*, customers(full_name)").order("created_at", { ascending: false }),
     ]);
 
     if (rentalsRes.error || salesRes.error) {
@@ -46,8 +49,17 @@ export default function AccountingPage() {
 
     const rentals: Transaction[] = (rentalsRes.data || []).map((r) => ({ ...r, type: "rental" as const }));
     const sales: Transaction[] = (salesRes.data || []).map((s) => ({ ...s, type: "sale" as const, deposit_amount: s.paid_amount }));
+    const beauty: Transaction[] = (beautyRes.data || []).filter(b => !b.is_package).map((b) => ({
+      ...b,
+      type: "beauty" as const,
+      customer_name: b.customers?.full_name,
+      product_name: b.service_type,
+      total_amount: b.price,
+      deposit_amount: b.deposit_amount,
+      paid_amount: b.paid_amount,
+    }));
 
-    const all = [...rentals, ...sales].sort(
+    const all = [...rentals, ...sales, ...beauty].sort(
       (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
     );
 
@@ -63,7 +75,7 @@ export default function AccountingPage() {
     const q = search.trim().toLowerCase();
     if (!q) return list;
     return list.filter((item) =>
-      [item.customer_name, item.product_name, item.status, item.delivery_date, item.return_date, item.sale_date, item.notes]
+      [item.customer_name, item.product_name, item.status, item.delivery_date, item.return_date, item.sale_date, item.appointment_date, item.notes]
         .filter(Boolean).join(" ").toLowerCase().includes(q)
     );
   }, [transactions, search, tab]);
@@ -72,17 +84,17 @@ export default function AccountingPage() {
     return transactions.reduce(
       (acc, item) => {
         const total = Number(item.total_amount || 0);
-        const paid = Number(item.deposit_amount || item.paid_amount || 0);
+        const paid = Number(item.paid_amount || item.deposit_amount || 0);
         const remaining = Number(item.remaining_amount ?? Math.max(total - paid, 0));
-        const isRental = item.type === "rental";
         acc.total += total;
         acc.paid += paid;
         acc.remaining += remaining;
-        if (isRental) acc.rentalTotal += total;
-        else acc.saleTotal += total;
+        if (item.type === "rental") acc.rentalTotal += total;
+        else if (item.type === "sale") acc.saleTotal += total;
+        else acc.beautyTotal += total;
         return acc;
       },
-      { total: 0, paid: 0, remaining: 0, rentalTotal: 0, saleTotal: 0 }
+      { total: 0, paid: 0, remaining: 0, rentalTotal: 0, saleTotal: 0, beautyTotal: 0 }
     );
   }, [transactions]);
 
@@ -97,12 +109,16 @@ export default function AccountingPage() {
           </p>
           <div className="mt-5 grid grid-cols-2 gap-3 lg:max-w-sm">
             <div className="rounded-2xl bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Kiralama Cirosu</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Kiralama</div>
               <div className="mt-1 text-lg font-black">{formatMoney(totals.rentalTotal)}</div>
             </div>
             <div className="rounded-2xl bg-white/10 p-4">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Satış Cirosu</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Satış</div>
               <div className="mt-1 text-lg font-black">{formatMoney(totals.saleTotal)}</div>
+            </div>
+            <div className="rounded-2xl bg-white/10 p-4">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Kuaför/Makyaj</div>
+              <div className="mt-1 text-lg font-black">{formatMoney(totals.beautyTotal)}</div>
             </div>
           </div>
         </div>
@@ -125,10 +141,10 @@ export default function AccountingPage() {
             </div>
           </div>
 
-          <div className="mb-5 flex gap-2">
-            {(["all", "rental", "sale"] as const).map((t) => (
+          <div className="mb-5 flex gap-2 flex-wrap">
+            {(["all", "rental", "sale", "beauty"] as const).map((t) => (
               <button key={t} onClick={() => setTab(t)} className={`rounded-2xl px-4 py-2 text-xs font-black transition ${tab === t ? "bg-[#211b16] text-white" : "border border-[#eadfce] bg-white text-[#6d6256]"}`}>
-                {t === "all" ? "Tümü" : t === "rental" ? "Kiralama" : "Satış"}
+                {t === "all" ? "Tümü" : t === "rental" ? "Kiralama" : t === "sale" ? "Satış" : "Kuaför/Makyaj"}
               </button>
             ))}
           </div>
@@ -146,23 +162,28 @@ export default function AccountingPage() {
                 const paid = Number(item.deposit_amount || item.paid_amount || 0);
                 const remaining = Number(item.remaining_amount ?? Math.max(total - paid, 0));
                 const isSale = item.type === "sale";
+                const isBeauty = item.type === "beauty";
 
                 return (
                   <div key={`${item.type}-${item.id}`} className="rounded-[1.4rem] border border-[#eadfce] bg-white/65 p-4 shadow-sm transition hover:bg-white/85">
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${isSale ? "bg-green-100 text-green-700" : "bg-[#b69463]/15 text-[#b69463]"}`}>
-                          {isSale ? <ShoppingBag size={18} /> : <CreditCard size={18} />}
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                          item.type === "beauty" ? "bg-pink-100 text-pink-600" :
+                          isSale ? "bg-green-100 text-green-700" : "bg-[#b69463]/15 text-[#b69463]"}`}>
+                          {item.type === "beauty" ? <Scissors size={18} /> : isSale ? <ShoppingBag size={18} /> : <CreditCard size={18} />}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h3 className="text-base font-black text-[#211b16]">{item.customer_name || "Müşteri bilgisi yok"}</h3>
-                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${isSale ? "bg-green-100 text-green-700" : "bg-[#b69463]/15 text-[#b69463]"}`}>
-                              {isSale ? "Satış" : "Kiralama"}
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${
+                              item.type === "beauty" ? "bg-pink-100 text-pink-600" :
+                              isSale ? "bg-green-100 text-green-700" : "bg-[#b69463]/15 text-[#b69463]"}`}>
+                              {item.type === "beauty" ? "Kuaför/Mkj" : isSale ? "Satış" : "Kiralama"}
                             </span>
                           </div>
                           <p className="mt-1 text-xs font-bold text-[#8a7f72]">
-                            {[item.product_name, item.sale_date || item.delivery_date, item.return_date].filter(Boolean).join(" • ") || "Detay yok"}
+                            {[item.product_name, item.appointment_date || item.sale_date || item.delivery_date, item.return_date].filter(Boolean).join(" • ") || "Detay yok"}
                           </p>
                         </div>
                       </div>
