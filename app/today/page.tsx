@@ -6,7 +6,7 @@ import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
 import {
   AlertTriangle, CalendarDays, Clock, Package,
-  RotateCcw, Search, ShoppingBag, UserRound,
+  RotateCcw, Scissors, Search, ShoppingBag, Sparkles, UserRound,
 } from "lucide-react";
 
 function formatDate(d: string) {
@@ -26,6 +26,7 @@ export default function TodayPage() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [products,  setProducts]  = useState<any[]>([]);
   const [sales,     setSales]     = useState<any[]>([]);
+  const [beauty,    setBeauty]    = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +34,7 @@ export default function TodayPage() {
 
   async function load() {
     setLoading(true);
-    const [rr, fr, cr, pr, sr] = await Promise.all([
+    const [rr, fr, cr, pr, sr, br] = await Promise.all([
       supabase.from("rentals")
         .select("*, customers(id,full_name,phone), products(id,name,category,image_url)")
         .order("delivery_date", { ascending: true }),
@@ -43,12 +44,16 @@ export default function TodayPage() {
       supabase.from("customers").select("id,full_name,phone,instagram").order("full_name"),
       supabase.from("products").select("id,name,barcode,category,color,size,image_url,status").order("name"),
       supabase.from("sales").select("*, customers(full_name)").order("created_at", { ascending: false }),
+      supabase.from("beauty_appointments")
+        .select("*, customers(id,full_name,phone)")
+        .order("appointment_date", { ascending: true }),
     ]);
     setRentals(rr.data || []);
     setFittings(fr.data || []);
     setCustomers(cr.data || []);
     setProducts(pr.data || []);
     setSales(sr.data || []);
+    setBeauty(br.data || []);
     setLoading(false);
   }
 
@@ -61,14 +66,16 @@ export default function TodayPage() {
     const returns        = rentals.filter(x => x.return_date === today);
     const overdue        = rentals.filter(x => x.return_date < today && !["tamamlandi","iptal"].includes(x.status));
     const unpaid         = rentals.filter(x => Number(x.remaining_amount || 0) > 0);
-    return { fittingsToday, readyFittings, deliveries, returns, overdue, unpaid };
-  }, [rentals, fittings, today]);
+    const beautyToday    = beauty.filter(x => x.appointment_date === today && x.status === "rezerve");
+    return { fittingsToday, readyFittings, deliveries, returns, overdue, unpaid, beautyToday };
+  }, [rentals, fittings, beauty, today]);
 
   const todayFlow = useMemo(() => {
     const items = [
       ...stats.fittingsToday.map(x => ({ ...x, flowType: "Prova",  flowTime: x.fitting_time  || "00:00" })),
       ...stats.deliveries.map(x  => ({ ...x, flowType: "Teslim", flowTime: x.delivery_time || "00:00" })),
       ...stats.returns.map(x     => ({ ...x, flowType: "İade",   flowTime: x.return_time   || "00:00" })),
+      ...stats.beautyToday.map(x => ({ ...x, flowType: x.service_type || "Kuaför & Makyaj", flowTime: x.appointment_time?.slice(0,5) || "00:00" })),
     ];
     return items.sort((a, b) => a.flowTime.localeCompare(b.flowTime));
   }, [stats]);
@@ -114,11 +121,12 @@ export default function TodayPage() {
           <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Personel</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Bugün ne var?</h1>
           <p className="mt-2 text-sm text-white/70">{formatDate(today)} — Tüm operasyonlar tek ekranda</p>
-          <div className="mt-5 grid grid-cols-3 gap-2 lg:grid-cols-6">
+          <div className="mt-5 grid grid-cols-3 gap-2 lg:grid-cols-7">
             {[
               ["Prova", stats.fittingsToday.length, false],
               ["Teslim", stats.deliveries.length, false],
               ["İade", stats.returns.length, false],
+              ["Kuaför/Makyaj", stats.beautyToday.length, false],
               ["Geciken", stats.overdue.length, true],
               ["Hazır", stats.readyFittings.length, false],
               ["Ödeme", stats.unpaid.length, stats.unpaid.length > 0],
@@ -202,6 +210,7 @@ export default function TodayPage() {
               ) : todayFlow.map(item => {
                 const isReturn  = item.flowType === "İade";
                 const isFitting = item.flowType === "Prova";
+                const isBeauty  = ["Kuaför", "Makyaj", "Kuaför + Makyaj"].includes(item.flowType);
                 const customerName = item.customers?.full_name || "—";
                 const phone        = item.customers?.phone || "";
                 const productName  = item.products?.name || "—";
@@ -211,12 +220,18 @@ export default function TodayPage() {
                   ? `Merhaba ${customerName}, Zülfiye Canbolat Gelinlik prova randevunuz bugün saat ${item.fitting_time?.slice(0,5) || ""} olarak planlanmıştır. Sizi bekliyoruz.`
                   : isReturn
                   ? `Merhaba ${customerName}, Zülfiye Canbolat Gelinlik'dan kiraladığınız ${productName} için iade tarihiniz bugündür.`
+                  : isBeauty
+                  ? `Merhaba ${customerName}, Zülfiye Canbolat Gelinlik ${item.flowType} randevunuz bugün saat ${item.flowTime} olarak planlanmıştır. Sizi bekliyoruz.`
                   : `Merhaba ${customerName}, ${productName} tesliminiz bugün planlanmıştır. Zülfiye Canbolat Gelinlik olarak sizi bekliyoruz.`;
 
                 return (
                   <div key={`${item.id}-${item.flowType}`} className="rounded-2xl border border-[#eadfce] bg-white/80 p-4">
                     <div className="flex items-start gap-3">
-                      {productImg
+                      {isBeauty
+                        ? <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-pink-600">
+                            <Scissors size={20} />
+                          </div>
+                        : productImg
                         ? <img src={productImg} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
                         : <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl ${isReturn ? "bg-red-100 text-red-600" : isFitting ? "bg-purple-100 text-purple-600" : "bg-blue-100 text-blue-600"}`}>
                             {isReturn ? <RotateCcw size={20} /> : isFitting ? <UserRound size={20} /> : <Package size={20} />}
@@ -224,13 +239,16 @@ export default function TodayPage() {
                       }
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`rounded-lg px-2 py-0.5 text-[11px] font-black ${isReturn ? "bg-red-100 text-red-700" : isFitting ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                          <span className={`rounded-lg px-2 py-0.5 text-[11px] font-black ${isReturn ? "bg-red-100 text-red-700" : isFitting ? "bg-purple-100 text-purple-700" : isBeauty ? "bg-pink-100 text-pink-700" : "bg-blue-100 text-blue-700"}`}>
                             {item.flowType}
                           </span>
                           <span className="text-xs font-black text-[#9d8b74]">{item.flowTime?.slice(0,5)}</span>
                         </div>
                         <div className="mt-1 font-black text-[#211b16]">{customerName}</div>
-                        <div className="text-xs text-[#9d8b74]">{productName}</div>
+                        {!isBeauty && <div className="text-xs text-[#9d8b74]">{productName}</div>}
+                        {isBeauty && item.event_date && (
+                          <div className="text-xs text-[#9d8b74]">Etkinlik: {formatDate(item.event_date)}</div>
+                        )}
                         <div className="mt-2 flex flex-wrap gap-2">
                           {item.customer_id && (
                             <Link href={`/customers/${item.customer_id}`} className="rounded-full bg-[#211b16] px-3 py-1.5 text-xs font-black text-white">Müşteri</Link>
@@ -243,6 +261,9 @@ export default function TodayPage() {
                           )}
                           {item.flowType === "İade" && (
                             <button onClick={() => completeReturn(item)} className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">İadeyi Al ✓</button>
+                          )}
+                          {isBeauty && (
+                            <Link href="/beauty" className="rounded-full bg-pink-600 px-3 py-1.5 text-xs font-black text-white">Detay</Link>
                           )}
                         </div>
                       </div>
@@ -318,12 +339,13 @@ export default function TodayPage() {
               <h2 className="mb-4 text-xl font-black text-[#1f1b16]">Hızlı İşlemler</h2>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { href: "/rentals",   label: "Kiralama",  icon: <CalendarDays size={18} /> },
-                  { href: "/sales",     label: "Satış",     icon: <ShoppingBag size={18} /> },
-                  { href: "/returns",   label: "İade Al",   icon: <RotateCcw size={18} /> },
-                  { href: "/customers", label: "Müşteri",   icon: <UserRound size={18} /> },
-                  { href: "/fittings",  label: "Prova",     icon: <UserRound size={18} /> },
-                  { href: "/products",  label: "Ürünler",   icon: <Package size={18} /> },
+                  { href: "/rentals",   label: "Kiralama",       icon: <CalendarDays size={18} /> },
+                  { href: "/sales",     label: "Satış",          icon: <ShoppingBag size={18} /> },
+                  { href: "/returns",   label: "İade Al",        icon: <RotateCcw size={18} /> },
+                  { href: "/customers", label: "Müşteri",        icon: <UserRound size={18} /> },
+                  { href: "/fittings",  label: "Prova",          icon: <UserRound size={18} /> },
+                  { href: "/products",  label: "Ürünler",        icon: <Package size={18} /> },
+                  { href: "/beauty",    label: "Kuaför & Makyaj",icon: <Scissors size={18} /> },
                 ].map(item => (
                   <Link key={item.href} href={item.href}
                     className="flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-2xl border border-[#eadfce] bg-white/70 text-center text-xs font-black text-[#211b16] hover:bg-white/90">

@@ -13,6 +13,7 @@ import {
   MessageSquareText,
   Package,
   RotateCcw,
+  Scissors,
   Settings,
   ShoppingBag,
   UserRound,
@@ -39,6 +40,7 @@ export default function AppShell({
     { name: "Müşteriler", href: "/customers", icon: Users },
     { name: "Ürünler", href: "/products", icon: Package },
     { name: "İade / Teslim", href: "/returns", icon: RotateCcw },
+    { name: "Kuaför & Makyaj", href: "/beauty", icon: Scissors },
   ];
 
   const managementMenu = [
