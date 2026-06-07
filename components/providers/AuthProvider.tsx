@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function logout() {
     await supabase.auth.signOut();
     setUser(null); setProfile(null); setRole("staff");
-    router.replace("/");
+    window.location.href = "/";
   }
 
   return (
