@@ -87,12 +87,12 @@ export default function AppShell({
 
           {/* Logo */}
           <div className="mb-6 flex items-center gap-3.5">
-            <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-white p-2 shadow-[0_12px_30px_rgba(0,0,0,.22)]">
-              <img src="/zulfiye-logo.png" alt="ZÜLFİYE CANBOLAT" className="h-full w-full object-contain" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-gradient-to-br from-[#c9a84c] to-[#e2c97e] shadow-[0_12px_30px_rgba(201,168,76,.35)]">
+              <span className="text-xl font-black tracking-widest text-white" style={{ fontFamily: "var(--font-cormorant), serif" }}>ZC</span>
             </div>
             <div>
-              <div className="text-xl font-black tracking-[0.18em]">ZÜLFİYE CANBOLAT</div>
-              <div className="text-[10px] tracking-[0.28em] text-[#c4a96e]">COUTURE</div>
+              <div className="text-xl font-black tracking-[0.12em]">ZÜLFİYE CANBOLAT</div>
+              <div className="text-[10px] tracking-[0.28em] text-[#c9a84c]">GELİNLİK</div>
             </div>
           </div>
 
