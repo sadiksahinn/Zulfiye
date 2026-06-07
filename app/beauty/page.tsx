@@ -605,21 +605,54 @@ export default function BeautyPage() {
               </div>
 
               {/* price */}
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <Label>Toplam Ücret ₺</Label>
-                  <input type="number" value={form.price} onChange={(e) => setF("price", e.target.value)}
-                    placeholder="0" className={inputCls} />
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Toplam Ücret ₺</Label>
+                    <input type="number" value={form.price}
+                      onChange={(e) => {
+                        setF("price", e.target.value);
+                      }}
+                      placeholder="0" className={inputCls} />
+                  </div>
+                  <div>
+                    <Label>Kapora ₺</Label>
+                    <input type="number" value={form.deposit_amount}
+                      onChange={(e) => {
+                        setF("deposit_amount", e.target.value);
+                        // Kapora girilince paid_amount'ı güncelle
+                        setForm((p) => ({ ...p, deposit_amount: e.target.value, paid_amount: e.target.value }));
+                      }}
+                      placeholder="0" className={inputCls} />
+                  </div>
                 </div>
+
+                {/* Canlı özet */}
+                {(Number(form.price) > 0 || Number(form.deposit_amount) > 0) && (
+                  <div className="rounded-2xl bg-[#faf6f0] border border-[#eadfce] p-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-semibold text-[#7d6c58]">Toplam Ücret</span>
+                      <span className="font-black text-[#211b16]">{Number(form.price || 0).toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="font-semibold text-[#7d6c58]">Kapora</span>
+                      <span className="font-black text-emerald-600">− {Number(form.deposit_amount || 0).toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                    <div className="border-t border-[#eadfce] pt-2 flex justify-between">
+                      <span className="font-black text-[#7d6c58]">Kalan Ödeme</span>
+                      <span className={`text-lg font-black ${(Number(form.price || 0) - Number(form.paid_amount || 0)) > 0 ? "text-red-500" : "text-emerald-600"}`}>
+                        {Math.max(0, Number(form.price || 0) - Number(form.paid_amount || 0)).toLocaleString("tr-TR")} ₺
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <div>
-                  <Label>Kapora ₺</Label>
-                  <input type="number" value={form.deposit_amount} onChange={(e) => setF("deposit_amount", e.target.value)}
+                  <Label>Toplam Ödenen ₺ (kapora + sonraki ödemeler)</Label>
+                  <input type="number" value={form.paid_amount}
+                    onChange={(e) => setF("paid_amount", e.target.value)}
                     placeholder="0" className={inputCls} />
-                </div>
-                <div>
-                  <Label>Ödenen ₺</Label>
-                  <input type="number" value={form.paid_amount} onChange={(e) => setF("paid_amount", e.target.value)}
-                    placeholder="0" className={inputCls} />
+                  <p className="mt-1 text-[11px] text-[#9d8b74] pl-2">Kapora alındığında otomatik dolar. Ek ödeme gelirse buraya toplam yazın.</p>
                 </div>
               </div>
 
