@@ -6,12 +6,17 @@ import { supabase } from "@/lib/supabase";
 import { CheckCircle, Copy, MessageSquareText, Send } from "lucide-react";
 
 const templates = [
-  { title: "Prova Hatırlatma", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik prova randevunuz için sizi bekliyoruz. Güzel günler dileriz." },
-  { title: "Teslim Hazır", message: "Merhaba {musteri}, ürününüz teslim için hazırdır. Detaylı bilgi için bizimle iletişime geçebilirsiniz. Zülfiye Canbolat Gelinlik" },
-  { title: "İade Hatırlatma", message: "Merhaba {musteri}, kiraladığınız ürünün iade tarihi yaklaşmıştır. Gecikme yaşanmaması için bilginize sunarız. Zülfiye Canbolat Gelinlik" },
-  { title: "Kalan Ödeme", message: "Merhaba {musteri}, kalan ödemeniz bulunmaktadır. Teslim öncesi ödemenizi tamamlamanızı rica ederiz. Zülfiye Canbolat Gelinlik" },
-  { title: "Randevu Teyit", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik randevunuz başarıyla oluşturulmuştur. Sizi bekliyoruz." },
-  { title: "Teşekkür & Yorum", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Yorumunuz için: g.page/zulfiyecouture" },
+  { category: "Gelinlik", title: "Prova Hatırlatma",       message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik prova randevunuz için sizi bekliyoruz. Güzel günler dileriz." },
+  { category: "Gelinlik", title: "Teslim Hazır",           message: "Merhaba {musteri}, ürününüz teslim için hazırdır. Detaylı bilgi için bizimle iletişime geçebilirsiniz. Zülfiye Canbolat Gelinlik" },
+  { category: "Gelinlik", title: "İade Hatırlatma",        message: "Merhaba {musteri}, kiraladığınız ürünün iade tarihi yaklaşmıştır. Gecikme yaşanmaması için bilginize sunarız. Zülfiye Canbolat Gelinlik" },
+  { category: "Gelinlik", title: "Kalan Ödeme",            message: "Merhaba {musteri}, kalan ödemeniz bulunmaktadır. Teslim öncesi ödemenizi tamamlamanızı rica ederiz. Zülfiye Canbolat Gelinlik" },
+  { category: "Gelinlik", title: "Randevu Teyit",          message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik randevunuz başarıyla oluşturulmuştur. Sizi bekliyoruz." },
+  { category: "Gelinlik", title: "Teşekkür & Yorum",       message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Yorumunuz için: g.page/zulfiyecouture" },
+  { category: "Kuaför",   title: "Kuaför Randevu Teyit",   message: "Merhaba {musteri}, Zülfiye Canbolat Güzellik'te kuaför & makyaj randevunuz onaylanmıştır. Sizi bekliyoruz. 🌸" },
+  { category: "Kuaför",   title: "Kuaför Hatırlatma",      message: "Merhaba {musteri}, yarınki kuaför & makyaj randevunuzu hatırlatmak istedik. Güzel günler dileriz. Zülfiye Canbolat Güzellik 🌸" },
+  { category: "Kuaför",   title: "Etkinlik Günü Hatırlatma", message: "Merhaba {musteri}, bugün etkinliğiniz için kuaför & makyaj hizmetiniz planlanmıştır. Güzel ve mutlu bir gün dileriz! 🌸 Zülfiye Canbolat" },
+  { category: "Kuaför",   title: "Kuaför Kalan Ödeme",     message: "Merhaba {musteri}, kuaför & makyaj hizmetinize ait kalan ödemeniz bulunmaktadır. Bilginize sunarız. Zülfiye Canbolat Güzellik" },
+  { category: "Kuaför",   title: "Kuaför Teşekkür",        message: "Merhaba {musteri}, Zülfiye Canbolat Güzellik'i tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! 🌸" },
 ];
 
 export default function SmsPage() {
@@ -91,12 +96,19 @@ export default function SmsPage() {
                 <p className="premium-muted text-sm">Tek tıkla mesaj seç</p>
               </div>
             </div>
-            <div className="mt-6 grid gap-3">
-              {templates.map((item) => (
-                <button key={item.title} onClick={() => setMessage(item.message)} className={`rounded-2xl border p-4 text-left transition ${message === item.message ? "border-[#b69463] bg-[#b69463]/10" : "border-[#eadfce] bg-white/70"}`}>
-                  <div className="text-sm font-black text-[#211b16]">{item.title}</div>
-                  <div className="mt-1 text-xs font-bold leading-5 text-[#8a7f72] line-clamp-2">{item.message}</div>
-                </button>
+            <div className="mt-6 space-y-4">
+              {["Gelinlik", "Kuaför"].map(cat => (
+                <div key={cat}>
+                  <p className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#b69463]">{cat}</p>
+                  <div className="grid gap-2">
+                    {templates.filter(t => t.category === cat).map((item) => (
+                      <button key={item.title} onClick={() => setMessage(item.message)} className={`rounded-2xl border p-3 text-left transition ${message === item.message ? "border-[#b69463] bg-[#b69463]/10" : "border-[#eadfce] bg-white/70"}`}>
+                        <div className="text-sm font-black text-[#211b16]">{item.title}</div>
+                        <div className="mt-0.5 text-xs font-bold leading-5 text-[#8a7f72] line-clamp-2">{item.message}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

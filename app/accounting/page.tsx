@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
-import { CreditCard, Scissors, Search, ShoppingBag, TrendingUp, Wallet } from "lucide-react";
+import { CreditCard, MinusCircle, Plus, Scissors, Search, ShoppingBag, TrendingUp, Wallet, X } from "lucide-react";
+
+const EXPENSE_CATS = ["Kira", "Elektrik/Su", "Malzeme", "Personel", "Reklam", "Kargo", "Tadilat", "Diğer"];
 
 type Transaction = {
   id: string;
@@ -26,19 +28,24 @@ type Transaction = {
 
 export default function AccountingPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
-  const [tab, setTab] = useState<"all" | "rental" | "sale" | "beauty">("all");
+  const [tab, setTab] = useState<"all" | "rental" | "sale" | "beauty" | "expenses">("all");
+  const [showExpForm, setShowExpForm] = useState(false);
+  const [expForm, setExpForm] = useState({ title: "", amount: "", category: "Kira", expense_date: new Date().toISOString().slice(0,10), note: "" });
+  const [savingExp, setSavingExp] = useState(false);
 
   async function loadAccounting() {
     setLoading(true);
     setMessage("");
 
-    const [rentalsRes, salesRes, beautyRes] = await Promise.all([
+    const [rentalsRes, salesRes, beautyRes, expRes] = await Promise.all([
       supabase.from("rentals").select("*").order("created_at", { ascending: false }),
       supabase.from("sales").select("*").order("created_at", { ascending: false }),
       supabase.from("beauty_appointments").select("*, customers(full_name)").order("created_at", { ascending: false }),
+      supabase.from("expenses").select("*").order("expense_date", { ascending: false }),
     ]);
 
     if (rentalsRes.error || salesRes.error) {
@@ -64,7 +71,24 @@ export default function AccountingPage() {
     );
 
     setTransactions(all);
+    setExpenses(expRes.data || []);
     setLoading(false);
+  }
+
+  async function saveExpense() {
+    if (!expForm.title.trim() || !expForm.amount) return;
+    setSavingExp(true);
+    await supabase.from("expenses").insert({ title: expForm.title.trim(), amount: Number(expForm.amount), category: expForm.category, expense_date: expForm.expense_date, note: expForm.note || null });
+    setSavingExp(false);
+    setExpForm({ title: "", amount: "", category: "Kira", expense_date: new Date().toISOString().slice(0,10), note: "" });
+    setShowExpForm(false);
+    loadAccounting();
+  }
+
+  async function deleteExpense(id: string) {
+    if (!confirm("Gideri silmek istediğinize emin misiniz?")) return;
+    await supabase.from("expenses").delete().eq("id", id);
+    setExpenses(prev => prev.filter(e => e.id !== id));
   }
 
   useEffect(() => { loadAccounting(); }, []);
@@ -98,6 +122,9 @@ export default function AccountingPage() {
     );
   }, [transactions]);
 
+  const expenseTotal = useMemo(() => expenses.reduce((s, e) => s + Number(e.amount || 0), 0), [expenses]);
+  const netProfit = useMemo(() => totals.paid - expenseTotal, [totals.paid, expenseTotal]);
+
   return (
     <AppShell title="Muhasebe">
       <div className="space-y-5 lg:space-y-8">
@@ -123,10 +150,11 @@ export default function AccountingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-6">
-          <StatCard title="Toplam Ciro" value={formatMoney(totals.total)} icon={<TrendingUp size={21} />} />
-          <StatCard title="Tahsilat" value={formatMoney(totals.paid)} icon={<CreditCard size={21} />} />
-          <StatCard title="Bekleyen" value={formatMoney(totals.remaining)} icon={<Wallet size={21} />} dark />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-6">
+          <StatCard title="Toplam Ciro"  value={formatMoney(totals.total)}    icon={<TrendingUp size={21} />} />
+          <StatCard title="Tahsilat"     value={formatMoney(totals.paid)}     icon={<CreditCard size={21} />} />
+          <StatCard title="Toplam Gider" value={formatMoney(expenseTotal)}    icon={<MinusCircle size={21} />} />
+          <StatCard title="Net Kâr"      value={formatMoney(netProfit)}       icon={<Wallet size={21} />} dark />
         </div>
 
         <section className="premium-card p-4 lg:p-7">
@@ -142,16 +170,97 @@ export default function AccountingPage() {
           </div>
 
           <div className="mb-5 flex gap-2 flex-wrap">
-            {(["all", "rental", "sale", "beauty"] as const).map((t) => (
+            {(["all", "rental", "sale", "beauty", "expenses"] as const).map((t) => (
               <button key={t} onClick={() => setTab(t)} className={`rounded-2xl px-4 py-2 text-xs font-black transition ${tab === t ? "bg-[#211b16] text-white" : "border border-[#eadfce] bg-white text-[#6d6256]"}`}>
-                {t === "all" ? "Tümü" : t === "rental" ? "Kiralama" : t === "sale" ? "Satış" : "Kuaför/Makyaj"}
+                {t === "all" ? "Tümü" : t === "rental" ? "Kiralama" : t === "sale" ? "Satış" : t === "beauty" ? "Kuaför/Makyaj" : "💸 Giderler"}
               </button>
             ))}
           </div>
 
           {message ? <div className="rounded-2xl border border-[#eadfce] bg-white/70 p-4 text-sm font-bold text-[#6d6256]">{message}</div> : null}
 
-          <div className="space-y-3">
+          {/* GİDERLER SEKMESİ */}
+          {tab === "expenses" && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-black text-[#9d8b74]">Toplam: <span className="text-[#211b16]">{formatMoney(expenseTotal)}</span></p>
+                <button onClick={() => setShowExpForm(v => !v)}
+                  className="flex items-center gap-2 rounded-full bg-[#b69463] px-4 py-2 text-sm font-black text-white hover:bg-[#a07d4f] transition">
+                  <Plus size={14} /> Gider Ekle
+                </button>
+              </div>
+
+              {showExpForm && (
+                <div className="rounded-2xl border border-[#eadfce] bg-[#faf6f0] p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Açıklama *</label>
+                      <input value={expForm.title} onChange={e => setExpForm(p => ({...p, title: e.target.value}))}
+                        placeholder="Kira, elektrik, malzeme..." className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Tutar (₺) *</label>
+                      <input type="number" value={expForm.amount} onChange={e => setExpForm(p => ({...p, amount: e.target.value}))}
+                        placeholder="0" className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Tarih</label>
+                      <input type="date" value={expForm.expense_date} onChange={e => setExpForm(p => ({...p, expense_date: e.target.value}))}
+                        className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Kategori</label>
+                      <select value={expForm.category} onChange={e => setExpForm(p => ({...p, category: e.target.value}))}
+                        className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]">
+                        {EXPENSE_CATS.map(c => <option key={c}>{c}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Not</label>
+                      <input value={expForm.note} onChange={e => setExpForm(p => ({...p, note: e.target.value}))}
+                        placeholder="Opsiyonel" className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowExpForm(false)} className="flex-1 rounded-full border border-[#eadfce] py-2 text-sm font-black text-[#9d8b74]">Vazgeç</button>
+                    <button onClick={saveExpense} disabled={savingExp || !expForm.title.trim() || !expForm.amount}
+                      className="flex-1 rounded-full bg-[#211b16] py-2 text-sm font-black text-white disabled:opacity-40">
+                      {savingExp ? "Kaydediliyor…" : "Kaydet"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {expenses.length === 0 ? (
+                <EmptyState text="Henüz gider kaydı yok." />
+              ) : (
+                <div className="space-y-2">
+                  {expenses.map(e => (
+                    <div key={e.id} className="flex items-center justify-between rounded-[1.4rem] border border-red-100 bg-red-50/60 px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-500">
+                          <MinusCircle size={15} />
+                        </div>
+                        <div>
+                          <div className="font-black text-[#211b16]">{e.title}</div>
+                          <div className="text-xs text-[#9d8b74]">{e.category} · {e.expense_date} {e.note ? `· ${e.note}` : ""}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-base font-black text-red-600">-{formatMoney(e.amount)}</span>
+                        <button onClick={() => deleteExpense(e.id)}
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-red-100 text-red-400 hover:bg-red-200 transition">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-3" style={{display: tab === "expenses" ? "none" : undefined}}>
             {loading ? (
               <EmptyState text="Muhasebe kayıtları yükleniyor..." />
             ) : filtered.length === 0 ? (

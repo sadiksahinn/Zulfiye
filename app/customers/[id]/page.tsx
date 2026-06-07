@@ -42,21 +42,26 @@ export default function CustomerDetailPage() {
   const [sales,    setSales]    = useState<any[]>([]);
   const [fittings, setFittings] = useState<any[]>([]);
   const [beauty,   setBeauty]   = useState<any[]>([]);
-  const [notes,    setNotes]    = useState<any[]>([]);
-  const [newNote,  setNewNote]  = useState("");
+  const [notes,      setNotes]      = useState<any[]>([]);
+  const [newNote,    setNewNote]    = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const [alterations,    setAlterations]    = useState<any[]>([]);
+  const [showAltForm,    setShowAltForm]    = useState(false);
+  const [altForm,        setAltForm]        = useState({ description: "", tailor: "", due_date: "", notes: "" });
+  const [savingAlt,      setSavingAlt]      = useState(false);
   const [editing,  setEditing]  = useState(false);
   const [message,  setMessage]  = useState<{ text: string; ok: boolean } | null>(null);
   const [form, setForm] = useState<any>({});
 
   async function load() {
-    const [cr, rr, sr, fr, br, nr] = await Promise.all([
+    const [cr, rr, sr, fr, br, nr, ar] = await Promise.all([
       supabase.from("customers").select("*").eq("id", id).maybeSingle(),
       supabase.from("rentals").select("*, products(name,category,image_url,barcode)").eq("customer_id", id).order("created_at", { ascending: false }),
       supabase.from("sales").select("*, products(name,category,image_url)").eq("customer_id", id).order("created_at", { ascending: false }),
       supabase.from("fittings").select("*, products(name,category,image_url)").eq("customer_id", id).order("fitting_date", { ascending: false }),
       supabase.from("beauty_appointments").select("*").eq("customer_id", id).order("appointment_date", { ascending: false }),
       supabase.from("customer_notes").select("*").eq("customer_id", id).order("created_at", { ascending: false }),
+      supabase.from("alterations").select("*").eq("customer_id", id).order("created_at", { ascending: false }),
     ]);
     setCustomer(cr.data);
     setRentals(rr.data || []);
@@ -64,7 +69,24 @@ export default function CustomerDetailPage() {
     setFittings(fr.data || []);
     setBeauty(br.data || []);
     setNotes(nr.data || []);
+    setAlterations(ar.data || []);
     if (cr.data) setForm(cr.data);
+  }
+
+  async function saveAlteration() {
+    if (!altForm.description.trim()) return;
+    setSavingAlt(true);
+    await supabase.from("alterations").insert({ customer_id: id, ...altForm, due_date: altForm.due_date || null });
+    setSavingAlt(false);
+    setAltForm({ description: "", tailor: "", due_date: "", notes: "" });
+    setShowAltForm(false);
+    load();
+  }
+
+  async function toggleAltStatus(altId: string, current: string) {
+    const next = current === "tamamlandi" ? "bekliyor" : "tamamlandi";
+    await supabase.from("alterations").update({ status: next, updated_at: new Date().toISOString() }).eq("id", altId);
+    setAlterations(prev => prev.map(a => a.id === altId ? { ...a, status: next } : a));
   }
 
   async function addNote() {
@@ -102,7 +124,11 @@ export default function CustomerDetailPage() {
       hip:                form.hip   ? Number(form.hip)   : null,
       bust:               form.bust  ? Number(form.bust)  : null,
       address:            form.address || null,
-      notes:              form.notes || null,
+      notes:              form.notes          || null,
+      meas_height:        form.meas_height    ? Number(form.meas_height)    : null,
+      meas_shoulder:      form.meas_shoulder  ? Number(form.meas_shoulder)  : null,
+      meas_arm:           form.meas_arm       ? Number(form.meas_arm)       : null,
+      meas_notes:         form.meas_notes     || null,
       fitting_date_1:     form.fitting_date_1 || null,
       fitting_time_1:     form.fitting_time_1 || null,
       fitting_date_2:     form.fitting_date_2 || null,
@@ -254,13 +280,15 @@ export default function CustomerDetailPage() {
                 </div></div>
 
               <p className="col-span-full text-[10px] font-black uppercase tracking-[0.2em] text-[#b69463]">Ölçüler (cm)</p>
-              {[["waist","Bel",55,120],["hip","Basen",75,145],["bust","Üst",70,130]].map(([k,l,min,max]) => (
+              {[["waist","Bel",55,120],["hip","Basen",75,145],["bust","Üst / Göğüs",70,130],["meas_height","Boy",140,195],["meas_shoulder","Omuz",30,60],["meas_arm","Kol Uzunluğu",45,80]].map(([k,l,min,max]) => (
                 <div key={k as string}><label className="mb-1 block text-xs font-black text-[#6d6256]">{l as string}</label>
                   <select className={inputCls} value={form[k as string] || ""} onChange={e => setForm((p:any) => ({...p, [k as string]: e.target.value}))}>
                     <option value="">Seçin</option>
                     {Array.from({length:(max as number)-(min as number)+1},(_,i)=>(min as number)+i).map(v=><option key={v} value={v}>{v} cm</option>)}
                   </select></div>
               ))}
+              <div className="col-span-full"><label className="mb-1 block text-xs font-black text-[#6d6256]">Ölçü Notları</label>
+                <textarea className={inputCls + " min-h-[60px] resize-none"} value={form.meas_notes || ""} onChange={e => setForm((p:any) => ({...p, meas_notes: e.target.value}))} placeholder="Özel durum, tadilat notu..." /></div>
 
               <p className="col-span-full text-[10px] font-black uppercase tracking-[0.2em] text-[#b69463]">Prova Tarihleri</p>
               {[1,2,3].map(n => (
@@ -318,15 +346,15 @@ export default function CustomerDetailPage() {
               {customer.notes && <InfoRow label="Not" value={customer.notes} />}
             </div>
 
-            {(customer.waist || customer.hip || customer.bust) && (
+            {(customer.waist || customer.hip || customer.bust || customer.meas_height || customer.meas_shoulder || customer.meas_arm) && (
               <>
                 <h3 className="mt-5 mb-3 text-sm font-black uppercase tracking-[0.15em] text-[#b69463]">Ölçüler</h3>
                 <div className="grid grid-cols-3 gap-2">
-                  {[["Bel","waist"],["Basen","hip"],["Üst","bust"]].map(([l,k]) => (
-                    <div key={k} className="rounded-2xl bg-[#f7f0e7] p-3 text-center">
+                  {[["Boy","meas_height"],["Göğüs","bust"],["Bel","waist"],["Basen","hip"],["Omuz","meas_shoulder"],["Kol","meas_arm"]].map(([l,k]) => (
+                    customer[k] ? <div key={k} className="rounded-2xl bg-[#f7f0e7] p-3 text-center">
                       <div className="text-[10px] font-black text-[#9d8b74]">{l}</div>
-                      <div className="mt-1 text-xl font-black text-[#211b16]">{customer[k] ? `${customer[k]} cm` : "—"}</div>
-                    </div>
+                      <div className="mt-1 text-xl font-black text-[#211b16]">{customer[k]} cm</div>
+                    </div> : null
                   ))}
                 </div>
               </>
@@ -463,6 +491,77 @@ export default function CustomerDetailPage() {
                   </div>
                 </div>
               ))}
+            </section>
+
+            {/* Tadilat Takibi */}
+            <section className="premium-card p-5">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="text-lg">✂️</span>
+                <h2 className="text-xl font-black text-[#1f1b16]">Tadilat Takibi</h2>
+                <span className="ml-auto rounded-full bg-[#f5ede2] px-2.5 py-0.5 text-xs font-black text-[#b69463]">{alterations.length}</span>
+                <button onClick={() => setShowAltForm(v => !v)}
+                  className="rounded-full bg-[#b69463] px-3 py-1.5 text-xs font-black text-white hover:bg-[#a07d4f] transition">
+                  + Ekle
+                </button>
+              </div>
+
+              {showAltForm && (
+                <div className="mb-4 space-y-3 rounded-2xl border border-[#eadfce] bg-[#faf6f0] p-4">
+                  <div>
+                    <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Tadilat Açıklaması *</label>
+                    <input value={altForm.description} onChange={e => setAltForm(p => ({...p, description: e.target.value}))}
+                      placeholder="Bel alma, kol kısaltma..." className={inputCls} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Terzi</label>
+                      <input value={altForm.tailor} onChange={e => setAltForm(p => ({...p, tailor: e.target.value}))}
+                        placeholder="Terzi adı" className={inputCls} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Teslim Tarihi</label>
+                      <input type="date" value={altForm.due_date} onChange={e => setAltForm(p => ({...p, due_date: e.target.value}))}
+                        className={inputCls} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[10px] font-black uppercase tracking-[0.15em] text-[#b69463]">Not</label>
+                    <input value={altForm.notes} onChange={e => setAltForm(p => ({...p, notes: e.target.value}))}
+                      placeholder="Ek detay..." className={inputCls} />
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => setShowAltForm(false)}
+                      className="flex-1 rounded-full border border-[#eadfce] py-2 text-sm font-black text-[#9d8b74]">Vazgeç</button>
+                    <button onClick={saveAlteration} disabled={savingAlt || !altForm.description.trim()}
+                      className="flex-1 rounded-full bg-[#211b16] py-2 text-sm font-black text-white disabled:opacity-40">
+                      {savingAlt ? "Kaydediliyor…" : "Kaydet"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {alterations.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#d9c9b5] p-5 text-center text-sm text-[#9d8b74]">Tadilat kaydı yok</div>
+              ) : (
+                <div className="space-y-2">
+                  {alterations.map(a => (
+                    <div key={a.id} className={`flex items-start gap-3 rounded-2xl border p-3 transition ${a.status === "tamamlandi" ? "border-emerald-200 bg-emerald-50" : "border-[#eadfce] bg-white/70"}`}>
+                      <button onClick={() => toggleAltStatus(a.id, a.status)}
+                        className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition ${a.status === "tamamlandi" ? "border-emerald-500 bg-emerald-500 text-white" : "border-[#b69463]"}`}>
+                        {a.status === "tamamlandi" && <span className="text-[10px]">✓</span>}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-black ${a.status === "tamamlandi" ? "text-emerald-700 line-through" : "text-[#211b16]"}`}>{a.description}</p>
+                        <div className="mt-0.5 flex flex-wrap gap-2 text-[10px] text-[#9d8b74]">
+                          {a.tailor && <span>✂️ {a.tailor}</span>}
+                          {a.due_date && <span>📅 {formatDate(a.due_date)}</span>}
+                          {a.notes && <span>· {a.notes}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
 
             {/* Müşteri Notları / Timeline */}
