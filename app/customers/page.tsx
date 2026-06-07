@@ -150,33 +150,39 @@ export default function CustomersPage() {
       return;
     }
     const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("customers").insert({
-      full_name:          form.fullName.trim(),
-      phone:              form.phone.trim(),
-      instagram:          form.instagram || null,
-      photo_video:        form.photoVideo || null,
-      photo_video_date:   form.photoVideo === "var" ? (form.photoVideoDate || null) : null,
-      photo_video_dress:  form.photoVideo === "var" ? form.photoVideoDress : false,
-      photo_video_makeup: form.photoVideo === "var" ? form.photoVideoMakeup : false,
-      birth_date:         form.birthDate || null,
-      engagement_date:    form.engagementDate || null,
-      engagement_time:    form.engagementTime || null,
-      wedding_date:       form.weddingDate || null,
-      wedding_time:       form.weddingTime || null,
-      waist:              form.waist ? Number(form.waist) : null,
-      hip:                form.hip   ? Number(form.hip)   : null,
-      bust:               form.bust  ? Number(form.bust)  : null,
-      address:            form.address || null,
-      notes:              form.notes || null,
-      fitting_date_1:     form.fittingDate1 || null,
-      fitting_time_1:     form.fittingTime1 || null,
-      fitting_date_2:     form.fittingDate2 || null,
-      fitting_time_2:     form.fittingTime2 || null,
-      fitting_date_3:     form.fittingDate3 || null,
-      fitting_time_3:     form.fittingTime3 || null,
-      created_by:         user?.id,
-    });
-    if (error) { setMessage("Müşteri kaydedilemedi."); return; }
+    const { data: inserted, error } = await supabase.from("customers").insert({
+      full_name:       form.fullName.trim(),
+      phone:           form.phone.trim(),
+      instagram:       form.instagram || null,
+      photo_video:     form.photoVideo || null,
+      birth_date:      form.birthDate || null,
+      engagement_date: form.engagementDate || null,
+      engagement_time: form.engagementTime || null,
+      wedding_date:    form.weddingDate || null,
+      wedding_time:    form.weddingTime || null,
+      waist:           form.waist ? Number(form.waist) : null,
+      hip:             form.hip   ? Number(form.hip)   : null,
+      bust:            form.bust  ? Number(form.bust)  : null,
+      address:         form.address || null,
+      notes:           form.notes || null,
+      fitting_date_1:  form.fittingDate1 || null,
+      fitting_time_1:  form.fittingTime1 || null,
+      fitting_date_2:  form.fittingDate2 || null,
+      fitting_time_2:  form.fittingTime2 || null,
+      fitting_date_3:  form.fittingDate3 || null,
+      fitting_time_3:  form.fittingTime3 || null,
+      created_by:      user?.id,
+    }).select("id").single();
+    if (error) { setMessage("Müşteri kaydedilemedi: " + error.message); return; }
+
+    // Yeni kolonlar varsa güncelle (migration çalıştırıldıktan sonra)
+    if (inserted?.id && form.photoVideo === "var") {
+      await supabase.from("customers").update({
+        photo_video_date:   form.photoVideoDate || null,
+        photo_video_dress:  !!form.photoVideoDress,
+        photo_video_makeup: !!form.photoVideoMakeup,
+      }).eq("id", inserted.id);
+    }
     setMessage("Müşteri başarıyla eklendi.");
     setForm(EMPTY_FORM);
     loadCustomers();
