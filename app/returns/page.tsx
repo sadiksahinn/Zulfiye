@@ -115,7 +115,7 @@ export default function ReturnsPage() {
 
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">
-                MAUNA İade Merkezi
+                ZÜLFİYE CANBOLAT İade Merkezi
               </p>
 
               <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] lg:text-5xl">

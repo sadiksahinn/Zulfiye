@@ -65,7 +65,7 @@ export default function ProductsPage() {
     const { data: userData } = await supabase.auth.getUser();
     const catCode = CAT_CODE[form.category] || "GL";
 
-    const { data: barcodeData, error: barcodeError } = await supabase.rpc("generate_mauna_barcode", { p_category_code: catCode });
+    const { data: barcodeData, error: barcodeError } = await supabase.rpc("generate_zulfiye_barcode", { p_category_code: catCode });
     if (barcodeError || !barcodeData) { setMessage({ text: "Barkod oluşturulamadı.", ok: false }); setLoading(false); return; }
 
     const newBarcode = barcodeData as string;
@@ -173,7 +173,7 @@ export default function ProductsPage() {
               <div className="rounded-3xl border border-[#eadfce] bg-white p-6">
                 {preview && <img src={preview} className="mb-5 h-52 w-full rounded-2xl object-cover" />}
                 <div className="text-center">
-                  <p className="text-xs tracking-[0.3em] text-[#b69463]">MAUNA COUTURE</p>
+                  <p className="text-xs tracking-[0.3em] text-[#b69463]">ZÜLFİYE CANBOLAT GELİNLİK</p>
                   <h3 className="mt-2 text-xl font-black text-[#1f1b16]">{form.name}</h3>
                   <p className="mt-1 text-sm text-[#8b8177]">{form.category} · {form.modelName || "-"} · {form.size || "-"} · {form.color || "-"}</p>
                   <div className="mt-5 flex items-center justify-center gap-6">

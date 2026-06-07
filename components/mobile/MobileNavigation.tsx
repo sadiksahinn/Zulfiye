@@ -154,7 +154,7 @@ export default function MobileNavigation() {
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
               <div>
-                <div className="text-xl font-black tracking-[0.22em]">MAUNA</div>
+                <div className="text-xl font-black tracking-[0.22em]">ZÜLFİYE CANBOLAT</div>
                 <div className="text-[10px] tracking-[0.30em] text-[#c4a96e]">COUTURE OPERATION</div>
               </div>
               <button

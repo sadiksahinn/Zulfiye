@@ -10,7 +10,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [firmName, setFirmName] = useState("MAUNA Couture");
+  const [firmName, setFirmName] = useState("Zülfiye Canbolat Gelinlik");
   const [branchName, setBranchName] = useState("Merkez");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -32,7 +32,7 @@ export default function SettingsPage() {
           .maybeSingle();
         if (data?.value) {
           const v = data.value;
-          setFirmName(v.firmName ?? "MAUNA Couture");
+          setFirmName(v.firmName ?? "Zülfiye Canbolat Gelinlik");
           setBranchName(v.branchName ?? "Merkez");
           setPhone(v.phone ?? "");
           setAddress(v.address ?? "");
@@ -94,7 +94,7 @@ export default function SettingsPage() {
           <p className="mt-1 text-sm text-[#8a7f72]">Sistem genelinde gorunen isim ve iletisim bilgileri</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <Field label="Firma Adi">
-              <input className="input" value={firmName} onChange={(e) => setFirmName(e.target.value)} placeholder="MAUNA Couture" />
+              <input className="input" value={firmName} onChange={(e) => setFirmName(e.target.value)} placeholder="Zülfiye Canbolat Gelinlik" />
             </Field>
             <Field label="Sube Adi">
               <input className="input" value={branchName} onChange={(e) => setBranchName(e.target.value)} placeholder="Merkez" />
@@ -119,7 +119,7 @@ export default function SettingsPage() {
               <input className="input" type="password" value={smsPass} onChange={(e) => setSmsPass(e.target.value)} placeholder="••••••••" />
             </Field>
             <Field label="SMS Basligi (Originator)">
-              <input className="input" value={smsHeader} onChange={(e) => setSmsHeader(e.target.value)} placeholder="MAUNACOUTURE" />
+              <input className="input" value={smsHeader} onChange={(e) => setSmsHeader(e.target.value)} placeholder="ZÜLFİYE CANBOLATCOUTURE" />
             </Field>
           </div>
           <div className="mt-6 space-y-3">

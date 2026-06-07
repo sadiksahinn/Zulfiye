@@ -5,7 +5,7 @@ export async function POST(request: Request) {
 
   const usercode = process.env.NETGSM_USERCODE;
   const password = process.env.NETGSM_PASSWORD;
-  const msgheader = process.env.NETGSM_MSGHEADER || "MAUNA";
+  const msgheader = process.env.NETGSM_MSGHEADER || "ZÜLFİYE CANBOLAT";
 
   if (!usercode || !password) {
     return NextResponse.json({ success: false, error: "Netgsm credentials tanımlı değil." });

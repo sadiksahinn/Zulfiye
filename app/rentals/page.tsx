@@ -218,7 +218,7 @@ export default function RentalsPage() {
 
         {/* Header */}
         <div className="rounded-[2rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white lg:p-7">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Kiralama</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Kiralama</p>
           <h2 className="mt-2 text-3xl font-black tracking-[-0.05em]">Yeni Kiralama</h2>
           <p className="mt-1 text-sm text-white/60">Birden fazla ürünü tek siparişte kirala</p>
         </div>

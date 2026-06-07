@@ -76,7 +76,7 @@ export default function StaffPage() {
       <div className="space-y-5 pb-24 lg:space-y-8 lg:pb-0">
         <section className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white">
           <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">
-            MAUNA Yetki Merkezi
+            ZÜLFİYE CANBOLAT Yetki Merkezi
           </p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">
             Personel ve Roller

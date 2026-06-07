@@ -158,7 +158,7 @@ export default function ProductDetailPage() {
         <div className="relative overflow-hidden rounded-[1.8rem] border border-white/70 bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white shadow-[0_24px_70px_rgba(33,27,22,.16)] lg:p-8">
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Ürün Kartı</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Ürün Kartı</p>
               <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] lg:text-5xl">{title}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
                 Ürün bilgileri, barkod/QR, fiyatlar ve durum bilgisi.

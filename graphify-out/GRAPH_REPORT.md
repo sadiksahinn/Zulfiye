@@ -1,0 +1,173 @@
+# Graph Report - mauna-couture  (2026-05-30)
+
+## Corpus Check
+- 84 files · ~39,102 words
+- Verdict: corpus is large enough that graph structure adds value.
+
+## Summary
+- 422 nodes · 446 edges · 61 communities (30 shown, 31 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
+- Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `5a323f99`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
+
+## Community Hubs (Navigation)
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+
+## God Nodes (most connected - your core abstractions)
+1. `compilerOptions` - 16 edges
+2. `compilerOptions` - 16 edges
+3. `scripts` - 5 edges
+4. `FlowCard()` - 5 edges
+5. `scripts` - 5 edges
+6. `FlowCard()` - 5 edges
+7. `ProductDetailPage()` - 4 edges
+8. `ProductDetailPage()` - 4 edges
+9. `formatMoney()` - 3 edges
+10. `formatMoney()` - 3 edges
+
+## Surprising Connections (you probably didn't know these)
+- None detected - all connections are within the same source files.
+
+## Communities (61 total, 31 thin omitted)
+
+### Community 0 - "Community 0"
+Cohesion: 0.06
+Nodes (34): dotenv, dependencies, date-fns, html5-qrcode, lucide-react, next, next-pwa, qrcode.react (+26 more)
+
+### Community 1 - "Community 1"
+Cohesion: 0.08
+Nodes (23): dependencies, date-fns, html5-qrcode, lucide-react, next, next-pwa, qrcode.react, react (+15 more)
+
+### Community 2 - "Community 2"
+Cohesion: 0.11
+Nodes (6): metadata, viewport, roles, AuthContext, AuthContextType, publicRoutes
+
+### Community 3 - "Community 3"
+Cohesion: 0.11
+Nodes (6): metadata, viewport, roles, AuthContext, AuthContextType, publicRoutes
+
+### Community 4 - "Community 4"
+Cohesion: 0.10
+Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
+
+### Community 5 - "Community 5"
+Cohesion: 0.10
+Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
+
+### Community 7 - "Community 7"
+Cohesion: 0.21
+Nodes (5): customerPhone(), FlowCard(), operationMessage(), statusText(), whatsappLink()
+
+### Community 8 - "Community 8"
+Cohesion: 0.21
+Nodes (5): customerPhone(), FlowCard(), operationMessage(), statusText(), whatsappLink()
+
+### Community 10 - "Community 10"
+Cohesion: 0.18
+Nodes (10): background_color, description, display, icons, name, orientation, scope, short_name (+2 more)
+
+### Community 11 - "Community 11"
+Cohesion: 0.18
+Nodes (10): background_color, description, display, icons, name, orientation, scope, short_name (+2 more)
+
+### Community 12 - "Community 12"
+Cohesion: 0.20
+Nodes (10): devDependencies, eslint, eslint-config-next, tailwindcss, tailwindcss-animate, @tailwindcss/postcss, @types/node, @types/react (+2 more)
+
+### Community 13 - "Community 13"
+Cohesion: 0.31
+Nodes (5): formatDate(), formatMoney(), Product, ProductDetailPage(), statusText()
+
+### Community 15 - "Community 15"
+Cohesion: 0.31
+Nodes (5): formatDate(), formatMoney(), Product, ProductDetailPage(), statusText()
+
+### Community 19 - "Community 19"
+Cohesion: 0.38
+Nodes (4): AccountingPage(), formatMoney(), MoneyBox(), Transaction
+
+### Community 21 - "Community 21"
+Cohesion: 0.38
+Nodes (4): AccountingPage(), formatMoney(), MoneyBox(), Transaction
+
+### Community 35 - "Community 35"
+Cohesion: 0.50
+Nodes (3): Deploy on Vercel, Getting Started, Learn More
+
+### Community 36 - "Community 36"
+Cohesion: 0.50
+Nodes (3): Deploy on Vercel, Getting Started, Learn More
+
+## Knowledge Gaps
+- **170 isolated node(s):** `crons`, `config`, `nextConfig`, `name`, `version` (+165 more)
+  These have ≤1 connection - possible missing edges or undocumented components.
+- **31 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+
+## Suggested Questions
+_Questions this graph is uniquely positioned to answer:_
+
+- **What connects `crons`, `config`, `nextConfig` to the rest of the system?**
+  _170 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._
+- **Should `Community 2` be split into smaller, more focused modules?**
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
+- **Should `Community 3` be split into smaller, more focused modules?**
+  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
+- **Should `Community 4` be split into smaller, more focused modules?**
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+- **Should `Community 5` be split into smaller, more focused modules?**
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._

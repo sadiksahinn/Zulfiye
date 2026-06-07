@@ -65,7 +65,7 @@ export default function RegisterPage() {
           </h1>
 
           <p className="mt-3 text-sm font-semibold leading-6 text-[#6d6256]">
-            MAUNA Couture yönetim sistemi için yeni hesap oluşturun.
+            Zülfiye Canbolat Gelinlik yönetim sistemi için yeni hesap oluşturun.
           </p>
 
           <div className="mt-7 grid gap-4">

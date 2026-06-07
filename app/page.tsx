@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [lang, setLang] = useState<"tr" | "en">(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("mauna_lang");
+      const saved = localStorage.getItem("zulfiye_lang");
       if (saved === "en") return "en";
     }
     return "tr";
@@ -24,9 +24,9 @@ export default function LoginPage() {
   const copy = {
     tr: {
       title: "Hoş Geldiniz",
-      subtitle: "MAUNA Couture yönetim sistemine güvenli giriş yapın.",
+      subtitle: "Zülfiye Canbolat Gelinlik yönetim sistemine güvenli giriş yapın.",
       email: "E-posta",
-      emailPlaceholder: "ornek@mauna.com",
+      emailPlaceholder: "ornek@zulfiye.com",
       password: "Şifre",
       login: "Giriş Yap",
       loading: "Giriş yapılıyor...",
@@ -34,13 +34,13 @@ export default function LoginPage() {
       register: "Kayıt Ol",
       error: "Giriş başarısız. E-posta veya şifreyi kontrol edin.",
       secure: "Güvenli Giriş",
-      footer: "MAUNA Couture - Yazılım VALKEA",
+      footer: "Zülfiye Canbolat Gelinlik - Yazılım VALKEA",
     },
     en: {
       title: "Welcome",
-      subtitle: "Sign in securely to the MAUNA Couture management system.",
+      subtitle: "Sign in securely to the Zülfiye Canbolat Gelinlik management system.",
       email: "Email",
-      emailPlaceholder: "example@mauna.com",
+      emailPlaceholder: "example@zulfiye.com",
       password: "Password",
       login: "Sign In",
       loading: "Signing in...",
@@ -48,7 +48,7 @@ export default function LoginPage() {
       register: "Register",
       error: "Login failed. Please check your email or password.",
       secure: "Secure Login",
-      footer: "MAUNA Couture - Software by VALKEA",
+      footer: "Zülfiye Canbolat Gelinlik - Software by VALKEA",
     },
   }[lang];
 
@@ -101,14 +101,14 @@ export default function LoginPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="relative -mt-12 flex h-32 w-32 items-center justify-center rounded-full bg-white shadow-[0_24px_70px_rgba(118,93,60,.18)]">
               <div className="absolute inset-2 rounded-full border border-[#eadfce]" />
-              <Image src="/mauna-logo.png" alt="MAUNA Couture" width={96} height={96} priority className="object-contain" />
+              <Image src="/zulfiye-logo.png" alt="Zülfiye Canbolat Gelinlik" width={96} height={96} priority className="object-contain" />
             </div>
 
             <div className="mt-1 rounded-full border border-[#eadfce] bg-white/75 p-1 shadow-sm backdrop-blur-xl">
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem("mauna_lang", "tr");
+                  localStorage.setItem("zulfiye_lang", "tr");
                   setLang("tr");
                 }}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-black ${lang === "tr" ? "bg-[#b69463] text-white" : "text-[#7d6c58]"}`}
@@ -118,7 +118,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem("mauna_lang", "en");
+                  localStorage.setItem("zulfiye_lang", "en");
                   setLang("en");
                 }}
                 className={`rounded-full px-3 py-1.5 text-[11px] font-black ${lang === "en" ? "bg-[#b69463] text-white" : "text-[#7d6c58]"}`}
@@ -129,7 +129,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-5 text-center">
-            <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#b69463]">MAUNA Couture v1</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.38em] text-[#b69463]">Zülfiye Canbolat Gelinlik v1</p>
             <h1 className="mt-3 text-[2.25rem] font-black leading-none tracking-[-0.055em] text-[#211b16]">{copy.title}</h1>
             <p className="mx-auto mt-3 max-w-[265px] text-[14px] leading-6 text-[#7d6c58]">{copy.subtitle}</p>
           </div>
@@ -175,7 +175,7 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-5 flex items-center justify-between text-xs font-semibold text-[#8a7f72]">
-            <span>MAUNA Couture v1</span>
+            <span>Zülfiye Canbolat Gelinlik v1</span>
             <span>{copy.secure}</span>
           </div>
         </div>

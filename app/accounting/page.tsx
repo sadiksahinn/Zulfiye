@@ -90,7 +90,7 @@ export default function AccountingPage() {
     <AppShell title="Muhasebe">
       <div className="space-y-5 lg:space-y-8">
         <div className="overflow-hidden rounded-[1.6rem] border border-white/70 bg-gradient-to-br from-[#211b16] via-[#2b231c] to-[#b69463] p-5 text-white shadow-[0_18px_55px_rgba(33,27,22,.16)] lg:rounded-[2rem] lg:p-7">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Muhasebe</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Muhasebe</p>
           <h2 className="mt-3 text-2xl font-black tracking-[-0.05em] lg:text-4xl">Ödeme ve tahsilat merkezi</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
             Kiralama ve satış gelirleri, tahsilatlar ve kalan bakiyeler.

@@ -52,7 +52,7 @@ export default function ProfileCompletePage() {
     <main className="min-h-screen bg-[#f5efe7] flex items-center justify-center p-6">
       <div className="w-full max-w-xl rounded-[2rem] bg-white p-10 shadow-xl border border-[#eadfce]">
         <p className="uppercase tracking-[0.3em] text-[#b69463] text-sm">
-          MAUNA Couture ERP
+          Zülfiye Canbolat Gelinlik ERP
         </p>
 
         <h1 className="mt-4 text-4xl font-semibold text-[#1f1b16]">

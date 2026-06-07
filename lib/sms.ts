@@ -2,12 +2,12 @@
 // .env.local dosyasına ekle:
 // NETGSM_USERCODE=kullanici_kodunuz
 // NETGSM_PASSWORD=sifreniz
-// NETGSM_MSGHEADER=MAUNA (İYS'de kayıtlı başlık)
+// NETGSM_MSGHEADER=ZÜLFİYE CANBOLAT (İYS'de kayıtlı başlık)
 
 export async function sendSMS(phone: string, message: string): Promise<{ success: boolean; error?: string }> {
   const usercode = process.env.NETGSM_USERCODE;
   const password = process.env.NETGSM_PASSWORD;
-  const msgheader = process.env.NETGSM_MSGHEADER || "MAUNA";
+  const msgheader = process.env.NETGSM_MSGHEADER || "ZÜLFİYE CANBOLAT";
 
   if (!usercode || !password) {
     console.warn("Netgsm credentials eksik, SMS gönderilemedi.");
@@ -61,17 +61,17 @@ export async function sendSMS(phone: string, message: string): Promise<{ success
 // Hazır mesaj şablonları
 export const smsTemplates = {
   provaHatirlatma: (name: string, date: string, time?: string) =>
-    `Merhaba ${name}, MAUNA Couture prova randevunuz ${date}${time ? ` saat ${time}` : ""} olarak planlanmıştır. Sizi bekliyoruz.`,
+    `Merhaba ${name}, Zülfiye Canbolat Gelinlik prova randevunuz ${date}${time ? ` saat ${time}` : ""} olarak planlanmıştır. Sizi bekliyoruz.`,
 
   teslimHazir: (name: string, productName?: string) =>
-    `Merhaba ${name}, ${productName || "ürününüz"} teslim için hazırdır. Detay için bizi arayabilirsiniz. MAUNA Couture`,
+    `Merhaba ${name}, ${productName || "ürününüz"} teslim için hazırdır. Detay için bizi arayabilirsiniz. Zülfiye Canbolat Gelinlik`,
 
   iadeHatirlatma: (name: string, productName?: string) =>
-    `Merhaba ${name}, MAUNA Couture'dan kiraladığınız ${productName || "ürün"} için iade tarihiniz bugündür. Bilginize sunarız.`,
+    `Merhaba ${name}, Zülfiye Canbolat Gelinlik'dan kiraladığınız ${productName || "ürün"} için iade tarihiniz bugündür. Bilginize sunarız.`,
 
   kalanOdeme: (name: string, amount: number) =>
-    `Merhaba ${name}, MAUNA Couture işleminiz için ${amount.toLocaleString("tr-TR")} TL kalan ödemeniz bulunmaktadır. Bilginize sunarız.`,
+    `Merhaba ${name}, Zülfiye Canbolat Gelinlik işleminiz için ${amount.toLocaleString("tr-TR")} TL kalan ödemeniz bulunmaktadır. Bilginize sunarız.`,
 
   tesekkur: (name: string) =>
-    `Merhaba ${name}, MAUNA Couture'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Google yorumunuz için: g.page/maunacouture`,
+    `Merhaba ${name}, Zülfiye Canbolat Gelinlik'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Google yorumunuz için: g.page/zulfiyecouture`,
 };

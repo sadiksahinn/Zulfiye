@@ -111,7 +111,7 @@ export default function TodayPage() {
 
         {/* Header */}
         <section className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white">
-          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">MAUNA Personel</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Personel</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Bugün ne var?</h1>
           <p className="mt-2 text-sm text-white/70">{formatDate(today)} — Tüm operasyonlar tek ekranda</p>
           <div className="mt-5 grid grid-cols-3 gap-2 lg:grid-cols-6">
@@ -208,10 +208,10 @@ export default function TodayPage() {
                 const productImg   = item.products?.image_url;
 
                 const waMsg = isFitting
-                  ? `Merhaba ${customerName}, MAUNA Couture prova randevunuz bugün saat ${item.fitting_time?.slice(0,5) || ""} olarak planlanmıştır. Sizi bekliyoruz.`
+                  ? `Merhaba ${customerName}, Zülfiye Canbolat Gelinlik prova randevunuz bugün saat ${item.fitting_time?.slice(0,5) || ""} olarak planlanmıştır. Sizi bekliyoruz.`
                   : isReturn
-                  ? `Merhaba ${customerName}, MAUNA Couture'dan kiraladığınız ${productName} için iade tarihiniz bugündür.`
-                  : `Merhaba ${customerName}, ${productName} tesliminiz bugün planlanmıştır. MAUNA Couture olarak sizi bekliyoruz.`;
+                  ? `Merhaba ${customerName}, Zülfiye Canbolat Gelinlik'dan kiraladığınız ${productName} için iade tarihiniz bugündür.`
+                  : `Merhaba ${customerName}, ${productName} tesliminiz bugün planlanmıştır. Zülfiye Canbolat Gelinlik olarak sizi bekliyoruz.`;
 
                 return (
                   <div key={`${item.id}-${item.flowType}`} className="rounded-2xl border border-[#eadfce] bg-white/80 p-4">
@@ -280,7 +280,7 @@ export default function TodayPage() {
                         <div className="text-xs text-red-600">{item.products?.name} · İade: {formatDate(item.return_date)}</div>
                       </div>
                       {item.customers?.phone && (
-                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers.full_name}, MAUNA Couture kiraladığınız ${item.products?.name || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`)}
+                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers.full_name}, Zülfiye Canbolat Gelinlik kiraladığınız ${item.products?.name || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`)}
                           target="_blank" className="shrink-0 rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                       )}
                     </div>
@@ -304,7 +304,7 @@ export default function TodayPage() {
                         <div className="text-xs text-orange-600">{Number(item.remaining_amount).toLocaleString("tr-TR")} ₺</div>
                       </div>
                       {item.customers?.phone && (
-                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers?.full_name}, MAUNA Couture işleminiz için kalan ödemeniz ${Number(item.remaining_amount).toLocaleString("tr-TR")} ₺'dir.`)}
+                        <a href={whatsappLink(item.customers.phone, `Merhaba ${item.customers?.full_name}, Zülfiye Canbolat Gelinlik işleminiz için kalan ödemeniz ${Number(item.remaining_amount).toLocaleString("tr-TR")} ₺'dir.`)}
                           target="_blank" className="shrink-0 rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                       )}
                     </div>

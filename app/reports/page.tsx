@@ -122,7 +122,7 @@ export default function ReportsPage() {
 
         {/* Header */}
         <div className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white lg:p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Raporlama</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Raporlama</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em] lg:text-5xl">İşletme Özeti</h1>
           <div className="mt-5 grid grid-cols-2 gap-3 lg:max-w-lg">
             {[["Toplam Ciro",money(metrics.total)],["Tahsil Edilen",money(metrics.paid)],["Bekleyen",money(metrics.remaining)],["Net Kâr",money(metrics.netProfit)]].map(([l,v])=>(
@@ -262,7 +262,7 @@ export default function ReportsPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-base font-black text-red-600">{money(d.debt)}</span>
                     {d.phone && (
-                      <a href={`https://wa.me/${d.phone.replace(/\D/g,"").replace(/^0/,"90")}?text=${encodeURIComponent(`Merhaba ${d.name}, MAUNA Couture işleminiz için kalan ödemeniz ${money(d.debt)}'dir.`)}`}
+                      <a href={`https://wa.me/${d.phone.replace(/\D/g,"").replace(/^0/,"90")}?text=${encodeURIComponent(`Merhaba ${d.name}, Zülfiye Canbolat Gelinlik işleminiz için kalan ödemeniz ${money(d.debt)}'dir.`)}`}
                         target="_blank"
                         className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-black text-white">WA</a>
                     )}

@@ -70,7 +70,7 @@ export default function AppShell({
       <main className="flex min-h-screen items-center justify-center bg-[#f7f0e7] text-[#211b16]">
         <div className="rounded-[2rem] border border-[#eadfce] bg-white/80 p-10 text-center shadow-2xl backdrop-blur-xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-[#171411] px-4 py-1.5 text-xs font-black uppercase tracking-[0.22em] text-[#d8be8d]">
-            MAUNA
+            ZÜLFİYE CANBOLAT
           </div>
           <div className="mt-4 text-2xl font-black tracking-tight">Yetki kontrol ediliyor…</div>
         </div>
@@ -88,10 +88,10 @@ export default function AppShell({
           {/* Logo */}
           <div className="mb-6 flex items-center gap-3.5">
             <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-white p-2 shadow-[0_12px_30px_rgba(0,0,0,.22)]">
-              <img src="/mauna-logo.png" alt="MAUNA" className="h-full w-full object-contain" />
+              <img src="/zulfiye-logo.png" alt="ZÜLFİYE CANBOLAT" className="h-full w-full object-contain" />
             </div>
             <div>
-              <div className="text-xl font-black tracking-[0.18em]">MAUNA</div>
+              <div className="text-xl font-black tracking-[0.18em]">ZÜLFİYE CANBOLAT</div>
               <div className="text-[10px] tracking-[0.28em] text-[#c4a96e]">COUTURE</div>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function AppShell({
         <section className="min-w-0 flex-1 rounded-none border border-[#ede4d8]/60 bg-white/65 shadow-xl shadow-amber-900/5 backdrop-blur-2xl lg:rounded-[2rem]">
           <header className="px-5 pb-5 pt-8 lg:px-8 lg:pt-8">
             <div className="inline-flex items-center rounded-full bg-[#171411] px-3.5 py-1 text-[9px] font-black uppercase tracking-[0.28em] text-[#c4a96e]">
-              MAUNA COUTURE
+              ZÜLFİYE CANBOLAT GELİNLİK
             </div>
             <h1 className="mt-3 text-[28px] font-black tracking-[-0.045em] text-[#211b16] lg:text-5xl">
               {title}

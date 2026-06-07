@@ -91,7 +91,7 @@ export default function CalendarPage() {
 
         {/* Header */}
         <div className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white lg:p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Takvim</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Takvim</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Operasyon Takvimi</h1>
           <div className="mt-5 grid grid-cols-3 gap-3 lg:max-w-lg">
             {[["Bugün", todayCount], ["Yaklaşan", upcomingCount], ["İade", returnCount]].map(([l, v]) => (

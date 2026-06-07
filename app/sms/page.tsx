@@ -6,12 +6,12 @@ import { supabase } from "@/lib/supabase";
 import { CheckCircle, Copy, MessageSquareText, Send } from "lucide-react";
 
 const templates = [
-  { title: "Prova Hatırlatma", message: "Merhaba {musteri}, MAUNA Couture prova randevunuz için sizi bekliyoruz. Güzel günler dileriz." },
-  { title: "Teslim Hazır", message: "Merhaba {musteri}, ürününüz teslim için hazırdır. Detaylı bilgi için bizimle iletişime geçebilirsiniz. MAUNA Couture" },
-  { title: "İade Hatırlatma", message: "Merhaba {musteri}, kiraladığınız ürünün iade tarihi yaklaşmıştır. Gecikme yaşanmaması için bilginize sunarız. MAUNA Couture" },
-  { title: "Kalan Ödeme", message: "Merhaba {musteri}, kalan ödemeniz bulunmaktadır. Teslim öncesi ödemenizi tamamlamanızı rica ederiz. MAUNA Couture" },
-  { title: "Randevu Teyit", message: "Merhaba {musteri}, MAUNA Couture randevunuz başarıyla oluşturulmuştur. Sizi bekliyoruz." },
-  { title: "Teşekkür & Yorum", message: "Merhaba {musteri}, MAUNA Couture'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Yorumunuz için: g.page/maunacouture" },
+  { title: "Prova Hatırlatma", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik prova randevunuz için sizi bekliyoruz. Güzel günler dileriz." },
+  { title: "Teslim Hazır", message: "Merhaba {musteri}, ürününüz teslim için hazırdır. Detaylı bilgi için bizimle iletişime geçebilirsiniz. Zülfiye Canbolat Gelinlik" },
+  { title: "İade Hatırlatma", message: "Merhaba {musteri}, kiraladığınız ürünün iade tarihi yaklaşmıştır. Gecikme yaşanmaması için bilginize sunarız. Zülfiye Canbolat Gelinlik" },
+  { title: "Kalan Ödeme", message: "Merhaba {musteri}, kalan ödemeniz bulunmaktadır. Teslim öncesi ödemenizi tamamlamanızı rica ederiz. Zülfiye Canbolat Gelinlik" },
+  { title: "Randevu Teyit", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik randevunuz başarıyla oluşturulmuştur. Sizi bekliyoruz." },
+  { title: "Teşekkür & Yorum", message: "Merhaba {musteri}, Zülfiye Canbolat Gelinlik'u tercih ettiğiniz için teşekkür ederiz. Güzel günler dileriz! Yorumunuz için: g.page/zulfiyecouture" },
 ];
 
 export default function SmsPage() {
@@ -75,7 +75,7 @@ export default function SmsPage() {
     <AppShell title="SMS / WhatsApp">
       <div className="space-y-5 pb-24 lg:pb-0">
         <div className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white">
-          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">MAUNA Mesaj Merkezi</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.36em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Mesaj Merkezi</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">SMS / WhatsApp</h1>
           <p className="mt-2 text-sm text-white/70">Hazır şablonlarla müşteri mesajlarını hızlıca oluşturun ve gönderin.</p>
         </div>

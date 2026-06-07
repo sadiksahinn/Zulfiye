@@ -70,7 +70,7 @@ export async function GET(request: Request) {
     const product = r.products?.name;
     if (!phone) continue;
     const date = new Date(tomorrow + "T00:00:00").toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
-    const msg = `Merhaba ${name}, ${product || "ürününüz"} teslimatı ${date} tarihinde planlanmıştır. MAUNA Couture sizi bekliyoruz.`;
+    const msg = `Merhaba ${name}, ${product || "ürününüz"} teslimatı ${date} tarihinde planlanmıştır. Zülfiye Canbolat Gelinlik sizi bekliyoruz.`;
     const res = await sendSMS(phone, msg);
     if (res.success) smsSent++;
     results.push(`Teslim SMS → ${name}: ${res.success ? "✓" : res.error}`);
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
     const phone = r.customers?.phone;
     const product = r.products?.name;
     if (!phone) continue;
-    const msg = `Merhaba ${name}, MAUNA Couture'dan kiraladığınız ${product || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`;
+    const msg = `Merhaba ${name}, Zülfiye Canbolat Gelinlik'dan kiraladığınız ${product || "ürün"} için iade tarihiniz geçmiştir. Lütfen en kısa sürede iade yapınız.`;
     const res = await sendSMS(phone, msg);
     if (res.success) smsSent++;
     results.push(`Gecikme SMS → ${name}: ${res.success ? "✓" : res.error}`);

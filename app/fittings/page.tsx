@@ -174,7 +174,7 @@ export default function FittingsPage() {
 
         {/* Header */}
         <div className="rounded-[1.8rem] bg-gradient-to-r from-[#211b16] via-[#2b231c] to-[#b69463] p-6 text-white lg:p-8">
-          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">MAUNA Prova Takibi</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.34em] text-[#d8bd84]">ZÜLFİYE CANBOLAT Prova Takibi</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-0.06em]">Prova Merkezi</h1>
           <p className="mt-2 max-w-2xl text-sm text-white/70">Prova randevularını oluşturun ve takip edin.</p>
         </div>

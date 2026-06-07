@@ -10,12 +10,12 @@ const cormorant = Cormorant_Garamond({
 });
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import MobileNavigation from "@/components/mobile/MobileNavigation";
-import MaunaLoader from "@/components/MaunaLoader";
+import ZulfiyeLoader from "@/components/ZulfiyeLoader";
 import ResetPWA from "@/components/system/ResetPWA";
 
 export const metadata: Metadata = {
-  title: "MAUNA Couture ERP",
-  description: "Luxury couture management system",
+  title: "Zülfiye Canbolat Gelinlik",
+  description: "Gelinlik yönetim sistemi",
 };
 
 export const viewport: Viewport = {
@@ -35,7 +35,7 @@ export default function RootLayout({
       <body className={cormorant.variable}>
         <ResetPWA />
         <AuthProvider>
-            <MaunaLoader />
+            <ZulfiyeLoader />
           {children}
           <MobileNavigation />
         </AuthProvider>

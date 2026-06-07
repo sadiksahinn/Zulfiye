@@ -58,11 +58,11 @@ export default function ConfirmPage() {
         <div className="w-full max-w-md rounded-[2rem] border border-[#eadfce] bg-white/85 p-10 text-center shadow-[0_40px_110px_rgba(118,93,60,.18)] backdrop-blur-2xl">
 
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_18px_45px_rgba(118,93,60,.15)]">
-            <Image src="/mauna-logo.png" alt="MAUNA" width={56} height={56} className="object-contain" />
+            <Image src="/zulfiye-logo.png" alt="ZÜLFİYE CANBOLAT" width={56} height={56} className="object-contain" />
           </div>
 
           <p className="text-[10px] font-black uppercase tracking-[0.38em] text-[#b69463]">
-            MAUNA Couture
+            Zülfiye Canbolat Gelinlik
           </p>
 
           {status === "loading" && (
@@ -88,7 +88,7 @@ export default function ConfirmPage() {
                 Hesabınız Doğrulandı
               </h1>
               <p className="mt-3 text-sm leading-6 text-[#7d6c58]">
-                Hoş geldiniz! MAUNA Couture sistemine başarıyla kaydoldunuz.
+                Hoş geldiniz! Zülfiye Canbolat Gelinlik sistemine başarıyla kaydoldunuz.
               </p>
               <div className="mt-8 flex flex-col items-center gap-3">
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#b69463]/10 text-xl font-black text-[#b69463]">
