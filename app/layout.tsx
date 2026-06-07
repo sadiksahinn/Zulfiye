@@ -12,6 +12,7 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 import MobileNavigation from "@/components/mobile/MobileNavigation";
 import ZulfiyeLoader from "@/components/ZulfiyeLoader";
 import ResetPWA from "@/components/system/ResetPWA";
+import OfflineBanner from "@/components/OfflineBanner";
 
 export const metadata: Metadata = {
   title: "Zülfiye Canbolat Gelinlik",
@@ -35,9 +36,10 @@ export default function RootLayout({
       <body className={cormorant.variable}>
         <ResetPWA />
         <AuthProvider>
-            <ZulfiyeLoader />
+          <ZulfiyeLoader />
           {children}
           <MobileNavigation />
+          <OfflineBanner />
         </AuthProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
+import { safeInsert } from "@/lib/offlineQueue";
 import { CalendarDays, Search, UserRound, X } from "lucide-react";
 
 type Customer = {
@@ -150,7 +151,7 @@ export default function CustomersPage() {
       return;
     }
     const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("customers").insert({
+    const { ok, offline } = await safeInsert("customers", {
       full_name:       form.fullName.trim(),
       phone:           form.phone.trim(),
       instagram:       form.instagram || null,
@@ -172,11 +173,11 @@ export default function CustomersPage() {
       fitting_date_3:  form.fittingDate3 || null,
       fitting_time_3:  form.fittingTime3 || null,
       created_by:      user?.id,
-    });
-    if (error) { setMessage("Müşteri kaydedilemedi: " + error.message); return; }
-    setMessage("Müşteri başarıyla eklendi.");
+    }, `Müşteri: ${form.fullName.trim()}`);
+    if (!ok) { setMessage("Müşteri kaydedilemedi."); return; }
+    setMessage(offline ? "📶 İnternet yok — müşteri kaydedildi, internet gelince yüklenecek." : "Müşteri başarıyla eklendi.");
     setForm(EMPTY_FORM);
-    loadCustomers();
+    if (!offline) loadCustomers();
   }
 
   useEffect(() => { loadCustomers(); }, []);

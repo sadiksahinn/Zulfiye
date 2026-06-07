@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { supabase } from "@/lib/supabase";
+import { safeInsert } from "@/lib/offlineQueue";
 import {
   CalendarDays, ChevronRight, Search, Scissors, Sparkles, UserPlus, X, Check,
   Phone, Trash2, Edit3,
@@ -243,12 +244,19 @@ export default function BeautyPage() {
     };
     if (editId) {
       await supabase.from("beauty_appointments").update(payload).eq("id", editId);
+      setSaving(false);
+      setShowForm(false);
+      load();
     } else {
-      await supabase.from("beauty_appointments").insert(payload);
+      const { ok, offline } = await safeInsert(
+        "beauty_appointments", payload,
+        `Kuaför/Makyaj: ${selectedCustomer?.full_name}`
+      );
+      setSaving(false);
+      if (!ok) return;
+      setShowForm(false);
+      if (!offline) load();
     }
-    setSaving(false);
-    setShowForm(false);
-    load();
   }
 
   async function deleteAppt(id: string) {
