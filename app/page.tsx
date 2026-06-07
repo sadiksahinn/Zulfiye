@@ -99,9 +99,9 @@ export default function LoginPage() {
       <section className="relative z-10 mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-[360px] flex-col justify-center">
         <div className="rounded-[2rem] border border-[#eadfce] bg-white/82 px-5 pb-6 pt-6 shadow-[0_28px_90px_rgba(118,93,60,.16)] backdrop-blur-2xl">
           <div className="flex items-start justify-between gap-4">
-            <div className="relative -mt-12 flex h-32 w-32 items-center justify-center rounded-full bg-white shadow-[0_24px_70px_rgba(118,93,60,.18)]">
-              <div className="absolute inset-2 rounded-full border border-[#eadfce]" />
-              <Image src="/zulfiye-logo.png" alt="Zülfiye Canbolat Gelinlik" width={96} height={96} priority className="object-contain" />
+            <div className="relative -mt-12 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#c9a84c] to-[#e2c97e] shadow-[0_24px_70px_rgba(201,168,76,.30)]">
+              <div className="absolute inset-2 rounded-full border border-white/30" />
+              <span className="text-4xl font-black tracking-widest text-white" style={{ fontFamily: "var(--font-cormorant), serif" }}>ZC</span>
             </div>
 
             <div className="mt-1 rounded-full border border-[#eadfce] bg-white/75 p-1 shadow-sm backdrop-blur-xl">
