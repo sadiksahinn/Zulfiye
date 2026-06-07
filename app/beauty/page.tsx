@@ -74,6 +74,10 @@ const EMPTY_FORM = {
   appointment_time: "",
   event_date: "",
   event_time: "",
+  event_date_2: "",
+  event_time_2: "",
+  event_date_3: "",
+  event_time_3: "",
   event_type: "Düğün",
   price: "",
   deposit_amount: "",
@@ -211,6 +215,10 @@ export default function BeautyPage() {
       appointment_time: a.appointment_time?.slice(0, 5) || "",
       event_date: a.event_date || "",
       event_time: a.event_time?.slice(0, 5) || "",
+      event_date_2: a.event_date_2 || "",
+      event_time_2: a.event_time_2?.slice(0, 5) || "",
+      event_date_3: a.event_date_3 || "",
+      event_time_3: a.event_time_3?.slice(0, 5) || "",
       event_type: a.event_type || "Düğün",
       price: String(a.price || ""),
       deposit_amount: String(a.deposit_amount || ""),
@@ -234,6 +242,10 @@ export default function BeautyPage() {
       appointment_time: form.appointment_time || null,
       event_date: form.event_date || null,
       event_time: form.event_time || null,
+      event_date_2: form.event_date_2 || null,
+      event_time_2: form.event_time_2 || null,
+      event_date_3: form.event_date_3 || null,
+      event_time_3: form.event_time_3 || null,
       event_type: form.event_type,
       price: Number(form.price) || 0,
       deposit_amount: Number(form.deposit_amount) || 0,
@@ -411,7 +423,7 @@ export default function BeautyPage() {
                 </div>
 
                 {/* dates */}
-                <div className="mt-3 grid grid-cols-2 gap-2 text-[11px] font-semibold text-[#7d6c58]">
+                <div className="mt-3 space-y-1.5 text-[11px] font-semibold text-[#7d6c58]">
                   <div className="rounded-xl bg-[#faf6f0] p-2.5">
                     <div className="font-black uppercase tracking-wider text-[#b69463]">Randevu</div>
                     <div className="mt-0.5">
@@ -419,13 +431,22 @@ export default function BeautyPage() {
                       {a.appointment_time ? ` • ${a.appointment_time.slice(0, 5)}` : ""}
                     </div>
                   </div>
-                  <div className="rounded-xl bg-[#faf6f0] p-2.5">
-                    <div className="font-black uppercase tracking-wider text-[#b69463]">Etkinlik</div>
-                    <div className="mt-0.5">
-                      {a.event_date ? formatDate(a.event_date) : "—"}
-                      {a.event_type ? ` • ${a.event_type}` : ""}
+                  {[
+                    { label: "1. Gün", date: a.event_date, time: a.event_time, type: a.event_type },
+                    { label: "2. Gün", date: a.event_date_2, time: a.event_time_2, type: null },
+                    { label: "3. Gün", date: a.event_date_3, time: a.event_time_3, type: null },
+                  ].filter(e => e.date).map((e, i) => (
+                    <div key={i} className="rounded-xl bg-[#faf6f0] p-2.5">
+                      <div className="font-black uppercase tracking-wider text-[#b69463]">
+                        Etkinlik {e.label}
+                      </div>
+                      <div className="mt-0.5">
+                        {formatDate(e.date)}
+                        {e.time ? ` • ${e.time.slice(0, 5)}` : ""}
+                        {e.type ? ` • ${e.type}` : ""}
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* payment */}
@@ -589,10 +610,21 @@ export default function BeautyPage() {
                 <DateTimeRow dateKey="appointment_date" timeKey="appointment_time" form={form} set={setF} />
               </div>
 
-              {/* event date */}
-              <div>
-                <Label>Etkinlik Tarihi & Saati</Label>
-                <DateTimeRow dateKey="event_date" timeKey="event_time" form={form} set={setF} />
+              {/* event dates */}
+              <div className="space-y-2">
+                <Label>Etkinlik Tarihleri & Saatleri</Label>
+                <div>
+                  <p className="mb-1 text-[10px] font-black text-[#9d8b74] uppercase tracking-wider">1. Gün</p>
+                  <DateTimeRow dateKey="event_date" timeKey="event_time" form={form} set={setF} />
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] font-black text-[#9d8b74] uppercase tracking-wider">2. Gün</p>
+                  <DateTimeRow dateKey="event_date_2" timeKey="event_time_2" form={form} set={setF} />
+                </div>
+                <div>
+                  <p className="mb-1 text-[10px] font-black text-[#9d8b74] uppercase tracking-wider">3. Gün</p>
+                  <DateTimeRow dateKey="event_date_3" timeKey="event_time_3" form={form} set={setF} />
+                </div>
               </div>
 
               {/* event type */}
