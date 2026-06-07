@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f0e7;
-  --foreground: #171717;
-  --accent: #b69463;
-  --accent-light: #d8bd84;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --accent: #c9a84c;
+  --accent-light: #e2c97e;
 }
 
 @theme inline {
@@ -22,23 +22,23 @@ body {
 
 /* Text Selection */
 ::selection {
-  background: #b69463;
+  background: #c9a84c;
   color: #fff;
 }
 
 /* Premium Cards — modern pill card */
 .premium-card {
   border-radius: 1.75rem;
-  border: 1px solid rgba(234, 223, 206, 0.7);
-  background: rgba(255,255,255,0.80);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(24px);
-  box-shadow: 0 8px 32px rgba(118, 93, 60, 0.08), 0 2px 8px rgba(118,93,60,0.06);
+  box-shadow: 0 8px 32px rgba(201, 168, 76, 0.08), 0 2px 8px rgba(201,168,76,0.05);
   position: relative;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .premium-card:hover {
-  box-shadow: 0 16px 48px rgba(118, 93, 60, 0.14), 0 4px 12px rgba(118,93,60,0.08);
+  box-shadow: 0 16px 48px rgba(201, 168, 76, 0.15), 0 4px 12px rgba(201,168,76,0.09);
 }
 
 .premium-card::after {
@@ -47,36 +47,36 @@ body {
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,.55), transparent 45%, rgba(182,148,99,.06));
+  background: linear-gradient(145deg, rgba(255,255,255,.7), transparent 45%, rgba(201,168,76,.04));
   opacity: .6;
 }
 
 /* Premium Titles */
 .premium-title {
-  color: #211b16;
+  color: #1a1a1a;
   letter-spacing: -0.04em;
   font-weight: 750;
 }
 
 /* Premium Muted Text */
 .premium-muted {
-  color: #7a6d5e;
+  color: #888888;
 }
 
 /* Premium Button — pill shape */
 .premium-button {
   border-radius: 9999px;
-  background: linear-gradient(135deg, #b69463, #d8bd84);
+  background: linear-gradient(135deg, #c9a84c, #e2c97e);
   color: white;
   font-weight: 700;
   letter-spacing: 0.01em;
-  box-shadow: 0 8px 24px rgba(182,148,99,0.28), 0 2px 8px rgba(182,148,99,0.18);
+  box-shadow: 0 8px 24px rgba(201,168,76,0.30), 0 2px 8px rgba(201,168,76,0.18);
   transition: all .22s cubic-bezier(.2,.8,.2,1);
 }
 
 .premium-button:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 16px 36px rgba(182,148,99,0.38), 0 4px 12px rgba(182,148,99,0.22);
+  box-shadow: 0 16px 36px rgba(201,168,76,0.40), 0 4px 12px rgba(201,168,76,0.24);
 }
 
 .premium-button:active {
@@ -101,16 +101,16 @@ body {
 /* Ghost button */
 .ghost-button {
   border-radius: 9999px;
-  border: 1.5px solid rgba(182,148,99,0.35);
-  background: rgba(255,255,255,0.6);
-  color: #5c4c3a;
+  border: 1.5px solid rgba(201,168,76,0.35);
+  background: rgba(255,255,255,0.8);
+  color: #555555;
   font-weight: 700;
   transition: all .22s cubic-bezier(.2,.8,.2,1);
 }
 
 .ghost-button:hover {
-  background: rgba(182,148,99,0.1);
-  border-color: rgba(182,148,99,0.6);
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.6);
   transform: translateY(-1px);
 }
 
@@ -128,9 +128,9 @@ body {
 }
 
 .input:focus {
-  border-color: #b69463;
-  box-shadow: 0 0 0 4px rgba(182,148,99,0.14);
-  background: rgba(255,255,255,0.98);
+  border-color: #c9a84c;
+  box-shadow: 0 0 0 4px rgba(201,168,76,0.14);
+  background: #ffffff;
 }
 
 /* Textarea stays rectangular but rounded */
