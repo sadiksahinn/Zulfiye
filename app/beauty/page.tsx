@@ -182,12 +182,18 @@ export default function BeautyPage() {
   async function saveNewCustomer() {
     if (!newCustName.trim() || !newCustPhone.trim()) return;
     setSavingCust(true);
-    const { data, error } = await supabase.from("customers")
-      .insert({ full_name: newCustName.trim(), phone: newCustPhone.trim() })
-      .select("id,full_name,phone").single();
+    const name = newCustName.trim();
+    const phone = newCustPhone.trim();
+    const { error } = await supabase.from("customers")
+      .insert({ full_name: name, phone });
     setSavingCust(false);
-    if (error || !data) return;
-    const newC = { id: data.id, full_name: data.full_name, phone: data.phone };
+    if (error) { alert("Müşteri kaydedilemedi: " + error.message); return; }
+    // Eklenen müşteriyi listeden çek
+    const { data: found } = await supabase.from("customers")
+      .select("id,full_name,phone")
+      .eq("full_name", name).eq("phone", phone)
+      .order("created_at", { ascending: false }).limit(1).maybeSingle();
+    const newC = found || { id: crypto.randomUUID(), full_name: name, phone };
     setCustomers((prev) => [newC, ...prev]);
     setSelectedCustomer(newC);
     setCustomerSearch(newC.full_name);
