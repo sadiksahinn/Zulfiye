@@ -139,6 +139,11 @@ export default function BeautyPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const [showNewCustomer, setShowNewCustomer] = useState(false);
+  const [newCustName, setNewCustName] = useState("");
+  const [newCustPhone, setNewCustPhone] = useState("");
+  const [savingCust, setSavingCust] = useState(false);
+
   const [filterStatus, setFilterStatus] = useState("tümü");
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
@@ -168,7 +173,28 @@ export default function BeautyPage() {
     setSelectedCustomer(null);
     setCustomerSearch("");
     setEditId(null);
+    setShowNewCustomer(false);
+    setNewCustName("");
+    setNewCustPhone("");
     setShowForm(true);
+  }
+
+  async function saveNewCustomer() {
+    if (!newCustName.trim() || !newCustPhone.trim()) return;
+    setSavingCust(true);
+    const { data, error } = await supabase.from("customers")
+      .insert({ full_name: newCustName.trim(), phone: newCustPhone.trim() })
+      .select("id,full_name,phone").single();
+    setSavingCust(false);
+    if (error || !data) return;
+    const newC = { id: data.id, full_name: data.full_name, phone: data.phone };
+    setCustomers((prev) => [newC, ...prev]);
+    setSelectedCustomer(newC);
+    setCustomerSearch(newC.full_name);
+    setShowDropdown(false);
+    setShowNewCustomer(false);
+    setNewCustName("");
+    setNewCustPhone("");
   }
 
   function openEdit(a: any) {
@@ -485,6 +511,40 @@ export default function BeautyPage() {
                         </div>
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {/* Yeni müşteri ekle butonu */}
+                {!selectedCustomer && (
+                  <button type="button" onClick={() => setShowNewCustomer((v) => !v)}
+                    className="mt-2 flex w-full items-center gap-2 rounded-full border border-dashed border-[#b69463] px-4 py-2.5 text-sm font-black text-[#b69463] hover:bg-[#faf6f0] transition">
+                    <UserPlus size={15} /> Yeni Müşteri Ekle
+                  </button>
+                )}
+
+                {showNewCustomer && (
+                  <div className="mt-2 rounded-2xl border border-[#eadfce] bg-[#faf6f0] p-4 space-y-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#b69463]">Hızlı Müşteri Kaydı</p>
+                    <input
+                      value={newCustName} onChange={(e) => setNewCustName(e.target.value)}
+                      placeholder="Ad Soyad *"
+                      className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]"
+                    />
+                    <input
+                      value={newCustPhone} onChange={(e) => setNewCustPhone(e.target.value)}
+                      placeholder="Telefon *"
+                      className="w-full rounded-full border border-[#eadfce] bg-white px-4 py-2.5 text-sm font-semibold outline-none focus:border-[#b69463]"
+                    />
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setShowNewCustomer(false)}
+                        className="flex-1 rounded-full border border-[#eadfce] py-2 text-sm font-black text-[#9d8b74]">
+                        Vazgeç
+                      </button>
+                      <button type="button" onClick={saveNewCustomer} disabled={savingCust || !newCustName.trim() || !newCustPhone.trim()}
+                        className="flex-1 rounded-full bg-[#b69463] py-2 text-sm font-black text-white disabled:opacity-50">
+                        {savingCust ? "Kaydediliyor…" : "Kaydet & Seç"}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
