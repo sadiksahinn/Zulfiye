@@ -8,6 +8,7 @@ import {
   BarChart3,
   CalendarDays,
   CreditCard,
+  FileText,
   Home,
   LogOut,
   MessageSquareText,
@@ -41,6 +42,7 @@ export default function AppShell({
     { name: "Ürünler", href: "/products", icon: Package },
     { name: "İade / Teslim", href: "/returns", icon: RotateCcw },
     { name: "Kuaför & Makyaj", href: "/beauty", icon: Scissors },
+    { name: "Sözleşmeler", href: "/contracts", icon: FileText },
   ];
 
   const managementMenu = [
